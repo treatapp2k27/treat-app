@@ -55,63 +55,70 @@ class DinerDrawer extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Avatar with verified star
-                      Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          Container(
-                            width: 60,
-                            height: 60,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: TreatColors.primary,
-                                width: 2.5,
-                              ),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Color.fromRGBO(224, 64, 160, 0.25),
-                                  blurRadius: 14,
-                                  offset: Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            clipBehavior: Clip.antiAlias,
-                            child: Image.network(
-                              persona.avatarUrl,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Container(
-                                color: TreatColors.primaryFixed,
-                                alignment: Alignment.center,
-                                child: Text(
-                                  persona.avatarEmoji,
-                                  style: const TextStyle(fontSize: 28),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            bottom: -2,
-                            right: -2,
-                            child: Container(
-                              width: 22,
-                              height: 22,
+                      // Avatar with verified star (Tappable to view Profile)
+                      InkWell(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          onNavigate('profile');
+                        },
+                        borderRadius: BorderRadius.circular(999),
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Container(
+                              width: 60,
+                              height: 60,
                               decoration: BoxDecoration(
-                                color: TreatColors.primary,
                                 shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 2),
+                                border: Border.all(
+                                  color: TreatColors.primary,
+                                  width: 2.5,
+                                ),
                                 boxShadow: const [
-                                  BoxShadow(color: Colors.black12, blurRadius: 4),
+                                  BoxShadow(
+                                    color: Color.fromRGBO(224, 64, 160, 0.25),
+                                    blurRadius: 14,
+                                    offset: Offset(0, 4),
+                                  ),
                                 ],
                               ),
-                              child: const Icon(
-                                Icons.stars,
-                                color: Colors.white,
-                                size: 12,
+                              clipBehavior: Clip.antiAlias,
+                              child: Image.network(
+                                persona.avatarUrl,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Container(
+                                  color: TreatColors.primaryFixed,
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    persona.avatarEmoji,
+                                    style: const TextStyle(fontSize: 28),
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                            Positioned(
+                              bottom: -2,
+                              right: -2,
+                              child: Container(
+                                width: 22,
+                                height: 22,
+                                decoration: BoxDecoration(
+                                  color: TreatColors.primary,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.white, width: 2),
+                                  boxShadow: const [
+                                    BoxShadow(color: Colors.black12, blurRadius: 4),
+                                  ],
+                                ),
+                                child: const Icon(
+                                  Icons.stars,
+                                  color: Colors.white,
+                                  size: 12,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
 
                       // Close Button
@@ -143,53 +150,95 @@ class DinerDrawer extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  // Handle & Verified Badge
-                  Row(
-                    children: [
-                      Text(
-                        persona.handle,
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                          color: TreatColors.onSurface,
-                          letterSpacing: -0.3,
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      const Icon(
-                        Icons.verified,
-                        color: TreatColors.primary,
-                        size: 18,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-
-                  // Foodie Adventurer Persona Badge
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFCEAF5),
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.explore,
-                          size: 14,
-                          color: TreatColors.secondary,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Foodie Adventurer',
-                          style: GoogleFonts.plusJakartaSans(
-                            color: const Color(0xFFB2107B),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
+                  // Handle & Verified Badge (Tappable to view Profile)
+                  InkWell(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      onNavigate('profile');
+                    },
+                    borderRadius: BorderRadius.circular(12),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 2),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                persona.handle,
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
+                                  color: TreatColors.onSurface,
+                                  letterSpacing: -0.3,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              const Icon(
+                                Icons.verified,
+                                color: TreatColors.primary,
+                                size: 18,
+                              ),
+                              const Spacer(),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: TreatColors.primary.withValues(alpha: 0.10),
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      'View Profile',
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w700,
+                                        color: TreatColors.primary,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 2),
+                                    const Icon(
+                                      Icons.chevron_right,
+                                      size: 12,
+                                      color: TreatColors.primary,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 6),
+
+                          // Foodie Adventurer Persona Badge
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFCEAF5),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.explore,
+                                  size: 14,
+                                  color: TreatColors.secondary,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Foodie Adventurer',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    color: const Color(0xFFB2107B),
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -202,27 +251,27 @@ class DinerDrawer extends StatelessWidget {
                 physics: const BouncingScrollPhysics(),
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 children: [
-                  // Home (Active Style matching wireframe)
+                  // Home
                   _buildNavItem(
                     route: 'home',
                     title: 'Home',
                     subtitle: 'Top Feasts & Drops',
                     icon: Icons.home_rounded,
                     iconColor: TreatColors.primary,
-                    iconBg: const Color(0xFFFFE5F3),
-                    isActive: activeRoute == 'home' || activeRoute == 'explore',
+                    iconBg: const Color(0xFFFBE4F2),
+                    isActive: activeRoute == 'home',
                   ),
                   const SizedBox(height: 6),
 
                   // Trending
                   _buildNavItem(
-                    route: 'trending',
+                    route: 'home',
                     title: 'Trending',
                     subtitle: 'Top Hotspots',
                     icon: Icons.local_fire_department_rounded,
-                    iconColor: TreatColors.primary,
-                    iconBg: const Color(0xFFFFE5F3),
-                    onTapOverride: () => onNavigate('home'),
+                    iconColor: const Color(0xFFF2547D),
+                    iconBg: const Color(0xFFFEE8EE),
+                    isActive: false,
                   ),
                   const SizedBox(height: 6),
 
@@ -233,9 +282,10 @@ class DinerDrawer extends StatelessWidget {
                     subtitle: 'Flash Perks & Deals',
                     icon: Icons.icecream_rounded,
                     iconColor: TreatColors.secondary,
-                    iconBg: const Color(0xFFEEDCFF),
+                    iconBg: const Color(0xFFF3E6FB),
                     trailingBadge: 'NEW',
                     trailingBadgeBg: TreatColors.primary,
+                    isActive: activeRoute == 'budget',
                   ),
                   const SizedBox(height: 6),
 
@@ -245,8 +295,8 @@ class DinerDrawer extends StatelessWidget {
                     title: 'Social',
                     subtitle: 'Foodie Circle & Feeds',
                     icon: Icons.forum_rounded,
-                    iconColor: TreatColors.tertiary,
-                    iconBg: const Color(0xFFC8EAFF),
+                    iconColor: const Color(0xFF1E9FD8),
+                    iconBg: const Color(0xFFE2F4FC),
                     isActive: activeRoute == 'social',
                   ),
                   const SizedBox(height: 6),
@@ -256,9 +306,9 @@ class DinerDrawer extends StatelessWidget {
                     route: 'platters',
                     title: 'Groups',
                     subtitle: 'Squad Bill Splitters',
-                    icon: Icons.group_work_rounded,
+                    icon: Icons.groups_rounded,
                     iconColor: TreatColors.secondary,
-                    iconBg: const Color(0xFFEEDCFF),
+                    iconBg: const Color(0xFFEDE0F8),
                     isActive: activeRoute == 'platters',
                   ),
                   const SizedBox(height: 6),
@@ -273,80 +323,73 @@ class DinerDrawer extends StatelessWidget {
                     iconBg: const Color(0xFFF2E8F2),
                     isActive: activeRoute == 'food_bar',
                   ),
-                  const SizedBox(height: 10),
-
-                  const Divider(color: Color(0xFFEDE5F2), thickness: 1),
-                  const SizedBox(height: 6),
-
-                  // Kitchen Portal
-                  _buildNavItem(
-                    route: 'kitchen_portal',
-                    title: 'Kitchen Portal',
-                    subtitle: 'Staff Orders & Floor',
-                    icon: Icons.storefront_rounded,
-                    iconColor: TreatColors.secondary,
-                    iconBg: const Color(0xFFF3E6FB),
-                  ),
                 ],
               ),
             ),
 
-            // 3. Treat Diner Pass VIP Card
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFF0F8),
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(
-                  color: TreatColors.primary.withValues(alpha: 0.20),
+            // 3. Treat Diner Pass VIP Card (Tappable to view Profile & VIP perks)
+            InkWell(
+              onTap: () {
+                Navigator.of(context).pop();
+                onNavigate('profile');
+              },
+              borderRadius: BorderRadius.circular(18),
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF0F8),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: TreatColors.primary.withValues(alpha: 0.20),
+                  ),
                 ),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 34,
-                    height: 34,
-                    decoration: const BoxDecoration(
-                      color: TreatColors.primary,
-                      shape: BoxShape.circle,
+                child: Row(
+                  children: [
+                    Container(
+                      width: 34,
+                      height: 34,
+                      decoration: const BoxDecoration(
+                        color: TreatColors.primary,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.cookie_rounded,
+                        size: 18,
+                        color: Colors.white,
+                      ),
                     ),
-                    child: const Icon(
-                      Icons.cookie_rounded,
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Treat Diner Pass',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                              color: TreatColors.onPrimaryFixed,
+                            ),
+                          ),
+                          Text(
+                            'VIP treats activated • Tap to manage',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: TreatColors.onPrimaryFixedVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(
+                      Icons.verified,
                       size: 18,
-                      color: Colors.white,
+                      color: TreatColors.primary,
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Treat Diner Pass',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w800,
-                            color: TreatColors.onPrimaryFixed,
-                          ),
-                        ),
-                        Text(
-                          'VIP treats activated',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                            color: TreatColors.onPrimaryFixedVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Icon(
-                    Icons.verified,
-                    size: 18,
-                    color: TreatColors.primary,
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
 

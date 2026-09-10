@@ -8,13 +8,11 @@ import '../../widgets/treat_animated_logo.dart';
 /// Matches the exact 'welcome_anonymous_login' wireframe & design specifications
 class WelcomeAnonymousScreen extends StatefulWidget {
   final VoidCallback onEnterGuest;
-  final VoidCallback onKitchenPortalTap;
   final VoidCallback? onBack;
 
   const WelcomeAnonymousScreen({
     super.key,
     required this.onEnterGuest,
-    required this.onKitchenPortalTap,
     this.onBack,
   });
 

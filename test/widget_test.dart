@@ -6,7 +6,6 @@ import 'package:treat/screens/app_shell.dart';
 import 'package:treat/state/booking_state.dart';
 import 'package:treat/state/budget_planner_state.dart';
 import 'package:treat/state/diner_state.dart';
-import 'package:treat/state/kitchen_partner_state.dart';
 
 void main() {
   testWidgets('AppShell renders Welcome Anonymous screen and allows navigation', (WidgetTester tester) async {
@@ -20,7 +19,6 @@ void main() {
           ChangeNotifierProvider<DinerState>(create: (_) => DinerState()),
           ChangeNotifierProvider<BudgetPlannerState>(create: (_) => BudgetPlannerState()),
           ChangeNotifierProvider<BookingState>(create: (_) => BookingState()),
-          ChangeNotifierProvider<KitchenPartnerState>(create: (_) => KitchenPartnerState()),
         ],
         child: MaterialApp(
           theme: TreatTheme.lightTheme,

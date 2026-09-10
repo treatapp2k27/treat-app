@@ -17,10 +17,6 @@ import 'diner/reservation_confirmed_slip_screen.dart';
 import 'diner/scanned_voucher_receipt_screen.dart';
 import 'diner/treat_opening_screen.dart';
 import 'diner/welcome_anonymous_screen.dart';
-import 'kitchen/floor_table_availability_screen.dart';
-import 'kitchen/kitchen_dashboard_screen.dart';
-import 'kitchen/kitchen_login_portal_screen.dart';
-import 'kitchen/kitchen_profile_settings_screen.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
@@ -52,11 +48,7 @@ class _AppShellState extends State<AppShell> {
             activeRoute: _currentScreen,
             onNavigate: (route) {
               Navigator.of(context).pop();
-              if (route == 'kitchen_portal') {
-                _navigateTo('kitchen_login');
-              } else {
-                _navigateTo(route);
-              }
+              _navigateTo(route);
             },
           ),
           body: AnimatedSwitcher(
@@ -205,7 +197,6 @@ class _AppShellState extends State<AppShell> {
         return WelcomeAnonymousScreen(
           onBack: () => _navigateTo('welcome'),
           onEnterGuest: () => _navigateTo('home'),
-          onKitchenPortalTap: () => _navigateTo('kitchen_login'),
         );
 
       case 'home':
@@ -278,30 +269,6 @@ class _AppShellState extends State<AppShell> {
       case 'profile':
         return FoodieProfileSettingsScreen(
           onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
-        );
-
-      case 'kitchen_login':
-        return KitchenLoginPortalScreen(
-          onLoginSuccess: () => _navigateTo('kitchen_dashboard'),
-          onReturnDiner: () => _navigateTo('welcome'),
-        );
-
-      case 'kitchen_dashboard':
-        return KitchenDashboardScreen(
-          onOpenFloorManager: () => _navigateTo('kitchen_floor'),
-          onOpenSettings: () => _navigateTo('kitchen_settings'),
-          onLogOut: () => _navigateTo('kitchen_login'),
-        );
-
-      case 'kitchen_floor':
-        return FloorTableAvailabilityScreen(
-          onBack: () => _navigateTo('kitchen_dashboard'),
-        );
-
-      case 'kitchen_settings':
-        return KitchenProfileSettingsScreen(
-          onBack: () => _navigateTo('kitchen_dashboard'),
-          onLogOut: () => _navigateTo('kitchen_login'),
         );
 
       default:

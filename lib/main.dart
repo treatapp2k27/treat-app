@@ -6,7 +6,6 @@ import 'services/treat_mock_backend.dart';
 import 'state/booking_state.dart';
 import 'state/budget_planner_state.dart';
 import 'state/diner_state.dart';
-import 'state/kitchen_partner_state.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,9 +24,6 @@ void main() {
         ),
         ChangeNotifierProvider<BookingState>(
           create: (_) => BookingState(),
-        ),
-        ChangeNotifierProvider<KitchenPartnerState>(
-          create: (_) => KitchenPartnerState(),
         ),
       ],
       child: const TreatApp(),

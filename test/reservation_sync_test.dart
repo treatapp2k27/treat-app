@@ -4,7 +4,6 @@ import 'package:treat/models/reservation.dart';
 import 'package:treat/models/table_info.dart';
 import 'package:treat/services/treat_mock_backend.dart';
 import 'package:treat/state/booking_state.dart';
-import 'package:treat/state/kitchen_partner_state.dart';
 
 void main() {
   group('Reservation and Cross-Role Sync Tests', () {
@@ -104,23 +103,6 @@ void main() {
       bookingState.reset();
       expect(bookingState.currentReservation.status, ReservationStatus.confirmed);
       bookingState.dispose();
-    });
-
-    test('KitchenPartnerState handles keypad PIN input and authentication', () {
-      final kitchenState = KitchenPartnerState();
-
-      kitchenState.clearPin();
-      expect(kitchenState.enteredPin, '');
-
-      kitchenState.appendPinDigit('1');
-      kitchenState.appendPinDigit('2');
-      kitchenState.appendPinDigit('3');
-      kitchenState.appendPinDigit('4');
-      expect(kitchenState.enteredPin, '1234');
-      expect(kitchenState.isAuthenticated, isTrue);
-
-      kitchenState.logOut();
-      expect(kitchenState.isAuthenticated, isFalse);
     });
   });
 }
