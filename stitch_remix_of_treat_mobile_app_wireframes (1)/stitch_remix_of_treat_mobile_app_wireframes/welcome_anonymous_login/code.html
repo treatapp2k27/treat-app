@@ -1,0 +1,163 @@
+<!DOCTYPE html><html class="h-full" lang="en" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "on-secondary": "#ffffff", "on-tertiary-container": "#003320", "tertiary-fixed": "#6ffbbe", "on-secondary-container": "#6a4500", "on-tertiary-fixed": "#002113", "error": "#ba1a1a", "inverse-surface": "#342f2e", "on-surface": "#1f1b1a", "surface-container-low": "#fbf2ef", "primary-container": "#ff5a36", "inverse-primary": "#ffb4a3", "on-secondary-fixed": "#291800", "on-tertiary": "#ffffff", "surface-container-lowest": "#ffffff", "on-background": "#1f1b1a", "background": "#fff8f6", "surface-dim": "#e1d8d6", "outline-variant": "#e3beb6", "secondary-fixed-dim": "#ffb94e", "on-primary-container": "#5a0c00", "outline": "#8f7069", "tertiary-container": "#00a773", "error-container": "#ffdad6", "surface-container-high": "#efe6e4", "surface": "#fff8f6", "primary-fixed-dim": "#ffb4a3", "surface-container": "#f5ecea", "inverse-on-surface": "#f8efed", "surface-variant": "#eae1de", "secondary-container": "#ffae1a", "primary-fixed": "#ffdad2", "surface-tint": "#b52603", "secondary-fixed": "#ffddb2", "on-primary-fixed-variant": "#8c1900", "surface-container-highest": "#eae1de", "on-secondary-fixed-variant": "#624000", "on-primary-fixed": "#3d0600", "secondary": "#825500", "surface-bright": "#fff8f6", "on-surface-variant": "#5b403a", "on-error": "#ffffff", "primary": "#b52603", "on-error-container": "#93000a", "tertiary": "#006c49", "tertiary-fixed-dim": "#4edea3", "on-tertiary-fixed-variant": "#005236", "on-primary": "#ffffff" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-2xs": "0.25rem", "space-xs": "0.5rem", "card-gap-desktop": "1.5rem", "space-sm": "0.75rem", "screen-margin-mobile": "1rem", "space-3xl": "2.5rem", "screen-margin-desktop": "2rem", "card-gap-tablet": "1rem", "card-gap-mobile": "0.75rem", "space-xl": "1.5rem", "space-lg": "1.25rem", "space-2xl": "2rem", "space-4xl": "3rem", "screen-margin-tablet": "1.5rem", "space-md": "1rem" }, fontFamily: { "display-lg-mobile": ["Plus Jakarta Sans", "sans-serif"], "title-md": ["Plus Jakarta Sans", "sans-serif"], "body-md": ["Plus Jakarta Sans", "sans-serif"], "headline-lg": ["Plus Jakarta Sans", "sans-serif"], "display-lg": ["Plus Jakarta Sans", "sans-serif"], "label-md": ["Plus Jakarta Sans", "sans-serif"], "body-sm": ["Plus Jakarta Sans", "sans-serif"], "label-sm": ["Plus Jakarta Sans", "sans-serif"], "body-lg": ["Plus Jakarta Sans", "sans-serif"], "label-lg": ["Plus Jakarta Sans", "sans-serif"], "headline-sm": ["Plus Jakarta Sans", "sans-serif"], "headline-md": ["Plus Jakarta Sans", "sans-serif"] }, fontSize: { "display-lg-mobile": ["32px", { lineHeight: "40px", letterSpacing: "-0.025em", fontWeight: "800" }], "title-md": ["16px", { lineHeight: "22px", letterSpacing: "-0.005em", fontWeight: "600" }], "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }], "headline-lg": ["28px", { lineHeight: "36px", letterSpacing: "-0.02em", fontWeight: "700" }], "display-lg": ["40px", { lineHeight: "48px", letterSpacing: "-0.03em", fontWeight: "800" }], "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.02em", fontWeight: "600" }], "body-sm": ["12px", { lineHeight: "16px", fontWeight: "400" }], "label-sm": ["11px", { lineHeight: "14px", letterSpacing: "0.04em", fontWeight: "700" }], "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }], "label-lg": ["14px", { lineHeight: "18px", letterSpacing: "0.01em", fontWeight: "600" }], "headline-sm": ["18px", { lineHeight: "24px", letterSpacing: "-0.01em", fontWeight: "700" }], "headline-md": ["22px", { lineHeight: "28px", letterSpacing: "-0.015em", fontWeight: "700" }] } } } };</script><style>@layer base { html, body { margin: 0; padding: 0; min-height: 100%; background-color: #fff8f6; } .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); } .pt-safe { padding-top: env(safe-area-inset-top, 0px); } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-body-md text-on-surface flex flex-col min-h-screen pt-safe pb-safe" style="background-color: rgb(254, 247, 255);"><main class="flex-1 flex flex-col relative w-full bg-surface min-h-screen" style="background: linear-gradient(rgb(254, 247, 255) 0%, rgb(248, 241, 249) 100%);"><div class="flex flex-col w-full px-screen-margin-mobile pb-space-3xl relative overflow-hidden">
+<!-- Subtle Decorative Warm Ambient Glows -->
+<div class="absolute -top-12 -right-12 w-64 h-64 rounded-full bg-primary-fixed opacity-40 blur-3xl pointer-events-none"></div>
+<div class="absolute top-72 -left-16 w-56 h-56 rounded-full bg-secondary-fixed opacity-50 blur-2xl pointer-events-none"></div>
+<!-- Top Status / Mode Switcher -->
+
+<!-- Hero Visual / Brand Logo Section -->
+<div class="flex flex-col items-center text-center mt-space-md z-10">
+<!-- Brand Icon Pill Composition -->
+<div class="flex items-center justify-center gap-2 mb-space-sm"><div class="w-12 h-12 rounded-full bg-gradient-to-tr from-primary to-primary-container flex items-center justify-center shadow-md" style="background: linear-gradient(135deg, rgb(124, 82, 170) 0%, rgb(224, 64, 160) 100%); box-shadow: rgba(224, 64, 160, 0.3) 0px 4px 14px;"><span class="material-symbols-outlined text-on-primary text-[26px]">celebration</span></div><div class="flex items-baseline gap-1"><span class="font-display-lg-mobile text-[36px] font-extrabold tracking-tight text-on-surface">treat</span><span class="w-3 h-3 rounded-full bg-primary inline-block animate-pulse" style="background-color: rgb(224, 64, 160);"></span></div></div>
+<!-- Hero Titles matching sketch -->
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-on-surface tracking-tight">
+      Treat your circle,<br>
+<span class="text-primary" style="color: rgb(224, 64, 160);">stay in budget.</span>
+</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-space-xs max-w-[280px]">
+      Spontaneous indulgence and pocket-friendly dining deals made for foodies with friends.
+    </p>
+</div>
+<!-- Visual Delight Food Strip Carousel (Visual Richness requirement) -->
+
+<!-- Interactive Card: Identity / Persona Selector (Sketch: 'Choose Name' + Top Sketch Box) -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm mb-space-md z-10 flex flex-col gap-space-sm mt-space-md" style="border: 1.5px solid rgb(255, 214, 238); box-shadow: rgba(224, 64, 160, 0.12) 0px 10px 30px -8px, rgba(124, 82, 170, 0.06) 0px 4px 12px;"><div class="flex items-center justify-between"><div class="flex items-center gap-space-xs"><div class="w-8 h-8 rounded-full flex items-center justify-center" style="background-color: #ffd6ee; color: #e040a0;"><span class="material-symbols-outlined text-[18px]">theater_comedy</span></div><div><h2 class="font-headline-sm text-headline-sm text-on-surface leading-tight font-extrabold">Choose Your Persona</h2><p class="font-body-sm text-body-sm text-on-surface-variant">No signup or real identity required</p></div></div><span class="font-label-sm px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm uppercase tracking-wider font-extrabold" style="background-color: rgb(252, 234, 245); color: rgb(178, 16, 123); border: 1px solid rgb(255, 216, 232); font-size: 10px;"><span class="w-1.5 h-1.5 rounded-full animate-pulse" style="background-color: #e040a0;"></span><span class="">1-Click Guest</span></span></div><div class="flex flex-col gap-2 pt-1"><span class="font-label-sm text-on-surface-variant font-bold flex items-center gap-1" style="font-size: 11px;"><span class="material-symbols-outlined text-[14px]" style="color: rgb(224, 64, 160);">mood</span>Pick your vibe avatar:</span><div class="flex items-center justify-between gap-2 px-1 py-1"><button type="button" class="w-12 h-12 rounded-full flex flex-col items-center justify-center text-[22px] transition-transform active:scale-90 shadow-sm relative" style="background-color: rgb(255, 214, 238); box-shadow: rgb(224, 64, 160) 0px 0px 0px 2.5px, rgba(224, 64, 160, 0.35) 0px 4px 12px;" title="Dumpling"><span class="leading-none">🥟</span><span class="absolute -bottom-1 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center" style="background-color: #e040a0; color: #ffffff;"><span class="material-symbols-outlined text-[10px]">check</span></span></button><button type="button" class="w-12 h-12 rounded-full flex flex-col items-center justify-center text-[22px] transition-transform active:scale-90 hover:scale-105 shadow-sm" style="background-color: rgb(248, 238, 248);" title="Boba"><span class="leading-none">🧋</span></button><button type="button" class="w-12 h-12 rounded-full flex flex-col items-center justify-center text-[22px] transition-transform active:scale-90 hover:scale-105 shadow-sm" style="background-color: rgb(248, 238, 248);" title="Pizza"><span class="leading-none">🍕</span></button><button type="button" class="w-12 h-12 rounded-full flex flex-col items-center justify-center text-[22px] transition-transform active:scale-90 hover:scale-105 shadow-sm" style="background-color: rgb(248, 238, 248);" title="Taco"><span class="leading-none">🌮</span></button><button type="button" class="w-12 h-12 rounded-full flex flex-col items-center justify-center text-[22px] transition-transform active:scale-90 hover:scale-105 shadow-sm" style="background-color: rgb(248, 238, 248);" title="Donut"><span class="leading-none">🍩</span></button></div></div><div class="flex items-center gap-2 pt-1"><div class="flex-1 rounded-full px-space-md py-2.5 flex items-center justify-between shadow-inner transition-all" style="background-color: #fbf2fb; border: 1.5px solid #dcc8e0;"><div class="flex items-center gap-2 min-w-0 flex-1"><span class="material-symbols-outlined text-[18px]" style="color: rgb(224, 64, 160);">edit_note</span><input class="bg-transparent font-title-md text-title-md text-on-surface outline-none w-full truncate font-bold" id="nickname-input" placeholder="Enter foodie handle" type="text" value="MidnightDumpling" style="color: #2e1a28;"></div></div><button type="button" class="flex items-center gap-1 font-label-md px-3.5 py-2.5 rounded-full transition-transform active:scale-95 shadow-sm hover:opacity-90 flex-shrink-0 font-bold" id="shuffle-btn" style="background-color: rgb(238, 220, 255); color: rgb(74, 48, 104); border: 1px solid rgb(220, 200, 224);"><span class="material-symbols-outlined text-[18px]" style="color: rgb(124, 82, 170);">casino</span><span class="">Shuffle</span></button></div><div class="flex items-center gap-1.5 flex-wrap pt-0.5"><span class="font-label-sm text-outline" style="font-size: 11px;">Quick picks:</span><button type="button" class="px-2.5 py-0.5 rounded-full font-label-sm font-semibold transition-colors" style="background-color: rgb(252, 234, 245); color: rgb(178, 16, 123); border: 1px solid rgb(255, 216, 232); font-size: 11px;">TacoFiend</button><button type="button" class="px-2.5 py-0.5 rounded-full font-label-sm font-semibold transition-colors" style="background-color: rgb(252, 234, 245); color: rgb(178, 16, 123); border: 1px solid rgb(255, 216, 232); font-size: 11px;">BobaBandit</button><button type="button" class="px-2.5 py-0.5 rounded-full font-label-sm font-semibold transition-colors" style="background-color: rgb(252, 234, 245); color: rgb(178, 16, 123); border: 1px solid rgb(255, 216, 232); font-size: 11px;">SweetTooth</button></div></div>
+<!-- Primary Interactive Flow (From Sketch: 'Enter' button & 'Login' button) -->
+<div class="flex flex-col gap-space-sm z-10">
+<!-- Anonymous Guest / Instant Entry (Primary Pill) -->
+<button class="w-full bg-primary-container text-on-primary font-label-lg text-label-lg py-3.5 px-space-xl rounded-full shadow-md hover:bg-primary transition-all active:scale-[0.98] flex items-center justify-center gap-space-xs" id="btn-guest-enter" style="background: linear-gradient(135deg, rgb(124, 82, 170) 0%, rgb(156, 110, 201) 100%); color: rgb(255, 255, 255); box-shadow: rgba(124, 82, 170, 0.45) 0px 8px 24px -4px;">
+<span class="">Enter as Anonymous Guest</span>
+<span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+<!-- Regular Auth Divider -->
+<div class="flex items-center my-space-2xs">
+<div class="flex-grow h-px bg-surface-variant"></div>
+<span class="px-space-sm font-label-sm text-label-sm text-outline uppercase tracking-wider">or sign in with</span>
+<div class="flex-grow h-px bg-surface-variant"></div>
+</div>
+<!-- Social Authentication Options (Sketch: 'Cont with Google', 'Cont with FB/Apple') -->
+<div class="grid grid-cols-3 gap-space-xs"><button class="bg-surface-container-lowest text-on-surface font-label-md text-label-md py-3 px-2 rounded-full shadow-sm flex items-center justify-center gap-1 active:scale-[0.98] transition-all hover:bg-surface-container-high"><svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"></path><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"></path></svg><span class="truncate font-label-sm">Google</span></button><button class="bg-surface-container-lowest text-on-surface font-label-md text-label-md py-3 px-2 rounded-full shadow-sm flex items-center justify-center gap-1 active:scale-[0.98] transition-all hover:bg-surface-container-high"><svg class="w-5 h-5 fill-current text-on-surface flex-shrink-0" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.65-.79 1.1-1.89.98-2.99-1 .04-2.14.67-2.82 1.46-.59.68-1.11 1.79-.97 2.87 1.11.09 2.17-.55 2.81-1.34z"></path></svg><span class="truncate font-label-sm">Apple</span></button><button class="bg-surface-container-lowest text-on-surface font-label-md text-label-md py-3 px-2 rounded-full shadow-sm flex items-center justify-center gap-1 active:scale-[0.98] transition-all hover:bg-surface-container-high"><svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"></path></svg><span class="truncate font-label-sm">Facebook</span></button></div>
+<!-- Direct Email / Member Sign In Pill (Secondary Pill) -->
+<button class="w-full bg-surface-container text-primary font-label-lg text-label-lg py-3.5 px-space-xl rounded-full transition-colors hover:bg-surface-container-high active:scale-[0.98] flex items-center justify-center gap-space-xs mt-space-2xs" id="btn-login-expand" style="background-color: rgb(248, 238, 248); color: rgb(124, 82, 170); border: 1px solid rgb(220, 200, 224);">
+<span class="material-symbols-outlined text-[18px]">lock_open</span>
+<span class="">Sign In with Treat Account</span>
+</button>
+</div>
+<!-- Collapsible Email Sign In Drawer Area (Toggled via JS) -->
+<div class="hidden flex-col gap-space-xs bg-surface-container-low rounded-xl p-space-md mt-space-sm transition-all duration-300" id="signin-drawer">
+<div class="flex justify-between items-center mb-1">
+<span class="font-headline-sm text-headline-sm text-on-surface">Member Credentials</span>
+<button class="text-on-surface-variant hover:text-on-surface" id="close-drawer-btn">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<div class="bg-surface-container-lowest rounded-full px-space-md py-2 flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-outline text-[18px]">mail</span>
+<input class="bg-transparent font-body-md text-body-md text-on-surface outline-none w-full" placeholder="Email address" type="email">
+</div>
+<div class="bg-surface-container-lowest rounded-full px-space-md py-2 flex items-center gap-space-xs mt-1">
+<span class="material-symbols-outlined text-outline text-[18px]">key</span>
+<input class="bg-transparent font-body-md text-body-md text-on-surface outline-none w-full" placeholder="Password" type="password">
+</div>
+<button class="mt-2 w-full bg-primary text-on-primary font-label-lg text-label-lg py-2.5 rounded-full shadow-sm hover:bg-primary-container transition-colors">
+      Authorize &amp; Continue
+    </button>
+</div>
+<!-- Footer Micro Guarantee / Community Warmth Note -->
+<div class="flex items-center justify-center gap-space-xs text-center mt-space-xl pt-space-xs">
+<span class="material-symbols-outlined text-tertiary text-[18px]" style="font-variation-settings: &quot;FILL&quot; 1; color: rgb(0, 150, 204);">verified_user</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">No real names required. Split easily, eat happily.</span>
+</div>
+</div>
+<script>
+  (function() {
+    // Dynamic alias shuffling matching user sketch ("Choose Name")
+    const aliases = [
+      "MidnightDumpling", 
+      "SpicyNoodleGod", 
+      "MatchaMuncher", 
+      "BobaBaron", 
+      "TacoTactician", 
+      "CrispyCroissant",
+      "CurryCaptain"
+    ];
+    const avatarIcons = [
+      "ramen_dining", 
+      "bakery_dining", 
+      "lunch_dining", 
+      "local_pizza", 
+      "icecream", 
+      "fastfood", 
+      "emoji_food_beverage"
+    ];
+
+    let currentIndex = 0;
+    const nicknameInput = document.getElementById('nickname-input');
+    const avatarIcon = document.getElementById('avatar-icon');
+    const shuffleBtn = document.getElementById('shuffle-btn');
+    const avatarToggle = document.getElementById('avatar-toggle');
+    const signinDrawer = document.getElementById('signin-drawer');
+    const btnLoginExpand = document.getElementById('btn-login-expand');
+    const closeDrawerBtn = document.getElementById('close-drawer-btn');
+    const guestBtn = document.getElementById('btn-guest-enter');
+
+    function cycleAlias() {
+      currentIndex = (currentIndex + 1) % aliases.length;
+      nicknameInput.value = aliases[currentIndex];
+      avatarIcon.textContent = avatarIcons[currentIndex];
+      
+      // Micro-interaction visual bounce
+      avatarToggle.classList.add('rotate-12');
+      setTimeout(() => avatarToggle.classList.remove('rotate-12'), 200);
+    }
+
+    if (shuffleBtn) shuffleBtn.addEventListener('click', cycleAlias);
+    if (avatarToggle) avatarToggle.addEventListener('click', cycleAlias);
+
+    // Expandable Auth Tray
+    if (btnLoginExpand && signinDrawer) {
+      btnLoginExpand.addEventListener('click', function() {
+        signinDrawer.classList.toggle('hidden');
+        signinDrawer.classList.toggle('flex');
+        if (!signinDrawer.classList.contains('hidden')) {
+          signinDrawer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      });
+    }
+
+    if (closeDrawerBtn && signinDrawer) {
+      closeDrawerBtn.addEventListener('click', function() {
+        signinDrawer.classList.add('hidden');
+        signinDrawer.classList.remove('flex');
+      });
+    }
+
+    // Guest Enter Feedback
+    if (guestBtn) {
+      guestBtn.addEventListener('click', function() {
+        const handle = nicknameInput.value.trim() || 'FoodieBuddy';
+        guestBtn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span><span>Entering as ${handle}...</span>`;
+        setTimeout(() => {
+          guestBtn.innerHTML = `<span>Welcome, ${handle}!</span><span class="material-symbols-outlined text-[20px]">check</span>`;
+          guestBtn.classList.remove('bg-primary-container');
+          guestBtn.classList.add('bg-tertiary-container');
+        }, 600);
+      });
+    }
+  })();
+</script></main>
+
+
+
+
+
+
+
+
+
+</body></html>

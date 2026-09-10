@@ -1,0 +1,11 @@
+{
+  "name": "Treat - Flash Food Deals & Budget Feasts",
+  "short_name": "Treat",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#fef7ff",
+  "theme_color": "#e040a0",
+  "description": "Treat your circle, stay in budget. Flash food deals and neighborhood feast platters.",
+  "orientation": "portrait-primary",
+  "prefer_related_applications": false
+}

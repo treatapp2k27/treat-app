@@ -1,0 +1,257 @@
+<!DOCTYPE html><html class="h-full" lang="en" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "on-tertiary-fixed": "#001a33", "tertiary-fixed-dim": "#80d0f0", "tertiary-fixed": "#c8eaff", "on-secondary-fixed": "#1a1030", "tertiary-container": "#40c0ee", "on-primary-container": "#2e1a28", "error": "#e53e3e", "surface-container-low": "#fbf2fb", "on-primary-fixed": "#3d0028", "on-background": "#2e1a28", "on-tertiary-fixed-variant": "#005580", "tertiary": "#0096cc", "surface-tint": "#e040a0", "background": "#fef7ff", "on-error": "#ffffff", "primary": "#e040a0", "outline": "#907898", "inverse-primary": "#f0a0cc", "primary-container": "#f080c0", "on-secondary-container": "#2e2040", "surface": "#fef7ff", "secondary": "#7c52aa", "surface-dim": "#e0d6e0", "outline-variant": "#dcc8e0", "on-secondary-fixed-variant": "#4a3068", "on-primary": "#ffffff", "on-surface-variant": "#604868", "error-container": "#ffe8e8", "surface-container-highest": "#ece2ec", "inverse-surface": "#2e1a28", "surface-container": "#f8eef8", "on-primary-fixed-variant": "#a02070", "surface-container-lowest": "#ffffff", "on-error-container": "#9b1c1c", "secondary-fixed": "#eedcff", "on-tertiary-container": "#00334d", "surface-variant": "#f2e8f2", "primary-fixed-dim": "#f0a0cc", "surface-bright": "#fef7ff", "surface-container-high": "#f2e8f2", "on-surface": "#2e1a28", "primary-fixed": "#ffd6ee", "secondary-fixed-dim": "#c8a8e8", "inverse-on-surface": "#fef7ff", "on-tertiary": "#ffffff", "on-secondary": "#ffffff", "secondary-container": "#eedcff" }, borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" }, fontFamily: { "headline": ["DM Sans", "sans-serif"], "display": ["DM Sans", "sans-serif"], "body": ["DM Sans", "sans-serif"], "label": ["DM Sans", "sans-serif"] } } } };</script><style>@layer base { html, body { margin: 0; padding: 0; min-height: 100%; background-color: #fef7ff; font-family: 'DM Sans', sans-serif; } .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); } .pt-safe { padding-top: env(safe-area-inset-top, 0px); } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; } #candy-drawer-toggle:checked ~ #candy-drawer { transform: translateX(0); } #candy-drawer-toggle:checked ~ #candy-backdrop { display: block; opacity: 1; pointer-events: auto; }</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body text-on-surface flex flex-col min-h-screen"><input class="hidden" id="candy-drawer-toggle" type="checkbox"><div class="fixed inset-0 bg-on-surface/40 backdrop-blur-sm z-[70] hidden opacity-0 transition-opacity duration-300 pointer-events-none" id="candy-backdrop"><label aria-label="Close Drawer" class="absolute inset-0 cursor-pointer" for="candy-drawer-toggle"></label></div><aside class="fixed top-0 left-0 bottom-0 w-[82%] max-w-[320px] bg-surface-container-lowest z-[80] shadow-[8px_0_32px_rgba(224,64,160,0.18)] flex flex-col justify-between p-6 transform -translate-x-full transition-transform duration-300 ease-out pt-safe pb-safe rounded-r-3xl" id="candy-drawer"><div class="flex flex-col gap-6"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><div class="w-9 h-9 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center shadow-[0_4px_12px_rgba(224,64,160,0.3)]"><span class="material-symbols-outlined text-white text-[20px]">cake</span></div><span class="font-headline font-extrabold text-2xl tracking-tight bg-gradient-to-r from-primary via-secondary to-tertiary bg-clip-text text-transparent">treat</span></div><label class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:text-primary active:scale-90 transition-transform cursor-pointer" for="candy-drawer-toggle"><span class="material-symbols-outlined text-[22px]">close</span></label></div><a class="flex items-center gap-3 p-3 rounded-2xl bg-surface-container-low hover:bg-surface-container transition-colors" data-path="bookings-profile" href="#"><div class="relative"><img alt="Profile Avatar" class="w-12 h-12 rounded-full object-cover ring-2 ring-primary/40" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDL0ldCZrEa1rprRpwRkdBYgPlqB8tN-nObbXN4KgqM0hgfA1R2zz9XPG026EbmMQ6Bx2tusGdYwjmd2LFafdTzPeLRmTmFfju1uZ8FCii5JIUIgwqVh0r76yDjmTKFzRbKKQEUjkU8Z6UZZOrhEa_attvyrf3IjRXsQHkYUSOp0Ghch9PFk0WI5q7B_5ltNKJnFkqidwoqxqeny5irQegMo9h30ovj3Big8E8kJrSxipiGNMZARSvGYA"><span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-tertiary rounded-full ring-2 ring-surface-container-lowest"></span></div><div class="flex flex-col min-w-0 flex-1"><span class="font-bold text-on-surface text-base truncate">Mia Candy</span><span class="text-xs text-on-surface-variant font-medium">@miatreats • VIP Sweetie</span></div></a><nav class="flex flex-col gap-1.5"><a class="flex items-center gap-3.5 px-4 py-3 rounded-full text-on-surface-variant hover:bg-primary-fixed hover:text-on-primary-fixed font-bold text-base transition-all duration-200 active:scale-98" data-path="home-explore" href="#"><span class="material-symbols-outlined text-primary text-[24px]">home</span><span class="">Home</span></a><a class="flex items-center gap-3.5 px-4 py-3 rounded-full text-on-surface-variant hover:bg-secondary-fixed hover:text-on-secondary-fixed font-bold text-base transition-all duration-200 active:scale-98" data-path="budget-planner" href="#"><span class="material-symbols-outlined text-secondary text-[24px]">fastfood</span><span class="">Food Bar</span></a><a class="flex items-center gap-3.5 px-4 py-3 rounded-full text-on-surface-variant hover:bg-tertiary-fixed hover:text-on-tertiary-fixed font-bold text-base transition-all duration-200 active:scale-98" data-path="home-explore" href="#"><span class="material-symbols-outlined text-tertiary text-[24px]">trending_up</span><span class="">Trending</span></a><a class="flex items-center gap-3.5 px-4 py-3 rounded-full text-on-surface-variant hover:bg-secondary-fixed hover:text-on-secondary-fixed font-bold text-base transition-all duration-200 active:scale-98" data-path="social-community" href="#"><span class="material-symbols-outlined text-secondary text-[24px]">forum</span><span class="">Social</span></a><a class="flex items-center gap-3.5 px-4 py-3 rounded-full text-on-surface-variant hover:bg-primary-fixed hover:text-on-primary-fixed font-bold text-base transition-all duration-200 active:scale-98" data-path="home-explore" href="#"><span class="material-symbols-outlined text-primary text-[24px]">redeem</span><span class="">Treat</span><span class="ml-auto bg-primary text-white text-[11px] font-extrabold px-2.5 py-0.5 rounded-full shadow-[0_2px_8px_rgba(224,64,160,0.4)]">NEW</span></a></nav></div><div class="flex flex-col gap-3"><a class="flex items-center justify-between px-4 py-3 rounded-2xl bg-secondary-fixed text-on-secondary-fixed font-bold text-sm hover:opacity-90 transition-opacity" data-path="bookings-profile" href="#"><span class="flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">confirmation_number</span>My Perks &amp; Passes</span><span class="material-symbols-outlined text-[18px]">arrow_forward</span></a><div class="text-[11px] text-center text-outline font-semibold uppercase tracking-wider">© Treat App Funky Life</div></div></aside><header class="fixed top-0 w-full z-50 pt-safe bg-surface/90 backdrop-blur-xl shadow-[0_4px_24px_rgba(224,64,160,0.08)]"><div class="flex flex-col"><div class="h-8 flex items-center justify-center pt-1"><a class="flex items-center gap-1.5 active:scale-95 transition-transform" data-path="home-explore" href="#"><span class="font-headline font-extrabold text-xl tracking-tight bg-gradient-to-r from-primary via-secondary to-tertiary bg-clip-text text-transparent drop-shadow-sm">treat</span><span class="inline-block w-2 h-2 rounded-full bg-primary animate-pulse"></span></a></div><div class="h-16 px-4 flex items-center justify-between gap-3"><label aria-label="Open Drawer Menu" class="w-11 h-11 rounded-full bg-surface-container-low hover:bg-surface-container flex items-center justify-center text-on-surface active:scale-90 transition-all cursor-pointer shadow-[0_2px_8px_rgba(124,82,170,0.12)]" for="candy-drawer-toggle"><span class="material-symbols-outlined text-[24px]">menu</span></label><div class="flex-1 h-11 px-3.5 rounded-full bg-surface-container-lowest flex items-center gap-2 shadow-[0_3px_12px_rgba(124,82,170,0.08)] ring-1 ring-outline-variant/40 focus-within:ring-2 focus-within:ring-primary transition-all"><span class="material-symbols-outlined text-tertiary text-[20px]">search</span><input class="w-full bg-transparent border-0 outline-none text-xs font-medium text-on-surface placeholder:text-on-surface-variant/60" placeholder="Search sweets, spots &amp; treats..." type="search"></div><a class="h-11 px-4 rounded-full bg-secondary hover:bg-opacity-90 active:scale-95 text-on-secondary font-headline font-extrabold text-xs tracking-wide uppercase flex items-center justify-center gap-1 shadow-[0_2px_8px_rgba(124,82,170,0.3)] transition-all" data-path="home-explore" href="#"><span class="material-symbols-outlined text-[18px]">celebration</span><span class="">Treat</span></a></div></div></header><main class="flex-1 flex flex-col relative w-full pt-24 pb-20 bg-surface min-h-screen"><div class="flex flex-col w-full px-4 gap-6">
+<!-- Interactive Calculator Wizard Container -->
+<section class="bg-surface-container-lowest rounded-xl p-5 shadow-[0_8px_32px_rgba(224,64,160,0.1)] relative overflow-hidden">
+<!-- Playful Background Accents -->
+<div class="absolute -right-10 -top-10 w-36 h-36 bg-primary-fixed/40 rounded-full blur-2xl pointer-events-none"></div>
+<div class="absolute -left-12 bottom-0 w-32 h-32 bg-secondary-fixed/40 rounded-full blur-xl pointer-events-none"></div>
+<!-- Wizard Header -->
+<div class="flex items-start justify-between gap-3 relative z-10">
+<div class="flex flex-col gap-1">
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed text-xs font-black uppercase tracking-wider self-start shadow-sm">
+<span class="material-symbols-outlined text-xs">tune</span>
+          Smart Matcher
+        </div>
+<h1 class="font-headline font-extrabold text-2xl text-on-surface leading-tight tracking-tight mt-1">
+          Calculate &amp; Find Treats in Your Budget
+        </h1>
+<p class="text-sm text-on-surface-variant font-medium">
+          Set your sweet spot &amp; feast like royalty without the wallet shock!
+        </p>
+</div>
+<div class="w-12 h-12 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center shrink-0 shadow-[0_4px_16px_rgba(0,150,204,0.2)]">
+<span class="material-symbols-outlined text-2xl">savings</span>
+</div>
+</div>
+<!-- Stepper & Party Controls -->
+<div class="mt-6 flex flex-col gap-5 relative z-10">
+<!-- Party Size Section -->
+<div class="flex items-center justify-between p-3.5 rounded-lg bg-surface-container-low">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]">groups</span>
+</div>
+<div>
+<div class="text-sm font-black text-on-surface">Party Crew</div>
+<div class="text-xs text-on-surface-variant">Who's joining the table?</div>
+</div>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-lowest p-1.5 rounded-full shadow-sm">
+<button aria-label="Decrease Party Size" class="w-8 h-8 rounded-full bg-surface-container-high text-on-surface hover:bg-secondary hover:text-on-secondary flex items-center justify-center transition-all duration-150 active:scale-90" id="party-minus">
+<span class="material-symbols-outlined text-base">remove</span>
+</button>
+<span class="font-headline font-black text-base px-2.5 text-secondary min-w-[28px] text-center" id="party-display">3</span>
+<button aria-label="Increase Party Size" class="w-8 h-8 rounded-full bg-secondary text-on-secondary flex items-center justify-center transition-all duration-150 active:scale-90 shadow-[0_2px_8px_rgba(124,82,170,0.3)]" id="party-plus">
+<span class="material-symbols-outlined text-base">add</span>
+</button>
+</div>
+</div>
+<!-- Total Budget Slider -->
+<div class="flex flex-col gap-3 p-4 rounded-lg bg-surface-container-low">
+<div class="flex items-center justify-between">
+<span class="text-sm font-black text-on-surface flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-[18px]">payments</span>
+            Total Squad Budget
+          </span>
+<div class="flex items-center gap-1.5">
+<span class="font-headline font-black text-2xl text-secondary" id="budget-val">$120</span>
+</div>
+</div>
+<!-- Chunky Custom Track -->
+<div class="relative flex items-center py-2">
+<input class="w-full h-3 rounded-full appearance-none cursor-pointer bg-gradient-to-r from-primary via-secondary to-tertiary focus:outline-none accent-secondary" id="budget-range" max="400" min="30" step="5" type="range" value="120">
+</div>
+<div class="flex items-center justify-between text-xs font-bold text-on-surface-variant">
+<span class="">Min: $30</span>
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-black shadow-sm">
+<span class="material-symbols-outlined text-xs">local_activity</span>
+<span id="per-person-val" class="">$40.00 / sweetie</span>
+</div>
+<span class="">Max: $400</span>
+</div>
+</div>
+<!-- Food Categories Chips -->
+<div class="flex flex-col gap-2">
+<label class="text-xs font-black uppercase tracking-wider text-on-surface-variant">Food Category Craving</label>
+<div class="grid grid-cols-2 gap-2.5" id="category-chips"><button class="category-chip active flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-full font-bold text-xs bg-secondary text-on-secondary shadow-[0_2px_8px_rgba(124,82,170,0.3)] transition-all active:scale-95" type="button"><span class="material-symbols-outlined text-sm">restaurant</span><span class="">Casual Dining</span></button><button class="category-chip flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-full font-bold text-xs bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all active:scale-95" type="button"><span class="material-symbols-outlined text-sm">bolt</span><span class="">Fast Treat</span></button><button class="category-chip flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-full font-bold text-xs bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all active:scale-95" type="button"><span class="material-symbols-outlined text-sm">hotel_class</span><span class="">Fine Dining</span></button><button class="category-chip flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-full font-bold text-xs bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all active:scale-95" type="button"><span class="material-symbols-outlined text-sm">all_inclusive</span><span class="">All-You-Can-Eat</span></button><button class="category-chip flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-full font-bold text-xs bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all active:scale-95" type="button"><span class="material-symbols-outlined text-sm">tapas</span><span class="">Street Bites</span></button></div>
+</div>
+<!-- Quick Toggles -->
+<div class="grid grid-cols-2 gap-2.5 pt-1">
+<!-- Tax & Tip Toggle -->
+<label class="flex items-center justify-between p-3 rounded-lg bg-surface-container-low cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex flex-col">
+<span class="text-xs font-bold text-on-surface">Tax &amp; Service</span>
+<span class="text-[10px] text-on-surface-variant">Include extra 18%</span>
+</div>
+<input checked="" class="w-5 h-5 rounded accent-secondary cursor-pointer" type="checkbox">
+</label>
+<!-- Distance Toggle -->
+<label class="flex items-center justify-between p-3 rounded-lg bg-surface-container-low cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex flex-col">
+<span class="text-xs font-bold text-on-surface">Walkable Only</span>
+<span class="text-[10px] text-on-surface-variant">&lt; 15 mins away</span>
+</div>
+<input class="w-5 h-5 rounded accent-primary cursor-pointer" type="checkbox">
+</label>
+</div>
+<!-- Main Action CTA -->
+<button class="w-full py-4 rounded-full bg-secondary text-on-secondary font-headline font-black text-sm tracking-wide uppercase flex items-center justify-center gap-2 shadow-[0_2px_8px_rgba(124,82,170,0.3)] hover:scale-[1.02] active:scale-95 transition-all mt-1"><span class="material-symbols-outlined text-xl animate-bounce">local_pizza</span><span class="">Find IT Within Budget</span><span class="material-symbols-outlined text-lg">arrow_forward</span></button>
+</div>
+</section>
+<!-- Matched Treats Results Section -->
+<section class="flex flex-col gap-4 pb-4">
+<div class="flex items-center justify-between px-1">
+<div>
+<h2 class="font-headline font-black text-lg text-on-surface">Tasty Matches for Your Crew</h2>
+<p class="text-xs text-on-surface-variant font-medium">Found 3 feast spots within your exact budget</p>
+</div>
+<span class="px-2.5 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed text-xs font-black">
+        3 Spots
+      </span>
+</div>
+<!-- Match Card 1 -->
+<article class="bg-surface-container-lowest overflow-hidden shadow-[0_4px_20px_rgba(124,82,170,0.08)] hover:-translate-y-1 transition-transform duration-200">
+<div class="relative h-44 w-full overflow-hidden" style="border-radius: 20pt; overflow: hidden;">
+<img class="w-full h-full object-cover" data-alt="Vibrant gourmet stacked pancake tower with berry compote, dripping melted pink strawberry glaze, dusted with powdered sugar, shot in bright warm cafe lighting with saturated pastel colors matching a playful Candy theme." src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&amp;fit=crop&amp;w=600&amp;q=80">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+<span class="absolute top-3 left-3 px-3 py-1 rounded-full bg-primary text-on-primary text-xs font-black shadow-[0_2px_10px_rgba(224,64,160,0.4)] flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">redeem</span>
+          Save $28 with Party Pass
+        </span>
+<span class="absolute bottom-3 left-3 text-white text-xs font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-sm">directions_walk</span>
+          0.4 miles away • 8 mins walk
+        </span>
+<div class="absolute bottom-3 right-3 bg-surface-container-lowest/90 backdrop-blur-md px-2.5 py-0.5 rounded-full flex items-center gap-1 text-xs font-black text-on-surface">
+<span class="material-symbols-outlined text-yellow-500 text-xs">star</span>
+          4.9 (420)
+        </div>
+</div>
+<div class="p-4 flex flex-col gap-3" style="border-radius: 20pt;">
+<div class="flex items-start justify-between gap-2">
+<div>
+<h3 class="font-headline font-black text-base text-on-surface">Sugar Bloom Cafe &amp; Brunch</h3>
+<p class="text-xs text-on-surface-variant font-medium">Sweet and Savory sharing board, loaded fries &amp; drinks</p>
+</div>
+<div class="text-right shrink-0">
+<div class="font-headline font-black text-lg text-primary">$105.00</div>
+<div class="text-[11px] text-on-surface-variant line-through">$133.00</div>
+</div>
+</div>
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center gap-1.5">
+<span class="px-2.5 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed text-[11px] font-extrabold">All Included</span>
+<span class="px-2.5 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed text-[11px] font-extrabold">$35.00 / person</span>
+</div>
+<button class="px-4 py-1.5 rounded-full bg-secondary text-on-secondary text-xs font-extrabold hover:bg-opacity-90 active:scale-95 transition-transform flex items-center gap-1 shadow-[0_2px_8px_rgba(124,82,170,0.25)]">
+            Book Spot
+            <span class="material-symbols-outlined text-xs">arrow_forward</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Match Card 2 -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(124,82,170,0.08)] hover:-translate-y-1 transition-transform duration-200" style="border-radius: 20pt;">
+<div class="relative h-44 w-full rounded-xl overflow-hidden" style="border-radius: 20pt; overflow: hidden;">
+<img class="w-full h-full object-cover" data-alt="Artisanal smash burger feast laid out on colorful pink and yellow plates with loaded cheesy waffle fries and fizzy boba milkshakes, soft retro-pop diner ambiance with vibrant saturation." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgD8zAUqjS50pFW3doS24wdVNFhoyCXrbghXLGWEGYv6gk-a6xA351JHhYClv4Mue9kLJF97vTLUXqxr3XLV7OQQC7HRRww2-v82PhLlBEAb3rsIuOqd77np9CDLsxRWh9TjPd2XKHROeuG-ja9lsAyxTh7ytuIGN5jaxuOcJmoXwcVDY5IazeVwd4FCl_S7YTgLXTDsOxwkdjw0NYDV4X5-JKopORFPUSo-T0JJ5jgdGutb7TJm45gw">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+<span class="absolute top-3 left-3 px-3 py-1 rounded-full bg-tertiary text-on-tertiary text-xs font-black shadow-[0_2px_10px_rgba(0,150,204,0.4)] flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">bolt</span>
+          Top Value Match
+        </span>
+<span class="absolute bottom-3 left-3 text-white text-xs font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-sm">directions_walk</span>
+          0.7 miles away • 14 mins walk
+        </span>
+<div class="absolute bottom-3 right-3 bg-surface-container-lowest/90 backdrop-blur-md px-2.5 py-0.5 rounded-full flex items-center gap-1 text-xs font-black text-on-surface">
+<span class="material-symbols-outlined text-yellow-500 text-xs">star</span>
+          4.8 (198)
+        </div>
+</div>
+<div class="p-4 flex flex-col gap-3">
+<div class="flex items-start justify-between gap-2">
+<div>
+<h3 class="font-headline font-black text-base text-on-surface">Neon Bun Diner</h3>
+<p class="text-xs text-on-surface-variant font-medium">Smash burger trio, salted caramel milkshakes &amp; sides</p>
+</div>
+<div class="text-right shrink-0">
+<div class="font-headline font-black text-lg text-primary">$88.50</div>
+<div class="text-[11px] text-on-surface-variant line-through">$110.00</div>
+</div>
+</div>
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center gap-1.5">
+<span class="px-2.5 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed text-[11px] font-extrabold">Tax Included</span>
+<span class="px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed text-[11px] font-extrabold">$29.50 / person</span>
+</div>
+<button class="px-4 py-1.5 rounded-full bg-secondary text-on-secondary text-xs font-extrabold hover:bg-opacity-90 active:scale-95 transition-transform flex items-center gap-1 shadow-[0_2px_8px_rgba(124,82,170,0.25)]">
+            Book Spot
+            <span class="material-symbols-outlined text-xs">arrow_forward</span>
+</button>
+</div>
+</div>
+</article>
+</section>
+</div>
+<script>
+  (function initBudgetCalculator() {
+    let partySize = 3;
+    const minusBtn = document.getElementById('party-minus');
+    const plusBtn = document.getElementById('party-plus');
+    const display = document.getElementById('party-display');
+    const rangeInput = document.getElementById('budget-range');
+    const budgetVal = document.getElementById('budget-val');
+    const perPersonVal = document.getElementById('per-person-val');
+    const chips = document.querySelectorAll('.category-chip');
+
+    function updateCalculations() {
+      const budget = parseFloat(rangeInput.value);
+      budgetVal.textContent = `$${budget}`;
+      const perHead = (budget / partySize).toFixed(2);
+      perPersonVal.textContent = `$${perHead} / sweetie`;
+      display.textContent = partySize;
+    }
+
+    if (minusBtn && plusBtn && rangeInput) {
+      minusBtn.addEventListener('click', () => {
+        if (partySize > 1) {
+          partySize--;
+          updateCalculations();
+        }
+      });
+
+      plusBtn.addEventListener('click', () => {
+        if (partySize < 12) {
+          partySize++;
+          updateCalculations();
+        }
+      });
+
+      rangeInput.addEventListener('input', updateCalculations);
+    }
+
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        chips.forEach((c) => {
+          c.classList.remove('bg-primary', 'text-on-primary', 'shadow-[0_4px_12px_rgba(224,64,160,0.25)]');
+          c.classList.add('bg-surface-container-low', 'text-on-surface-variant');
+        });
+        chip.classList.remove('bg-surface-container-low', 'text-on-surface-variant');
+        chip.classList.add('bg-primary', 'text-on-primary', 'shadow-[0_4px_12px_rgba(224,64,160,0.25)]');
+      });
+    });
+  })();
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-4px_24px_rgba(124,82,170,0.08)]" data-active-classes="text-primary font-extrabold scale-105"><div class="flex justify-around items-center h-16 px-4"><a class="flex flex-col items-center justify-center min-w-[54px] h-12 gap-0.5 text-on-surface-variant hover:text-primary transition-all duration-200 active:scale-95" data-path="home-explore" href="#"><span class="material-symbols-outlined text-[24px]">explore</span><span class="text-[11px] font-bold tracking-tight">Explore</span></a><a aria-current="page" class="flex flex-col items-center justify-center min-w-[54px] h-12 gap-0.5 transition-all duration-200 text-secondary font-extrabold scale-105" data-path="budget-planner" href="#"><span class="material-symbols-outlined text-[24px]">lunch_dining</span><span class="text-[11px] font-bold tracking-tight">Food Bar</span></a><a class="flex flex-col items-center justify-center min-w-[54px] h-12 gap-0.5 text-on-surface-variant hover:text-tertiary transition-all duration-200 active:scale-95" data-path="social-community" href="#"><span class="material-symbols-outlined text-[24px]">forum</span><span class="text-[11px] font-bold tracking-tight">Social</span></a><a class="flex flex-col items-center justify-center min-w-[54px] h-12 gap-0.5 text-on-surface-variant hover:text-primary transition-all duration-200 active:scale-95" data-path="bookings-profile" href="#"><span class="material-symbols-outlined text-[24px]">person</span><span class="text-[11px] font-bold tracking-tight">Profile</span></a></div></nav>
+
+
+
+
+
+
+
+</body></html>
