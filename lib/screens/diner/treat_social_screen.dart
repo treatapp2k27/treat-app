@@ -76,7 +76,7 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
   final List<Map<String, dynamic>> _chatMessages = [
     {
       'author': 'BobaQueen',
-      'avatar': 'umber',
+      'avatar': '🧋',
       'text': 'Anyone at Sugar Smash right now? Is the line long?',
       'time': '12:04 PM',
       'isMe': false,
@@ -230,19 +230,34 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
-            color: isActive ? TreatColors.secondary : TreatColors.surfaceContainerLowest,
+            gradient: isActive
+                ? const LinearGradient(
+                    colors: [
+                      Color(0xFF7C52AA), // Funky Purple
+                      Color(0xFFE040A0), // Candy Berry Pink
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                : null,
+            color: isActive ? null : TreatColors.surfaceContainerLowest,
             borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color: isActive
+                  ? Colors.transparent
+                  : TreatColors.outlineVariant.withValues(alpha: 0.5),
+            ),
             boxShadow: isActive
                 ? const [
                     BoxShadow(
-                      color: Color.fromRGBO(124, 82, 170, 0.25),
-                      blurRadius: 8,
-                      offset: Offset(0, 2),
+                      color: Color.fromRGBO(224, 64, 160, 0.28),
+                      blurRadius: 10,
+                      offset: Offset(0, 3),
                     )
                   ]
                 : const [
                     BoxShadow(
-                      color: Color.fromRGBO(0, 0, 0, 0.04),
+                      color: Color.fromRGBO(124, 82, 170, 0.05),
                       blurRadius: 4,
                       offset: Offset(0, 1),
                     )
@@ -254,7 +269,7 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
               Icon(
                 icon,
                 size: 15,
-                color: isActive ? Colors.white : TreatColors.onSurfaceVariant,
+                color: isActive ? Colors.white : TreatColors.secondary,
               ),
               const SizedBox(width: 4),
               Flexible(
@@ -264,19 +279,27 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 10.5,
-                    fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
-                    color: isActive ? Colors.white : TreatColors.onSurfaceVariant,
+                    fontWeight: isActive ? FontWeight.w800 : FontWeight.w700,
+                    color: isActive ? Colors.white : TreatColors.onSurface,
                   ),
                 ),
               ),
               if (hasLiveDot) ...[
-                const SizedBox(width: 4),
+                const SizedBox(width: 5),
                 Container(
-                  width: 6,
-                  height: 6,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF00C853),
+                  width: 7,
+                  height: 7,
+                  decoration: BoxDecoration(
+                    color: isActive ? Colors.white : TreatColors.success,
                     shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: (isActive ? Colors.white : TreatColors.success)
+                            .withValues(alpha: 0.5),
+                        blurRadius: 4,
+                        spreadRadius: 0.5,
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -574,30 +597,64 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
       children: [
         // Live Chatroom Room Pill
         Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
           decoration: BoxDecoration(
             color: TreatColors.surfaceContainerLowest,
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: const Color(0xFFEDE5F2)),
+            border: Border.all(
+              color: TreatColors.outlineVariant.withValues(alpha: 0.6),
+              width: 1.0,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: TreatColors.secondary.withValues(alpha: 0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 8,
-                height: 8,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF00C853),
-                  shape: BoxShape.circle,
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [TreatColors.secondary, TreatColors.primary],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 6,
+                      height: 6,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'LIVE',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 6),
+              const SizedBox(width: 8),
               Flexible(
                 child: Text(
                   'Live Town Foodie Chat • 128 foodies online',
                   style: GoogleFonts.plusJakartaSans(
-                    fontSize: 11,
+                    fontSize: 11.5,
                     fontWeight: FontWeight.w700,
                     color: TreatColors.onSurfaceVariant,
                   ),
@@ -619,67 +676,148 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
               final msg = _chatMessages[index];
               final isMe = msg['isMe'] as bool;
 
-              return Align(
-                alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 10),
-                  constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 0.75,
-                  ),
-                  child: Column(
-                    crossAxisAlignment:
-                        isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                    children: [
-                      if (!isMe)
-                        Padding(
-                          padding: const EdgeInsets.only(left: 4, bottom: 2),
-                          child: Text(
-                            msg['author'] as String,
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              color: TreatColors.onSurfaceVariant,
-                            ),
-                          ),
-                        ),
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Row(
+                  mainAxisAlignment:
+                      isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    if (!isMe) ...[
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        width: 34,
+                        height: 34,
+                        margin: const EdgeInsets.only(right: 8, bottom: 2),
                         decoration: BoxDecoration(
-                          color: isMe ? TreatColors.secondary : Colors.white,
-                          borderRadius: BorderRadius.only(
-                            topLeft: const Radius.circular(18),
-                            topRight: const Radius.circular(18),
-                            bottomLeft: Radius.circular(isMe ? 18 : 4),
-                            bottomRight: Radius.circular(isMe ? 4 : 18),
+                          gradient: LinearGradient(
+                            colors: [
+                              TreatColors.secondaryFixed.withValues(alpha: 0.7),
+                              TreatColors.primaryFixed.withValues(alpha: 0.7),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color.fromRGBO(0, 0, 0, 0.05),
-                              blurRadius: 6,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Text(
-                          msg['text'] as String,
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 12.5,
-                            color: isMe ? Colors.white : TreatColors.onSurface,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: TreatColors.outlineVariant.withValues(alpha: 0.7),
+                            width: 1.5,
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 2, right: 4, left: 4),
+                        alignment: Alignment.center,
                         child: Text(
-                          msg['time'] as String,
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 9.5,
-                            color: TreatColors.onSurfaceVariant.withValues(alpha: 0.6),
-                          ),
+                          (msg['avatar'] as String?) ?? '🍽️',
+                          style: const TextStyle(fontSize: 16),
                         ),
                       ),
                     ],
-                  ),
+                    Flexible(
+                      child: Container(
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * 0.72,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: isMe
+                              ? CrossAxisAlignment.end
+                              : CrossAxisAlignment.start,
+                          children: [
+                            if (!isMe)
+                              Padding(
+                                padding: const EdgeInsets.only(left: 4, bottom: 4),
+                                child: Text(
+                                  msg['author'] as String,
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: TreatColors.secondaryDark,
+                                  ),
+                                ),
+                              ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 14, vertical: 10),
+                              decoration: BoxDecoration(
+                                gradient: isMe
+                                    ? const LinearGradient(
+                                        colors: [
+                                          TreatColors.secondary,
+                                          TreatColors.primary
+                                        ],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      )
+                                    : null,
+                                color: isMe
+                                    ? null
+                                    : TreatColors.surfaceContainerLowest,
+                                borderRadius: BorderRadius.only(
+                                  topLeft: const Radius.circular(18),
+                                  topRight: const Radius.circular(18),
+                                  bottomLeft: Radius.circular(isMe ? 18 : 4),
+                                  bottomRight: Radius.circular(isMe ? 4 : 18),
+                                ),
+                                border: isMe
+                                    ? null
+                                    : Border.all(
+                                        color: TreatColors.outlineVariant
+                                            .withValues(alpha: 0.6),
+                                        width: 1.0,
+                                      ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: isMe
+                                        ? TreatColors.primary
+                                            .withValues(alpha: 0.25)
+                                        : TreatColors.secondary
+                                            .withValues(alpha: 0.06),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: Text(
+                                msg['text'] as String,
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w500,
+                                  height: 1.35,
+                                  color: isMe
+                                      ? Colors.white
+                                      : TreatColors.onSurface,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 3, right: 4, left: 4),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    msg['time'] as String,
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 9.5,
+                                      fontWeight: FontWeight.w500,
+                                      color: TreatColors.onSurfaceVariant
+                                          .withValues(alpha: 0.6),
+                                    ),
+                                  ),
+                                  if (isMe) ...[
+                                    const SizedBox(width: 4),
+                                    Icon(
+                                      Icons.done_all_rounded,
+                                      size: 12,
+                                      color: TreatColors.primary
+                                          .withValues(alpha: 0.8),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               );
             },
@@ -690,10 +828,20 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: TreatColors.surfaceContainerLowest,
             border: Border(
-              top: BorderSide(color: const Color(0xFFEDE5F2), width: 1.0),
+              top: BorderSide(
+                color: TreatColors.outlineVariant.withValues(alpha: 0.5),
+                width: 1.0,
+              ),
             ),
+            boxShadow: [
+              BoxShadow(
+                color: TreatColors.secondary.withValues(alpha: 0.04),
+                blurRadius: 12,
+                offset: const Offset(0, -3),
+              ),
+            ],
           ),
           child: SafeArea(
             top: false,
@@ -701,27 +849,48 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
               children: [
                 Expanded(
                   child: Container(
-                    height: 42,
+                    height: 44,
                     padding: const EdgeInsets.symmetric(horizontal: 14),
                     decoration: BoxDecoration(
-                      color: TreatColors.surfaceContainerLowest,
+                      color: TreatColors.surfaceContainerLow,
                       borderRadius: BorderRadius.circular(999),
-                      border: Border.all(color: const Color(0xFFEDE5F2)),
-                    ),
-                    child: TextField(
-                      controller: _chatController,
-                      onSubmitted: (_) => _handleSendMessage(),
-                      style: GoogleFonts.plusJakartaSans(fontSize: 12),
-                      decoration: InputDecoration(
-                        hintText: 'Share a secret spot, voucher or drop...',
-                        hintStyle: GoogleFonts.plusJakartaSans(
-                          fontSize: 11.5,
-                          color: TreatColors.onSurfaceVariant.withValues(alpha: 0.6),
-                        ),
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.zero,
-                        isDense: true,
+                      border: Border.all(
+                        color: TreatColors.outlineVariant.withValues(alpha: 0.7),
+                        width: 1.0,
                       ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.chat_bubble_outline_rounded,
+                          size: 17,
+                          color: TreatColors.secondary.withValues(alpha: 0.8),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: TextField(
+                            controller: _chatController,
+                            onSubmitted: (_) => _handleSendMessage(),
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w500,
+                              color: TreatColors.onSurface,
+                            ),
+                            cursorColor: TreatColors.primary,
+                            decoration: InputDecoration(
+                              hintText: 'Share a secret spot, voucher or drop...',
+                              hintStyle: GoogleFonts.plusJakartaSans(
+                                fontSize: 11.5,
+                                color: TreatColors.onSurfaceVariant
+                                    .withValues(alpha: 0.6),
+                              ),
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.zero,
+                              isDense: true,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -730,20 +899,28 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
                   onTap: _handleSendMessage,
                   borderRadius: BorderRadius.circular(999),
                   child: Container(
-                    width: 42,
-                    height: 42,
+                    width: 44,
+                    height: 44,
                     decoration: BoxDecoration(
-                      color: TreatColors.secondary,
+                      gradient: const LinearGradient(
+                        colors: [TreatColors.secondary, TreatColors.primary],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                       shape: BoxShape.circle,
-                      boxShadow: const [
+                      boxShadow: [
                         BoxShadow(
-                          color: Color.fromRGBO(124, 82, 170, 0.3),
-                          blurRadius: 8,
-                          offset: Offset(0, 2),
+                          color: TreatColors.primary.withValues(alpha: 0.35),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
                         ),
                       ],
                     ),
-                    child: const Icon(Icons.send_rounded, size: 18, color: Colors.white),
+                    child: const Icon(
+                      Icons.send_rounded,
+                      size: 19,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ],

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../core/theme/treat_colors.dart';
 import '../core/theme/treat_typography.dart';
+import '../state/diner_state.dart';
 import '../widgets/diner_drawer.dart';
 import '../widgets/treat_bottom_nav_bar.dart';
 import 'diner/choose_treat_budget_screen.dart';
@@ -40,17 +42,20 @@ class _AppShellState extends State<AppShell> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isDesktop = constraints.maxWidth > 500;
+        final isFoodieLoggedIn = context.watch<DinerState>().isFoodieLoggedIn;
 
         Widget content = Scaffold(
           key: _scaffoldKey,
           backgroundColor: TreatColors.background,
-          drawer: DinerDrawer(
-            activeRoute: _currentScreen,
-            onNavigate: (route) {
-              Navigator.of(context).pop();
-              _navigateTo(route);
-            },
-          ),
+          drawer: isFoodieLoggedIn
+              ? DinerDrawer(
+                  activeRoute: _currentScreen,
+                  onNavigate: (route) {
+                    Navigator.of(context).pop();
+                    _navigateTo(route);
+                  },
+                )
+              : null,
           body: AnimatedSwitcher(
             duration: const Duration(milliseconds: 280),
             switchInCurve: Curves.easeOutCubic,
@@ -128,7 +133,6 @@ class _AppShellState extends State<AppShell> {
       'social',
       'budget',
       'platters',
-      'location',
       'profile',
     ].contains(_currentScreen);
   }
@@ -154,8 +158,10 @@ class _AppShellState extends State<AppShell> {
   }
 
   Widget _buildDinerBottomNav() {
+    final dinerState = context.watch<DinerState>();
     return TreatBottomNavBar(
       currentTab: _getCurrentNavTab(),
+      isGuest: !dinerState.isFoodieLoggedIn,
       onTabSelected: (tab) {
         switch (tab) {
           case TreatNavTab.explore:
@@ -188,7 +194,10 @@ class _AppShellState extends State<AppShell> {
       case 'welcome':
       case 'gateway':
         return GatewayExploreScreen(
-          onExploreGuest: () => _navigateTo('home'),
+          onExploreGuest: () {
+            context.read<DinerState>().setFoodieLoggedIn(false);
+            _navigateTo('home');
+          },
           onFoodieSignInTap: () => _navigateTo('welcome_persona'),
         );
 
@@ -196,21 +205,34 @@ class _AppShellState extends State<AppShell> {
       case 'foodie_signin':
         return WelcomeAnonymousScreen(
           onBack: () => _navigateTo('welcome'),
-          onEnterGuest: () => _navigateTo('home'),
+          onEnterGuest: () => _navigateTo('location'),
         );
 
       case 'home':
       case 'explore':
         return HomePromotionsScreen(
           onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
+          onBackToLogin: () => _navigateTo('welcome'),
+          onNavigateLogin: () => _navigateTo('welcome_persona'),
           onSelectDeal: (_) => _navigateTo('platters'),
           onNavigateBudgetPlanner: () => _navigateTo('budget'),
+          onNavigateProfile: () => _navigateTo('profile'),
         );
 
       case 'food_bar':
+        final isFoodie = context.watch<DinerState>().isFoodieLoggedIn;
+        if (!isFoodie) {
+          return PlatterPackagesScreen(
+            onOpenDrawer: () {},
+            onBackToLogin: () => _navigateTo('welcome'),
+            onSelectPlatter: (_) => _navigateTo('booking_hold'),
+            onEditBudget: () => _navigateTo('budget'),
+          );
+        }
         return CommunityFoodBarScreen(
           onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
-          onExploreTreats: () => _navigateTo('home'),
+          onExploreTreats: () => _navigateTo('budget'),
+          onOpenFilter: () => _navigateTo('budget'),
           onSelectDeal: (_) => _navigateTo('platters'),
         );
 
@@ -231,11 +253,14 @@ class _AppShellState extends State<AppShell> {
         return ChooseTreatBudgetScreen(
           onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
           onSelectDeal: (_) => _navigateTo('platters'),
+          onFindWithinBudget: () => _navigateTo('platters'),
+          onBackToFoodBar: () => _navigateTo('food_bar'),
         );
 
       case 'platters':
         return PlatterPackagesScreen(
           onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
+          onBackToLogin: () => _navigateTo('welcome'),
           onSelectPlatter: (_) => _navigateTo('booking_hold'),
           onEditBudget: () => _navigateTo('budget'),
         );
@@ -262,13 +287,35 @@ class _AppShellState extends State<AppShell> {
 
       case 'location':
         return LocationSharingScreen(
-          onEnableLocation: () => _navigateTo('home'),
-          onSkip: () => _navigateTo('home'),
+          onEnableLocation: () {
+            final state = context.read<DinerState>();
+            state.setFoodieLoggedIn(true);
+            state.setUserLocation('Soho Quarter');
+            _navigateTo('home');
+          },
+          onSkip: () {
+            final state = context.read<DinerState>();
+            state.setFoodieLoggedIn(true);
+            _navigateTo('home');
+          },
+          onLocationSelected: (location) {
+            final state = context.read<DinerState>();
+            state.setFoodieLoggedIn(true);
+            if (location.trim().isNotEmpty) {
+              state.setUserLocation(location.trim());
+            }
+            _navigateTo('home');
+          },
         );
 
       case 'profile':
         return FoodieProfileSettingsScreen(
           onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
+          onNavigateHome: () => _navigateTo('home'),
+          onLogOut: () {
+            context.read<DinerState>().setFoodieLoggedIn(false);
+            _navigateTo('welcome');
+          },
         );
 
       default:
@@ -276,6 +323,7 @@ class _AppShellState extends State<AppShell> {
           onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
           onSelectDeal: (_) => _navigateTo('platters'),
           onNavigateBudgetPlanner: () => _navigateTo('budget'),
+          onNavigateProfile: () => _navigateTo('profile'),
         );
     }
   }

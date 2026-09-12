@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/diner_persona.dart';
+import '../models/favorite_item.dart';
 import '../models/voucher.dart';
 
 class DinerState extends ChangeNotifier {
@@ -12,10 +13,57 @@ class DinerState extends ChangeNotifier {
   int _shuffleIndex = 0;
   List<Voucher> _vouchers = List.from(Voucher.sampleVouchers);
   final Set<String> _wishlistIds = {'platter-1'};
+  final List<FavoriteItem> _favorites = List.from(FavoriteItem.initialFavorites);
+
+  bool _isFoodieLoggedIn = false;
+  String _userLocation = 'Soho Quarter';
+  String _locationRadius = 'Within 2 mi';
 
   DinerPersona get currentPersona => _currentPersona;
   List<Voucher> get vouchers => _vouchers;
   Set<String> get wishlistIds => _wishlistIds;
+  List<FavoriteItem> get favorites => List.unmodifiable(_favorites);
+  bool isFavorite(String id) => _favorites.any((item) => item.id == id);
+  bool get isFoodieLoggedIn => _isFoodieLoggedIn;
+  String get userLocation => _userLocation;
+  String get locationRadius => _locationRadius;
+
+  void addFavorite(FavoriteItem item) {
+    if (!_favorites.any((existing) => existing.id == item.id)) {
+      _favorites.insert(0, item);
+      notifyListeners();
+    }
+  }
+
+  void removeFavorite(String id) {
+    _favorites.removeWhere((item) => item.id == id);
+    notifyListeners();
+  }
+
+  bool toggleFavorite(FavoriteItem item) {
+    if (isFavorite(item.id)) {
+      removeFavorite(item.id);
+      return false;
+    } else {
+      addFavorite(item);
+      return true;
+    }
+  }
+
+  void setFoodieLoggedIn(bool value) {
+    _isFoodieLoggedIn = value;
+    notifyListeners();
+  }
+
+  void setUserLocation(String location) {
+    _userLocation = location;
+    notifyListeners();
+  }
+
+  void setLocationRadius(String radius) {
+    _locationRadius = radius;
+    notifyListeners();
+  }
 
   void shufflePersona() {
     _shuffleIndex = (_shuffleIndex + 1) % DinerPersona.presetPersonas.length;

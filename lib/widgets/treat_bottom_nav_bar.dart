@@ -13,11 +13,13 @@ enum TreatNavTab {
 class TreatBottomNavBar extends StatelessWidget {
   final TreatNavTab currentTab;
   final ValueChanged<TreatNavTab> onTabSelected;
+  final bool isGuest;
 
   const TreatBottomNavBar({
     super.key,
     required this.currentTab,
     required this.onTabSelected,
+    this.isGuest = false,
   });
 
   @override
@@ -45,38 +47,53 @@ class TreatBottomNavBar extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(
-                tab: TreatNavTab.explore,
-                label: 'Explore',
-                icon: Icons.explore_outlined,
-                activeIcon: Icons.explore,
-              ),
-              _buildNavItem(
-                tab: TreatNavTab.foodBar,
-                label: 'Food Bar',
-                icon: Icons.lunch_dining_outlined,
-                activeIcon: Icons.lunch_dining,
-              ),
-              _buildNavItem(
-                tab: TreatNavTab.favorites,
-                label: 'Favorites',
-                icon: Icons.favorite_border_rounded,
-                activeIcon: Icons.favorite_rounded,
-              ),
-              _buildNavItem(
-                tab: TreatNavTab.social,
-                label: 'Social',
-                icon: Icons.forum_outlined,
-                activeIcon: Icons.forum,
-              ),
-              _buildNavItem(
-                tab: TreatNavTab.profile,
-                label: 'Profile',
-                icon: Icons.person_outline,
-                activeIcon: Icons.person,
-              ),
-            ],
+            children: isGuest
+                ? [
+                    _buildNavItem(
+                      tab: TreatNavTab.explore,
+                      label: 'Explore',
+                      icon: Icons.explore_outlined,
+                      activeIcon: Icons.explore,
+                    ),
+                    _buildNavItem(
+                      tab: TreatNavTab.foodBar,
+                      label: 'Food Bar',
+                      icon: Icons.lunch_dining_outlined,
+                      activeIcon: Icons.lunch_dining,
+                    ),
+                  ]
+                : [
+                    _buildNavItem(
+                      tab: TreatNavTab.explore,
+                      label: 'Explore',
+                      icon: Icons.explore_outlined,
+                      activeIcon: Icons.explore,
+                    ),
+                    _buildNavItem(
+                      tab: TreatNavTab.foodBar,
+                      label: 'Food Bar',
+                      icon: Icons.lunch_dining_outlined,
+                      activeIcon: Icons.lunch_dining,
+                    ),
+                    _buildNavItem(
+                      tab: TreatNavTab.favorites,
+                      label: 'Favorites',
+                      icon: Icons.favorite_border_rounded,
+                      activeIcon: Icons.favorite_rounded,
+                    ),
+                    _buildNavItem(
+                      tab: TreatNavTab.social,
+                      label: 'Social',
+                      icon: Icons.forum_outlined,
+                      activeIcon: Icons.forum,
+                    ),
+                    _buildNavItem(
+                      tab: TreatNavTab.profile,
+                      label: 'Profile',
+                      icon: Icons.person_outline,
+                      activeIcon: Icons.person,
+                    ),
+                  ],
           ),
         ),
       ),

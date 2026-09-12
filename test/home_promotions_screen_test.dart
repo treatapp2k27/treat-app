@@ -6,16 +6,16 @@ import 'package:treat/models/platter_deal.dart';
 import 'package:treat/screens/diner/home_promotions_screen.dart';
 import 'package:treat/state/budget_planner_state.dart';
 import 'package:treat/state/diner_state.dart';
-import 'package:treat/widgets/treat_header.dart';
 
 void main() {
-  testWidgets('HomePromotionsScreen renders all sections from HTML wireframe and handles interactions',
+  testWidgets('HomePromotionsScreen renders wireframe mockup layout and verifies workable carousel functionalities',
       (WidgetTester tester) async {
-    tester.view.physicalSize = const Size(500, 2600);
+    tester.view.physicalSize = const Size(500, 3000);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() => tester.view.resetPhysicalSize());
 
     bool drawerOpened = false;
+    bool backToLoginCalled = false;
     PlatterDeal? selectedDeal;
     bool budgetPlannerNavigated = false;
 
@@ -29,6 +29,7 @@ void main() {
           theme: TreatTheme.lightTheme,
           home: HomePromotionsScreen(
             onOpenDrawer: () => drawerOpened = true,
+            onBackToLogin: () => backToLoginCalled = true,
             onSelectDeal: (deal) => selectedDeal = deal,
             onNavigateBudgetPlanner: () => budgetPlannerNavigated = true,
           ),
@@ -36,73 +37,169 @@ void main() {
       ),
     );
 
-    await tester.pump();
+    await tester.pumpAndSettle();
 
-    // 1. Verify Header Elements
-    expect(find.byIcon(Icons.menu), findsOneWidget);
-    expect(find.byIcon(Icons.search), findsOneWidget);
-    expect(find.text('TREAT'), findsOneWidget);
+    // 1. Verify Header Elements (guest mode shows back button, no menu)
+    expect(find.byIcon(Icons.arrow_back_ios_new_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.menu), findsNothing);
+    expect(find.byIcon(Icons.search), findsAtLeastNWidgets(1));
+    expect(find.byType(Image), findsAtLeastNWidgets(1));
+    // Profile icon is NOT visible in guest mode
+    expect(find.byIcon(Icons.person), findsNothing);
 
-    // 2. Verify Filter Chips
-    expect(find.text('Trending Treats'), findsOneWidget);
-    expect(find.text('Group Feasts'), findsOneWidget);
-    expect(find.text('Mega Deals'), findsOneWidget);
+    // 2. Verify Live Ticker
+    expect(find.text('Live nearby platters updating in real-time'), findsOneWidget);
+    expect(find.text('14 Active Feasts'), findsOneWidget);
 
-    // 3. Verify Section 1: Hottest Promotions
-    expect(find.text('Hottest Promotions'), findsOneWidget);
-    expect(find.text('POPULAR'), findsOneWidget);
+    // 3. Verify Search Bar
+    expect(find.text('Search sweets, spots & group pla...'), findsOneWidget);
+    expect(find.byIcon(Icons.tune_rounded), findsOneWidget);
+
+    // 4. Verify Filter Chips
+    expect(find.text('Trending Platters'), findsOneWidget);
+    expect(find.text('Squad Feasts'), findsOneWidget);
+    expect(find.text('Flash Drops'), findsOneWidget);
+
+    // Test filter selection tap
+    await tester.tap(find.text('Squad Feasts'));
+    await tester.pump(const Duration(milliseconds: 200));
+
+    // 5. Verify Section: HOT NEARBY & Hottest Platters Near You
+    expect(find.text('HOT NEARBY'), findsOneWidget);
+    expect(find.text('Hottest Platters Near You'), findsOneWidget);
+    expect(find.text('Within 1.2 mi'), findsOneWidget);
+
+    // Verify Initial Carousel Card (Neon Glaze Fiesta Platter)
     expect(find.text('Neon Glaze Fiesta Platter'), findsOneWidget);
-    expect(find.text('35% Off Squad Crunch Bar'), findsOneWidget);
+    expect(find.text('2-FOR-1 DEAL'), findsOneWidget);
+    expect(find.text('0.4 mi away'), findsOneWidget);
+    expect(find.text('Ends in 2h 14m'), findsOneWidget);
+    expect(find.text('50% SAVED'), findsOneWidget);
+    expect(find.text('Includes 6 sweet dips'), findsOneWidget);
+    expect(find.text('View Details'), findsAtLeastNWidgets(1));
 
-    // 4. Verify Section 2: Exclusive Vouchers
-    expect(find.text('Exclusive Vouchers'), findsOneWidget);
-    expect(find.text('TAP TO COPY'), findsOneWidget);
-    expect(find.text('50% Off First Treat'), findsOneWidget);
-    expect(find.text('TREAT50'), findsOneWidget);
-    expect(find.text('\$20 Weekend Chill'), findsOneWidget);
-    expect(find.text('WEEKENDVIBE'), findsOneWidget);
+    // 6. Test Carousel "Loved It" Button Toggle
+    final lovedButtons = find.text('Loved It');
+    expect(lovedButtons, findsAtLeastNWidgets(1));
+    await tester.tap(lovedButtons.first);
+    await tester.pump(const Duration(milliseconds: 200));
 
-    // 5. Test Copy Voucher Interaction
-    await tester.tap(find.text('TREAT50'));
-    await tester.pump();
-    expect(find.text('COPIED!'), findsOneWidget);
-
-    // Test Claim Deal Callback
-    await tester.tap(find.text('Claim'));
-    await tester.pump();
+    // 7. Test Carousel Navigation to Platter Details
+    final viewDetails = find.text('View Details');
+    expect(viewDetails, findsAtLeastNWidgets(1));
+    await tester.tap(viewDetails.first);
+    await tester.pump(const Duration(milliseconds: 200));
     expect(selectedDeal, isNotNull);
 
-    // Test Action Button (Treat Header celebration button)
-    await tester.tap(find.descendant(
-      of: find.byType(TreatHeader),
-      matching: find.byIcon(Icons.celebration),
-    ));
-    await tester.pump();
-    expect(budgetPlannerNavigated, isTrue);
+    // 8. Verify Carousel Navigation Chevron Icons removed and Auto-Sliding works
+    expect(find.byIcon(Icons.chevron_right_rounded), findsNothing);
+    expect(find.byIcon(Icons.chevron_left_rounded), findsNothing);
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump(const Duration(milliseconds: 500));
 
-    // 6. Verify Section 3: Featured Group Feast Spots
-    expect(find.text('Featured Group Feast Spots'), findsOneWidget);
-    expect(find.text('Sprinkle & Sizzle Social'), findsOneWidget);
-    expect(find.text('Sugar Smash & Patty Lounge'), findsOneWidget);
+    // 9. Verify Section: Exploring Current Events (WHAT'S ON NOW)
+    expect(find.text("WHAT'S ON NOW"), findsOneWidget);
+    expect(find.text('Exploring Current Events'), findsOneWidget);
+    expect(find.text('Sprinkle & Sizzle Social'), findsAtLeastNWidgets(1));
+    expect(find.text('Sugar Bloom Cafe & Brunch'), findsAtLeastNWidgets(1));
+    expect(find.text('Join Gathering'), findsOneWidget);
+    expect(find.text('RSVP Table'), findsOneWidget);
 
-    // 7. Verify Section 4: Gamified Loyalty Perks Banner
+    // 10. Verify Section: Mia's Sweet Treat Perks & Squad Ludo Modal
     expect(find.text("Mia's Sweet Treat Perks"), findsOneWidget);
-    expect(find.text('Spin Wheel 🎡'), findsOneWidget);
+    expect(find.text('Play Squad Ludo 🎲'), findsOneWidget);
 
-    // 8. Test Spin Wheel Modal
-    await tester.tap(find.text('Spin Wheel 🎡'));
+    // Tap Play Squad Ludo to open interactive modal
+    await tester.tap(find.text('Play Squad Ludo 🎲'));
     await tester.pumpAndSettle();
-    expect(find.text('🎡 Sweet Treat Wheel'), findsOneWidget);
-    expect(find.text('Spin Now!'), findsOneWidget);
 
-    // Close modal
+    expect(find.text('🎲 Treat Squad Ludo'), findsOneWidget);
+    expect(find.text('Roll Dice! 🎲'), findsOneWidget);
+
+    // Roll the dice in the modal
+    await tester.tap(find.text('Roll Dice! 🎲'));
+    await tester.pump(const Duration(milliseconds: 1000));
+    await tester.pumpAndSettle();
+
+    // Close the modal
     await tester.tap(find.text('Close'));
     await tester.pumpAndSettle();
-    expect(find.text('🎡 Sweet Treat Wheel'), findsNothing);
+    expect(find.text('🎲 Treat Squad Ludo'), findsNothing);
 
-    // 9. Test Header Drawer Tap
-    await tester.tap(find.byIcon(Icons.menu));
-    await tester.pump();
-    expect(drawerOpened, isTrue);
+    // 11. Test Header Back to Login Button in Guest Mode
+    await tester.tap(find.byIcon(Icons.arrow_back_ios_new_rounded));
+    await tester.pumpAndSettle();
+    expect(backToLoginCalled, isTrue);
+  });
+
+  testWidgets('HomePromotionsScreen renders location bar when Foodie is logged in and handles change and radius modals',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(500, 3000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() => tester.view.resetPhysicalSize());
+
+    final dinerState = DinerState();
+    dinerState.setFoodieLoggedIn(true);
+
+    bool profileNavigated = false;
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<DinerState>.value(value: dinerState),
+          ChangeNotifierProvider<BudgetPlannerState>(create: (_) => BudgetPlannerState()),
+        ],
+        child: MaterialApp(
+          theme: TreatTheme.lightTheme,
+          home: HomePromotionsScreen(
+            onOpenDrawer: () {},
+            onSelectDeal: (_) {},
+            onNavigateBudgetPlanner: () {},
+            onNavigateProfile: () => profileNavigated = true,
+          ),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    // Verify location bar elements
+    expect(find.text('Soho Quarter'), findsOneWidget);
+    expect(find.text('CHANGE'), findsOneWidget);
+    expect(find.text('Within 2 mi'), findsOneWidget);
+
+    // Verify profile icon is visible and redirects to profile
+    expect(find.byIcon(Icons.person), findsOneWidget);
+    await tester.tap(find.byIcon(Icons.person));
+    await tester.pumpAndSettle();
+    expect(profileNavigated, isTrue);
+
+    // Test tapping CHANGE
+    await tester.tap(find.text('CHANGE'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Change Location'), findsOneWidget);
+    expect(find.text('Williamsburg'), findsOneWidget);
+
+    // Select Williamsburg
+    await tester.tap(find.text('Williamsburg'));
+    await tester.pumpAndSettle();
+
+    expect(dinerState.userLocation, equals('Williamsburg'));
+    expect(find.text('Williamsburg'), findsOneWidget);
+
+    // Test tapping Radius
+    await tester.tap(find.text('Within 2 mi'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Select Search Radius'), findsOneWidget);
+    expect(find.text('Within 5 mi'), findsOneWidget);
+
+    // Select Within 5 mi
+    await tester.tap(find.text('Within 5 mi'));
+    await tester.pumpAndSettle();
+
+    expect(dinerState.locationRadius, equals('Within 5 mi'));
+    expect(find.text('Within 5 mi'), findsOneWidget);
   });
 }

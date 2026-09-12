@@ -1,21 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/treat_colors.dart';
 import '../../core/theme/treat_typography.dart';
+import '../../models/favorite_item.dart';
 import '../../models/platter_deal.dart';
 import '../../state/budget_planner_state.dart';
-import '../../widgets/treat_button.dart';
+import '../../state/diner_state.dart';
 import '../../widgets/treat_card.dart';
 import '../../widgets/treat_header.dart';
 
 class ChooseTreatBudgetScreen extends StatelessWidget {
   final VoidCallback onOpenDrawer;
   final Function(PlatterDeal deal) onSelectDeal;
+  final VoidCallback? onBackToFoodBar;
+  final VoidCallback? onFindWithinBudget;
 
   const ChooseTreatBudgetScreen({
     super.key,
     required this.onOpenDrawer,
     required this.onSelectDeal,
+    this.onBackToFoodBar,
+    this.onFindWithinBudget,
   });
 
   @override
@@ -27,8 +33,9 @@ class ChooseTreatBudgetScreen extends StatelessWidget {
       backgroundColor: TreatColors.background,
       appBar: TreatHeader(
         onMenuTap: onOpenDrawer,
-        actionLabel: 'Radar',
-        actionIcon: Icons.radar,
+        actionLabel: 'Treat',
+        actionIcon: Icons.celebration,
+        onActionTap: onBackToFoodBar,
       ),
       body: ListView(
         padding: const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 36),
@@ -88,7 +95,7 @@ class ChooseTreatBudgetScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Set your sweet spot & feast like royalty without wallet shock!',
+                  'Set your sweet spot & feast like royalty without the wallet shock!',
                   style: TreatTypography.bodySmall,
                 ),
                 const SizedBox(height: 18),
@@ -103,27 +110,32 @@ class ChooseTreatBudgetScreen extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              color: TreatColors.secondaryFixed,
-                              shape: BoxShape.circle,
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: TreatColors.secondaryFixed,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.groups, color: TreatColors.secondary, size: 20),
                             ),
-                            child: const Icon(Icons.groups, color: TreatColors.secondary, size: 20),
-                          ),
-                          const SizedBox(width: 10),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Party Crew', style: TreatTypography.titleSmall),
-                              Text("Who's joining the table?", style: TreatTypography.bodySmall.copyWith(fontSize: 10)),
-                            ],
-                          ),
-                        ],
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Party Crew', style: TreatTypography.titleSmall),
+                                  Text("Who's joining the table?", style: TreatTypography.bodySmall.copyWith(fontSize: 10)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
+                      const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
@@ -192,12 +204,20 @@ class ChooseTreatBudgetScreen extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              const Icon(Icons.payments, size: 18, color: TreatColors.primary),
-                              const SizedBox(width: 6),
-                              Text('Total Squad Budget', style: TreatTypography.titleSmall),
-                            ],
+                          Expanded(
+                            child: Row(
+                              children: [
+                                const Icon(Icons.payments, size: 18, color: TreatColors.primary),
+                                const SizedBox(width: 6),
+                                Flexible(
+                                  child: Text(
+                                    'Total Squad Budget',
+                                    style: TreatTypography.titleSmall,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                           Text(
                             '\$${state.budget.toInt()}',
@@ -228,24 +248,31 @@ class ChooseTreatBudgetScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text('Min: \$30', style: TreatTypography.bodySmall.copyWith(fontSize: 10)),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: TreatColors.primaryFixed,
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.local_activity, size: 12, color: TreatColors.primary),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '\$${state.perPersonBudget.toStringAsFixed(2)} / sweetie',
-                                  style: TreatTypography.labelSmall.copyWith(
-                                    color: TreatColors.onPrimaryFixedVariant,
-                                    fontSize: 10,
+                          Flexible(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: TreatColors.primaryFixed,
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.credit_card, size: 12, color: TreatColors.primary),
+                                  const SizedBox(width: 4),
+                                  Flexible(
+                                    child: Text(
+                                      '\$${state.perPersonBudget.toStringAsFixed(2)} / sweetie',
+                                      style: TreatTypography.labelSmall.copyWith(
+                                        color: TreatColors.onPrimaryFixedVariant,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                           Text('Max: \$400', style: TreatTypography.bodySmall.copyWith(fontSize: 10)),
@@ -270,7 +297,7 @@ class ChooseTreatBudgetScreen extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
-                          color: isSel ? TreatColors.secondary : TreatColors.surfaceContainerLow,
+                          color: isSel ? const Color(0xFFD6228A) : TreatColors.surfaceContainerLow,
                           borderRadius: BorderRadius.circular(999),
                           boxShadow: isSel ? TreatColors.pillShadow : null,
                         ),
@@ -288,6 +315,7 @@ class ChooseTreatBudgetScreen extends StatelessWidget {
                               style: TreatTypography.labelSmall.copyWith(
                                 color: isSel ? Colors.white : TreatColors.onSurface,
                                 fontSize: 11,
+                                fontWeight: isSel ? FontWeight.w700 : FontWeight.w500,
                               ),
                             ),
                           ],
@@ -298,90 +326,211 @@ class ChooseTreatBudgetScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 14),
 
-                // Quick Toggles
+                // Quick Checkbox Toggles
                 Row(
                   children: [
                     Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: TreatColors.surfaceContainerLow,
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Tax & Tip', style: TreatTypography.labelSmall.copyWith(fontSize: 11)),
-                                Text('Add 18%', style: TreatTypography.bodySmall.copyWith(fontSize: 9)),
-                              ],
-                            ),
-                            Switch(
-                              value: state.includeTax,
-                              onChanged: (val) => state.toggleIncludeTax(val),
-                              activeThumbColor: TreatColors.secondary,
-                            ),
-                          ],
+                      child: InkWell(
+                        onTap: () => state.toggleIncludeTax(!state.includeTax),
+                        borderRadius: BorderRadius.circular(14),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: TreatColors.surfaceContainerLow,
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Tax & Service',
+                                      style: TreatTypography.labelSmall.copyWith(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      'Include extra 18%',
+                                      style: TreatTypography.bodySmall.copyWith(
+                                        color: TreatColors.onSurfaceVariant.withValues(alpha: 0.7),
+                                        fontSize: 9,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Container(
+                                width: 20,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  color: state.includeTax ? TreatColors.secondary : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(5),
+                                  border: Border.all(
+                                    color: state.includeTax ? TreatColors.secondary : TreatColors.outlineVariant,
+                                    width: 1.5,
+                                  ),
+                                ),
+                                child: state.includeTax
+                                    ? const Icon(Icons.check, size: 14, color: Colors.white)
+                                    : null,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: TreatColors.surfaceContainerLow,
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Walkable', style: TreatTypography.labelSmall.copyWith(fontSize: 11)),
-                                Text('< 15 mins', style: TreatTypography.bodySmall.copyWith(fontSize: 9)),
-                              ],
-                            ),
-                            Switch(
-                              value: state.walkableOnly,
-                              onChanged: (val) => state.toggleWalkableOnly(val),
-                              activeThumbColor: TreatColors.primary,
-                            ),
-                          ],
+                      child: InkWell(
+                        onTap: () => state.toggleWalkableOnly(!state.walkableOnly),
+                        borderRadius: BorderRadius.circular(14),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: TreatColors.surfaceContainerLow,
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Walkable Only',
+                                      style: TreatTypography.labelSmall.copyWith(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      '< 15 mins away',
+                                      style: TreatTypography.bodySmall.copyWith(
+                                        color: TreatColors.onSurfaceVariant.withValues(alpha: 0.7),
+                                        fontSize: 9,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Container(
+                                width: 20,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  color: state.walkableOnly ? TreatColors.secondary : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(5),
+                                  border: Border.all(
+                                    color: state.walkableOnly ? TreatColors.secondary : TreatColors.outlineVariant,
+                                    width: 1.5,
+                                  ),
+                                ),
+                                child: state.walkableOnly
+                                    ? const Icon(Icons.check, size: 14, color: Colors.white)
+                                    : null,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ],
+                ),
+                const SizedBox(height: 16),
+
+                // Find It Within Budget Button
+                Container(
+                  width: double.infinity,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF7C52AA), Color(0xFF673AB7)],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
+                    borderRadius: BorderRadius.circular(999),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color.fromRGBO(124, 82, 170, 0.35),
+                        blurRadius: 14,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {
+                        onFindWithinBudget?.call();
+                      },
+                      borderRadius: BorderRadius.circular(999),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.diamond_outlined, color: Colors.white, size: 18),
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              'FIND IT WITHIN BUDGET',
+                              style: GoogleFonts.plusJakartaSans(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 12,
+                                letterSpacing: 0.5,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 18),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 20),
 
-          // Matched Results Section
+          // Matched Results Section Header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Tasty Matches for Your Crew', style: TreatTypography.titleMedium),
-                  Text('Found ${matches.length} feast platters within your budget', style: TreatTypography.bodySmall),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Tasty Matches for Your Crew', style: TreatTypography.titleMedium.copyWith(fontWeight: FontWeight.w800)),
+                    Text(
+                      'Found ${matches.length} feast spots within your exact budget',
+                      style: TreatTypography.bodySmall.copyWith(
+                        color: TreatColors.onSurfaceVariant.withValues(alpha: 0.8),
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: TreatColors.tertiaryFixed,
+                  color: const Color(0xFFE0F2FE),
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
-                  '${matches.length} Matches',
+                  '${matches.length} Spots',
                   style: TreatTypography.labelSmall.copyWith(
-                    color: TreatColors.onTertiaryFixed,
+                    color: const Color(0xFF0284C7),
+                    fontWeight: FontWeight.w800,
                     fontSize: 10,
                   ),
                 ),
@@ -393,12 +542,18 @@ class ChooseTreatBudgetScreen extends StatelessWidget {
           // Platter Match Cards
           ...matches.map((deal) {
             return Container(
-              margin: const EdgeInsets.only(bottom: 16),
+              margin: const EdgeInsets.only(bottom: 18),
               decoration: BoxDecoration(
-                color: TreatColors.surfaceContainerLowest,
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(24),
-                boxShadow: TreatColors.candyShadow,
-                border: Border.all(color: TreatColors.outlineVariant.withValues(alpha: 0.4)),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color.fromRGBO(124, 82, 170, 0.08),
+                    blurRadius: 18,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+                border: Border.all(color: TreatColors.outlineVariant.withValues(alpha: 0.35)),
               ),
               clipBehavior: Clip.antiAlias,
               child: Column(
@@ -408,64 +563,233 @@ class ChooseTreatBudgetScreen extends StatelessWidget {
                     children: [
                       Image.network(
                         deal.imageUrl,
-                        height: 150,
+                        height: 160,
                         width: double.infinity,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(height: 150, color: TreatColors.primaryFixed),
+                        errorBuilder: (_, __, ___) => Container(
+                          height: 160,
+                          color: TreatColors.primaryFixed,
+                          child: const Center(
+                            child: Icon(Icons.restaurant, size: 40, color: TreatColors.secondary),
+                          ),
+                        ),
                       ),
+                      // Walk distance & time overlay
                       Positioned(
-                        top: 10,
+                        bottom: 10,
                         left: 10,
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: TreatColors.primary,
+                            color: Colors.black.withValues(alpha: 0.65),
                             borderRadius: BorderRadius.circular(999),
                           ),
-                          child: Text(
-                            deal.badgeText,
-                            style: TreatTypography.labelSmall.copyWith(color: Colors.white, fontSize: 10),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.directions_walk, size: 14, color: Color(0xFF67E8F9)),
+                              const SizedBox(width: 4),
+                              Text(
+                                deal.walkTime,
+                                style: GoogleFonts.plusJakartaSans(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
+                      // Rating & review count overlay
                       Positioned(
-                        bottom: 8,
-                        right: 8,
+                        bottom: 10,
+                        right: 10,
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.92),
+                            color: Colors.black.withValues(alpha: 0.65),
                             borderRadius: BorderRadius.circular(999),
                           ),
-                          child: Text(
-                            '\$${deal.price.toStringAsFixed(2)}',
-                            style: TreatTypography.headlineSmall.copyWith(
-                              color: TreatColors.primary,
-                              fontSize: 14,
-                            ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.star, size: 13, color: Color(0xFFFBBF24)),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${deal.rating.toStringAsFixed(1)} (${deal.reviewsCount})',
+                                style: GoogleFonts.plusJakartaSans(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
                     ],
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(14),
+                    padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(deal.title, style: TreatTypography.titleMedium),
-                        const SizedBox(height: 2),
-                        Text(deal.subtitle, style: TreatTypography.bodySmall),
-                        const SizedBox(height: 12),
-                        TreatButton(
-                          text: 'View Platter Packages',
-                          icon: Icons.fastfood,
-                          height: 44,
-                          variant: TreatButtonVariant.solidSecondary,
-                          onPressed: () {
-                            state.selectPlatter(deal);
-                            onSelectDeal(deal);
-                          },
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                deal.restaurantName.isNotEmpty ? deal.restaurantName : deal.title,
+                                style: TreatTypography.titleMedium.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  '\$${deal.price.toStringAsFixed(2)}',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    color: const Color(0xFFD6228A),
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                Text(
+                                  deal.perPersonText ?? '\$${(deal.price / state.partySize).toStringAsFixed(0)}/person',
+                                  style: TreatTypography.bodySmall.copyWith(
+                                    color: TreatColors.onSurfaceVariant.withValues(alpha: 0.7),
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          deal.subtitle,
+                          style: TreatTypography.bodySmall.copyWith(
+                            color: TreatColors.onSurfaceVariant,
+                            fontSize: 12,
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        Row(
+                          children: [
+                            // Save & Pass button
+                            Expanded(
+                              child: Container(
+                                height: 38,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF3E8FF),
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () {
+                                      state.selectPlatter(deal);
+                                      onSelectDeal(deal);
+                                    },
+                                    borderRadius: BorderRadius.circular(999),
+                                    child: Center(
+                                      child: Text(
+                                        deal.saveText ?? 'Save \$28 • Pass',
+                                        style: GoogleFonts.plusJakartaSans(
+                                          color: const Color(0xFF7C52AA),
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            // Loved It ♡ button
+                            Expanded(
+                              child: Container(
+                                height: 38,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFD6228A),
+                                  borderRadius: BorderRadius.circular(999),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Color.fromRGBO(214, 34, 138, 0.3),
+                                      blurRadius: 10,
+                                      offset: Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: Builder(
+                                    builder: (context) {
+                                      final isLoved = context.watch<DinerState>().isFavorite(deal.id);
+                                      return InkWell(
+                                        onTap: () {
+                                          final added = context.read<DinerState>().toggleFavorite(FavoriteItem.fromPlatterDeal(deal));
+                                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Row(
+                                                children: [
+                                                  Icon(
+                                                    added ? Icons.favorite : Icons.favorite_border,
+                                                    color: Colors.white,
+                                                    size: 18,
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Flexible(
+                                                    child: Text(
+                                                      added ? 'Added to your Loved Favorites! ❤️' : 'Removed from Favorites',
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              backgroundColor: TreatColors.secondary,
+                                              behavior: SnackBarBehavior.floating,
+                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                              duration: const Duration(seconds: 2),
+                                            ),
+                                          );
+                                        },
+                                        borderRadius: BorderRadius.circular(999),
+                                        child: Center(
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                'Loved It',
+                                                style: GoogleFonts.plusJakartaSans(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w800,
+                                                  fontSize: 11,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Icon(
+                                                isLoved ? Icons.favorite : Icons.favorite_border,
+                                                size: 14,
+                                                color: Colors.white,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),

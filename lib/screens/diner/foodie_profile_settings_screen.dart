@@ -1,24 +1,31 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../../core/constants/asset_constants.dart';
 import '../../core/theme/treat_colors.dart';
-import '../../core/theme/treat_typography.dart';
+import '../../models/diner_persona.dart';
 import '../../state/diner_state.dart';
-import '../../widgets/treat_button.dart';
-import '../../widgets/treat_card.dart';
-import '../../widgets/treat_header.dart';
 
 class FoodieProfileSettingsScreen extends StatefulWidget {
   final VoidCallback onOpenDrawer;
+  final VoidCallback? onNavigateHome;
+  final VoidCallback? onLogOut;
 
-  const FoodieProfileSettingsScreen({super.key, required this.onOpenDrawer});
+  const FoodieProfileSettingsScreen({
+    super.key,
+    required this.onOpenDrawer,
+    this.onNavigateHome,
+    this.onLogOut,
+  });
 
   @override
-  State<FoodieProfileSettingsScreen> createState() => _FoodieProfileSettingsScreenState();
+  State<FoodieProfileSettingsScreen> createState() =>
+      _FoodieProfileSettingsScreenState();
 }
 
-class _FoodieProfileSettingsScreenState extends State<FoodieProfileSettingsScreen>
-    with SingleTickerProviderStateMixin {
+class _FoodieProfileSettingsScreenState
+    extends State<FoodieProfileSettingsScreen> {
   static const List<Map<String, dynamic>> allTags = [
     {'name': 'Spicy Lover', 'icon': Icons.local_fire_department_rounded},
     {'name': 'Halal', 'icon': Icons.verified_rounded},
@@ -32,54 +39,40 @@ class _FoodieProfileSettingsScreenState extends State<FoodieProfileSettingsScree
     {'name': 'Boba Lover', 'icon': Icons.local_cafe_rounded},
   ];
 
-  late AnimationController _pulseController;
-  late Animation<double> _pulseAnimation;
-  double _budgetSliderVal = 35.0;
+  double _budgetSliderVal = 45.0;
 
-  @override
-  void initState() {
-    super.initState();
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1400),
-    )..repeat(reverse: true);
-    _pulseAnimation = Tween<double>(begin: 0.6, end: 1.0).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
-    );
-  }
+  void _showEditPersonaDialog(BuildContext context) {
+    final dinerState = context.read<DinerState>();
+    final controller =
+        TextEditingController(text: dinerState.currentPersona.handle);
 
-  @override
-  void dispose() {
-    _pulseController.dispose();
-    super.dispose();
-  }
-
-  void _showAddCustomFundsDialog(BuildContext context, DinerState dinerState) {
-    final controller = TextEditingController();
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        backgroundColor: TreatColors.surfaceContainerLowest,
+        backgroundColor: Colors.white,
         title: Row(
           children: [
             Container(
               width: 36,
               height: 36,
               decoration: const BoxDecoration(
-                color: TreatColors.secondaryContainer,
+                color: Color(0xFFF3E8FC),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.account_balance_wallet_rounded,
-                  color: TreatColors.secondary, size: 20),
+              child: const Icon(
+                Icons.edit_rounded,
+                color: Color(0xFF7C52AA),
+                size: 18,
+              ),
             ),
             const SizedBox(width: 10),
             Text(
-              'Add Treat Credits',
+              'Edit Display Persona',
               style: GoogleFonts.plusJakartaSans(
                 fontWeight: FontWeight.w800,
                 fontSize: 18,
-                color: TreatColors.onSurface,
+                color: const Color(0xFF201A24),
               ),
             ),
           ],
@@ -89,56 +82,40 @@ class _FoodieProfileSettingsScreenState extends State<FoodieProfileSettingsScree
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Enter the custom amount to add to your Treat Wallet for instant partner table settlements:',
-              style: TreatTypography.bodySmall,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: controller,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              autofocus: true,
-              decoration: InputDecoration(
-                prefixText: '\$ ',
-                prefixStyle: GoogleFonts.plusJakartaSans(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: TreatColors.secondary,
-                ),
-                hintText: '25.00',
-                filled: true,
-                fillColor: TreatColors.surfaceContainerLow,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
-                ),
+              'Choose how other diners see you on public feasts & community tables:',
+              style: GoogleFonts.dmSans(
+                fontSize: 13,
+                color: const Color(0xFF706776),
               ),
             ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [15.0, 30.0, 75.0].map((amt) {
-                return InkWell(
-                  onTap: () {
-                    controller.text = amt.toStringAsFixed(2);
-                  },
-                  borderRadius: BorderRadius.circular(999),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: TreatColors.primaryFixed,
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    child: Text(
-                      '+\$${amt.toInt()}',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontWeight: FontWeight.w800,
-                        fontSize: 12,
-                        color: TreatColors.onPrimaryFixed,
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
+            const SizedBox(height: 14),
+            TextField(
+              controller: controller,
+              autofocus: true,
+              style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF201A24),
+              ),
+              decoration: InputDecoration(
+                hintText: 'e.g. MidnightDumpling',
+                filled: true,
+                fillColor: const Color(0xFFFBF6FD),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Color(0xFFE2D6EE)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Color(0xFFE2D6EE)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide:
+                      const BorderSide(color: Color(0xFF7C52AA), width: 1.5),
+                ),
+              ),
             ),
           ],
         ),
@@ -149,34 +126,31 @@ class _FoodieProfileSettingsScreenState extends State<FoodieProfileSettingsScree
               'Cancel',
               style: GoogleFonts.plusJakartaSans(
                 fontWeight: FontWeight.w700,
-                color: TreatColors.outline,
+                color: const Color(0xFF706776),
               ),
             ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: TreatColors.primary,
+              backgroundColor: const Color(0xFF7C52AA),
               foregroundColor: Colors.white,
               shape: const StadiumBorder(),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              elevation: 0,
             ),
             onPressed: () {
-              final val = double.tryParse(controller.text.trim());
-              if (val != null && val > 0) {
-                dinerState.addWalletFunds(val);
-                Navigator.of(ctx).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Added \$${val.toStringAsFixed(2)} Treat Credits! 🍰'),
-                    backgroundColor: TreatColors.secondary,
-                    duration: const Duration(seconds: 2),
-                  ),
-                );
+              final text = controller.text.trim();
+              if (text.isNotEmpty) {
+                dinerState.setHandle(text);
               }
+              Navigator.of(ctx).pop();
             },
             child: Text(
-              'Confirm Top Up',
-              style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w800),
+              'Save Persona',
+              style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w800,
+                fontSize: 13,
+              ),
             ),
           ),
         ],
@@ -184,55 +158,479 @@ class _FoodieProfileSettingsScreenState extends State<FoodieProfileSettingsScree
     );
   }
 
-  void _showAddTagDialog(BuildContext context, DinerState dinerState) {
-    final controller = TextEditingController();
+  void _showSwitchPersonaDialog(BuildContext context) {
+    final dinerState = context.read<DinerState>();
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFDDD3E2),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Switch Active Persona',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 18,
+                        color: const Color(0xFF201A24),
+                      ),
+                    ),
+                    TextButton.icon(
+                      onPressed: () {
+                        dinerState.shufflePersona();
+                        Navigator.of(ctx).pop();
+                      },
+                      icon: const Icon(Icons.shuffle_rounded, size: 16),
+                      label: const Text('Shuffle'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFF7C52AA),
+                        textStyle: GoogleFonts.plusJakartaSans(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                ...DinerPersona.presetPersonas.map((preset) {
+                  final handle = preset['handle']!;
+                  final emoji = preset['emoji']!;
+                  final isCurrent =
+                      dinerState.currentPersona.handle == handle;
+
+                  return ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: isCurrent
+                            ? const Color(0xFFF2E8FC)
+                            : const Color(0xFFF6F3F7),
+                        shape: BoxShape.circle,
+                        border: isCurrent
+                            ? Border.all(
+                                color: const Color(0xFF7C52AA), width: 2)
+                            : null,
+                      ),
+                      child: Center(
+                        child: Text(emoji,
+                            style: const TextStyle(fontSize: 20)),
+                      ),
+                    ),
+                    title: Text(
+                      handle,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 15,
+                        fontWeight:
+                            isCurrent ? FontWeight.w800 : FontWeight.w600,
+                        color: isCurrent
+                            ? const Color(0xFF7C52AA)
+                            : const Color(0xFF201A24),
+                      ),
+                    ),
+                    subtitle: Text(
+                      '@treat_nomad • Foodie Adventurer',
+                      style: GoogleFonts.dmSans(
+                        fontSize: 12,
+                        color: const Color(0xFF706776),
+                      ),
+                    ),
+                    trailing: isCurrent
+                        ? const Icon(Icons.check_circle_rounded,
+                            color: Color(0xFF7C52AA), size: 20)
+                        : null,
+                    onTap: () {
+                      dinerState.setHandle(handle);
+                      dinerState.setAvatarEmoji(emoji);
+                      Navigator.of(ctx).pop();
+                    },
+                  );
+                }),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showDietaryPreferencesDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        backgroundColor: TreatColors.surfaceContainerLowest,
-        title: Text(
-          'Add Custom Taste Tag',
-          style: GoogleFonts.plusJakartaSans(
-            fontWeight: FontWeight.w800,
-            fontSize: 18,
-            color: TreatColors.onSurface,
-          ),
-        ),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: InputDecoration(
-            hintText: 'e.g. Truffle Fanatic',
-            filled: true,
-            fillColor: TreatColors.surfaceContainerLow,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide.none,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            final dinerState = context.watch<DinerState>();
+            final tags = dinerState.currentPersona.dietTags;
+
+            return AlertDialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24)),
+              title: Row(
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFF2E8FC),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.restaurant_outlined,
+                      color: Color(0xFF7C52AA),
+                      size: 18,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    'Dietary Preferences',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 18,
+                      color: const Color(0xFF201A24),
+                    ),
+                  ),
+                ],
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Tap to toggle tags matched on platter menus:',
+                      style: GoogleFonts.dmSans(
+                        fontSize: 13,
+                        color: const Color(0xFF706776),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: allTags.map((t) {
+                        final name = t['name'] as String;
+                        final icon = t['icon'] as IconData;
+                        final isSelected = tags.contains(name);
+
+                        return FilterChip(
+                          selected: isSelected,
+                          avatar: Icon(
+                            icon,
+                            size: 15,
+                            color: isSelected
+                                ? Colors.white
+                                : const Color(0xFF7C52AA),
+                          ),
+                          label: Text(
+                            name,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 12,
+                              fontWeight: isSelected
+                                  ? FontWeight.w800
+                                  : FontWeight.w600,
+                              color: isSelected
+                                  ? Colors.white
+                                  : const Color(0xFF201A24),
+                            ),
+                          ),
+                          backgroundColor: const Color(0xFFF9F4FC),
+                          selectedColor: const Color(0xFF7C52AA),
+                          checkmarkColor: Colors.white,
+                          shape: const StadiumBorder(
+                            side: BorderSide(color: Color(0xFFE2D6EE)),
+                          ),
+                          onSelected: (_) {
+                            dinerState.toggleDietTag(name);
+                            setDialogState(() {});
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF7C52AA),
+                    foregroundColor: Colors.white,
+                    shape: const StadiumBorder(),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 12),
+                    elevation: 0,
+                  ),
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: Text(
+                    'Done',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showTargetSpendDialog(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            final lower = (_budgetSliderVal - 15).clamp(15, 80).toInt();
+            final upper = (_budgetSliderVal + 15).clamp(30, 150).toInt();
+
+            return SafeArea(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 22),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFDDD3E2),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Target Spend per Diner',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 18,
+                        color: const Color(0xFF201A24),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Adjust your comfort dining range for platter splits:',
+                      style: GoogleFonts.dmSans(
+                        fontSize: 13,
+                        color: const Color(0xFF706776),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Center(
+                      child: Text(
+                        '\$$lower - \$$upper • Shared Feast',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                          color: const Color(0xFF7C52AA),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    SliderTheme(
+                      data: SliderTheme.of(context).copyWith(
+                        activeTrackColor: const Color(0xFF7C52AA),
+                        inactiveTrackColor: const Color(0xFFF0E5F7),
+                        thumbColor: const Color(0xFF7C52AA),
+                        overlayColor:
+                            const Color(0xFF7C52AA).withValues(alpha: 0.15),
+                      ),
+                      child: Slider(
+                        value: _budgetSliderVal,
+                        min: 25.0,
+                        max: 95.0,
+                        divisions: 14,
+                        onChanged: (val) {
+                          setState(() => _budgetSliderVal = val);
+                          setSheetState(() {});
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF7C52AA),
+                          foregroundColor: Colors.white,
+                          shape: const StadiumBorder(),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          elevation: 0,
+                        ),
+                        onPressed: () => Navigator.of(ctx).pop(),
+                        child: Text(
+                          'Save Target Spend',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showSquadSizeDialog(BuildContext context) {
+    final dinerState = context.read<DinerState>();
+    final options = [
+      {'size': 2, 'label': '2-3 guests • Duo Nibble'},
+      {'size': 4, 'label': '4-5 guests • Standard Squad Feast'},
+      {'size': 6, 'label': '6-8 guests • Mega Group Feast'},
+      {'size': 10, 'label': '10+ guests • Party Reservation'},
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFDDD3E2),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  'Default Squad Size',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 18,
+                    color: const Color(0xFF201A24),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Preferred table reservation headcount for group platters:',
+                  style: GoogleFonts.dmSans(
+                    fontSize: 13,
+                    color: const Color(0xFF706776),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ...options.map((opt) {
+                  final size = opt['size'] as int;
+                  final label = opt['label'] as String;
+                  final isCurrent =
+                      dinerState.currentPersona.preferredSquadSize == size;
+
+                  return ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: isCurrent
+                            ? const Color(0xFFF2E8FC)
+                            : const Color(0xFFF6F3F7),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        isCurrent
+                            ? Icons.check_circle_rounded
+                            : Icons.groups_outlined,
+                        color: isCurrent
+                            ? const Color(0xFF7C52AA)
+                            : const Color(0xFFA098A5),
+                        size: 18,
+                      ),
+                    ),
+                    title: Text(
+                      label,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 14,
+                        fontWeight:
+                            isCurrent ? FontWeight.w800 : FontWeight.w600,
+                        color: isCurrent
+                            ? const Color(0xFF7C52AA)
+                            : const Color(0xFF201A24),
+                      ),
+                    ),
+                    onTap: () {
+                      dinerState.setPreferredSquadSize(size);
+                      Navigator.of(ctx).pop();
+                    },
+                  );
+                }),
+              ],
             ),
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: TreatColors.secondary,
-              foregroundColor: Colors.white,
-              shape: const StadiumBorder(),
+        );
+      },
+    );
+  }
+
+  void _showSquadLudoModal() {
+    showDialog(
+      context: context,
+      builder: (ctx) => _SquadLudoProfileModal(
+        onRewardClaimed: (reward) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('🎉 Awesome! You won $reward!'),
+              backgroundColor: TreatColors.primary,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
-            onPressed: () {
-              final text = controller.text.trim();
-              if (text.isNotEmpty) {
-                dinerState.toggleDietTag(text);
-                Navigator.of(ctx).pop();
-              }
-            },
-            child: const Text('Add Tag'),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -242,13 +640,30 @@ class _FoodieProfileSettingsScreenState extends State<FoodieProfileSettingsScree
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: Colors.white,
         title: Row(
           children: [
-            const Icon(Icons.history_edu_rounded, color: TreatColors.secondary),
-            const SizedBox(width: 8),
+            Container(
+              width: 36,
+              height: 36,
+              decoration: const BoxDecoration(
+                color: Color(0xFFF2E8FC),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.receipt_long_outlined,
+                color: Color(0xFF7C52AA),
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 10),
             Text(
               'Export Dining History',
-              style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w800, fontSize: 18),
+              style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w800,
+                fontSize: 18,
+                color: const Color(0xFF201A24),
+              ),
             ),
           ],
         ),
@@ -258,20 +673,25 @@ class _FoodieProfileSettingsScreenState extends State<FoodieProfileSettingsScree
           children: [
             Text(
               'Your anonymous dining transactions, redeemed platter vouchers, and group split receipts are compiled.',
-              style: TreatTypography.bodySmall,
+              style: GoogleFonts.dmSans(
+                fontSize: 13,
+                color: const Color(0xFF706776),
+              ),
             ),
             const SizedBox(height: 12),
             Container(
+              width: double.infinity,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: TreatColors.surfaceContainerLow,
-                borderRadius: BorderRadius.circular(12),
+                color: const Color(0xFFFBF6FD),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: const Color(0xFFEADBEE)),
               ),
               child: Text(
                 'treat_diner_pass_history_2026.csv\n• 34 Verified Treats Claimed\n• \$185 Total Community Savings\n• Zero PII Disclosed',
                 style: GoogleFonts.sourceCodePro(
                   fontSize: 11,
-                  color: TreatColors.onSurfaceVariant,
+                  color: const Color(0xFF493B52),
                 ),
               ),
             ),
@@ -280,25 +700,120 @@ class _FoodieProfileSettingsScreenState extends State<FoodieProfileSettingsScree
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Dismiss'),
+            child: Text(
+              'Dismiss',
+              style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF706776),
+              ),
+            ),
           ),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
-              backgroundColor: TreatColors.primary,
+              backgroundColor: const Color(0xFF7C52AA),
               foregroundColor: Colors.white,
               shape: const StadiumBorder(),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              elevation: 0,
             ),
             onPressed: () {
               Navigator.of(ctx).pop();
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Downloaded treat_diner_pass_history_2026.csv! 📜'),
+                  content:
+                      Text('Downloaded treat_diner_pass_history_2026.csv! 📜'),
                   duration: Duration(seconds: 2),
                 ),
               );
             },
             icon: const Icon(Icons.download_rounded, size: 16),
-            label: const Text('Download CSV'),
+            label: Text(
+              'Download CSV',
+              style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w800,
+                fontSize: 13,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLogOutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: const BoxDecoration(
+                color: Color(0xFFFEE2E2),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.logout_rounded,
+                color: Color(0xFFDC2626),
+                size: 18,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              'Log Out of Foodie?',
+              style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w800,
+                fontSize: 18,
+                color: const Color(0xFF201A24),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'You will return to the Welcome & Explore screen in Guest mode. Your saved personas and vouchers will be preserved.',
+          style: GoogleFonts.dmSans(
+            fontSize: 13,
+            color: const Color(0xFF706776),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF706776),
+              ),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFDC2626),
+              foregroundColor: Colors.white,
+              shape: const StadiumBorder(),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              elevation: 0,
+            ),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              context.read<DinerState>().setFoodieLoggedIn(false);
+              if (widget.onLogOut != null) {
+                widget.onLogOut!();
+              } else if (widget.onNavigateHome != null) {
+                widget.onNavigateHome!();
+              }
+            },
+            child: Text(
+              'Log Out',
+              style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w800,
+                fontSize: 13,
+              ),
+            ),
           ),
         ],
       ),
@@ -310,1391 +825,1172 @@ class _FoodieProfileSettingsScreenState extends State<FoodieProfileSettingsScree
     final dinerState = context.watch<DinerState>();
     final persona = dinerState.currentPersona;
 
-    final lowerBudget = (_budgetSliderVal - 15).clamp(10, 90).toInt();
-    final upperBudget = (_budgetSliderVal + 15).clamp(15, 120).toInt();
+    final lowerBudget = (_budgetSliderVal - 15).clamp(15, 80).toInt();
+    final upperBudget = (_budgetSliderVal + 15).clamp(30, 150).toInt();
 
     return Scaffold(
-      backgroundColor: TreatColors.background,
-      appBar: TreatHeader(
-        onMenuTap: widget.onOpenDrawer,
-        actionLabel: 'Treat',
-        actionIcon: Icons.celebration_rounded,
-      ),
+      backgroundColor: const Color(0xFFFEF7FF),
+      appBar: _buildTopAppBar(context),
       body: ListView(
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 44),
+        padding:
+            const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 44),
         children: [
           // ==========================================
           // 1. Hero Profile & Identity Card
           // ==========================================
-          Stack(
-            clipBehavior: Clip.none,
+          _buildHeroProfileCard(context, dinerState, persona),
+          const SizedBox(height: 22),
+
+          // ==========================================
+          // 2. Section: ACCOUNT & PERSONA
+          // ==========================================
+          _buildSectionHeader('ACCOUNT & PERSONA'),
+          const SizedBox(height: 8),
+          _buildCardContainer(
             children: [
-              // Ambient Glow Decor Blobs behind card
-              Positioned(
-                top: -16,
-                right: -16,
-                child: Container(
-                  width: 140,
-                  height: 140,
-                  decoration: BoxDecoration(
-                    color: TreatColors.primaryFixed.withValues(alpha: 0.70),
-                    shape: BoxShape.circle,
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color.fromRGBO(224, 64, 160, 0.25),
-                        blurRadius: 40,
-                        spreadRadius: 10,
-                      ),
-                    ],
-                  ),
+              _buildSettingRow(
+                icon: Icons.badge_outlined,
+                title: 'Display Persona',
+                subtitle: '${persona.handle} (@treat_nomad)',
+                trailing: const Icon(
+                  Icons.chevron_right_rounded,
+                  color: Color(0xFFA098A5),
+                  size: 20,
                 ),
+                onTap: () => _showEditPersonaDialog(context),
               ),
-              Positioned(
-                bottom: -16,
-                left: -12,
-                child: Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    color: TreatColors.secondaryFixed.withValues(alpha: 0.60),
-                    shape: BoxShape.circle,
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color.fromRGBO(124, 82, 170, 0.20),
-                        blurRadius: 36,
-                        spreadRadius: 8,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              TreatCard(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Avatar with Glow & Magic Wand Shuffle Button
-                        Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            Container(
-                              width: 76,
-                              height: 76,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: TreatColors.primary,
-                                  width: 2.8,
-                                ),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Color.fromRGBO(224, 64, 160, 0.30),
-                                    blurRadius: 16,
-                                    offset: Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              clipBehavior: Clip.antiAlias,
-                              child: Image.network(
-                                persona.avatarUrl,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => Container(
-                                  color: TreatColors.primaryFixed,
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    persona.avatarEmoji,
-                                    style: const TextStyle(fontSize: 34),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              bottom: -3,
-                              right: -3,
-                              child: InkWell(
-                                onTap: () {
-                                  dinerState.shufflePersona();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                          'Shuffled to ${dinerState.currentPersona.handle}! ✨'),
-                                      duration: const Duration(milliseconds: 1400),
-                                      backgroundColor: TreatColors.secondary,
-                                    ),
-                                  );
-                                },
-                                borderRadius: BorderRadius.circular(999),
-                                child: Container(
-                                  width: 28,
-                                  height: 28,
-                                  decoration: BoxDecoration(
-                                    color: TreatColors.secondary,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(color: Colors.white, width: 2),
-                                    boxShadow: const [
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        blurRadius: 6,
-                                        offset: Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  child: const Icon(
-                                    Icons.auto_fix_high_rounded,
-                                    size: 14,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(width: 16),
-
-                        // Identity Meta: VIP Pill, Handle, Tagline & Shuffle
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 3),
-                                    decoration: BoxDecoration(
-                                      gradient: TreatColors.pinkGradient,
-                                      borderRadius: BorderRadius.circular(999),
-                                      boxShadow: const [
-                                        BoxShadow(
-                                          color: Color.fromRGBO(224, 64, 160, 0.30),
-                                          blurRadius: 8,
-                                          offset: Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Text(
-                                      'ANONYMOUS VIP',
-                                      style: GoogleFonts.plusJakartaSans(
-                                        color: Colors.white,
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.w800,
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    '#FD-882',
-                                    style: GoogleFonts.plusJakartaSans(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                      color: TreatColors.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-
-                              Row(
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      persona.handle,
-                                      style: GoogleFonts.plusJakartaSans(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w800,
-                                        color: TreatColors.onSurface,
-                                        letterSpacing: -0.4,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  const Icon(
-                                    Icons.verified,
-                                    color: TreatColors.primary,
-                                    size: 18,
-                                  ),
-                                ],
-                              ),
-
-                              Text(
-                                '@treat_nomad • Foodie Adventurer',
-                                style: GoogleFonts.plusJakartaSans(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: TreatColors.secondary,
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-
-                              // Shuffle Persona Pill Button
-                              InkWell(
-                                onTap: () {
-                                  dinerState.shufflePersona();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                          'Shuffled to ${dinerState.currentPersona.handle}! 🎲'),
-                                      duration: const Duration(milliseconds: 1400),
-                                      backgroundColor: TreatColors.primary,
-                                    ),
-                                  );
-                                },
-                                borderRadius: BorderRadius.circular(999),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 14, vertical: 7),
-                                  decoration: BoxDecoration(
-                                    gradient: TreatColors.pinkGradient,
-                                    borderRadius: BorderRadius.circular(999),
-                                    boxShadow: const [
-                                      BoxShadow(
-                                        color: Color.fromRGBO(224, 64, 160, 0.35),
-                                        blurRadius: 12,
-                                        offset: Offset(0, 3),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Icon(
-                                        Icons.casino_rounded,
-                                        color: Colors.white,
-                                        size: 15,
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        'Shuffle Persona',
-                                        style: GoogleFonts.plusJakartaSans(
-                                          color: Colors.white,
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w800,
-                                          letterSpacing: 0.2,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 18),
-
-                    // Persona Tag Chips Row with Add Button
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        _buildPersonaPill(
-                          '${persona.avatarEmoji} ${persona.handle}',
-                          TreatColors.primary,
-                          Colors.white,
-                          isPrimary: true,
-                        ),
-                        _buildPersonaPill(
-                          '🌮 Taco Fiend',
-                          TreatColors.secondaryFixed,
-                          TreatColors.onSecondaryFixedVariant,
-                        ),
-                        _buildPersonaPill(
-                          '🍩 Sweet Tooth',
-                          TreatColors.tertiaryFixed,
-                          TreatColors.onTertiaryFixedVariant,
-                        ),
-                        InkWell(
-                          onTap: () => _showAddTagDialog(context, dinerState),
-                          borderRadius: BorderRadius.circular(999),
-                          child: Container(
-                            width: 30,
-                            height: 30,
-                            decoration: BoxDecoration(
-                              color: TreatColors.surfaceContainerHigh,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: TreatColors.outlineVariant.withValues(alpha: 0.5),
-                              ),
-                            ),
-                            child: const Icon(
-                              Icons.add_rounded,
-                              size: 18,
-                              color: TreatColors.onSurfaceVariant,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 18),
-
-                    // ==========================================
-                    // VIP Foodie Pass Ribbon Card
-                    // ==========================================
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        gradient: TreatColors.potBannerGradient,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color.fromRGBO(224, 64, 160, 0.28),
-                            blurRadius: 18,
-                            offset: Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 36,
-                                    height: 36,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withValues(alpha: 0.22),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(
-                                      Icons.workspace_premium_rounded,
-                                      color: Colors.white,
-                                      size: 20,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Text(
-                                            'VIP PASS LEVEL ${persona.vipLevel}',
-                                            style: GoogleFonts.plusJakartaSans(
-                                              fontWeight: FontWeight.w800,
-                                              fontSize: 12,
-                                              color: Colors.white,
-                                              letterSpacing: 0.6,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 6),
-                                          FadeTransition(
-                                            opacity: _pulseAnimation,
-                                            child: Container(
-                                              width: 7,
-                                              height: 7,
-                                              decoration: const BoxDecoration(
-                                                color: Colors.white,
-                                                shape: BoxShape.circle,
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.white,
-                                                    blurRadius: 6,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        '${persona.treatsClaimed} Treats Claimed • \$${persona.totalSaved.toInt()} Total Saved',
-                                        style: GoogleFonts.plusJakartaSans(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.white.withValues(alpha: 0.90),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.25),
-                                  borderRadius: BorderRadius.circular(999),
-                                  border: Border.all(
-                                    color: Colors.white.withValues(alpha: 0.35),
-                                  ),
-                                ),
-                                child: Text(
-                                  'Active VIP',
-                                  style: GoogleFonts.plusJakartaSans(
-                                    color: Colors.white,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 14),
-
-                          // Progress Bar
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(999),
-                            child: Stack(
-                              children: [
-                                Container(
-                                  height: 8,
-                                  color: Colors.white.withValues(alpha: 0.25),
-                                ),
-                                FractionallySizedBox(
-                                  widthFactor: 0.68,
-                                  child: Container(
-                                    height: 8,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(999),
-                                      boxShadow: const [
-                                        BoxShadow(
-                                          color: Colors.white,
-                                          blurRadius: 4,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: Text(
-                              '6 treats to VIP Gold 🧁',
-                              style: GoogleFonts.plusJakartaSans(
-                                color: Colors.white.withValues(alpha: 0.90),
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 18),
-
-          // ==========================================
-          // 2. Treat Wallet & Quick Pay Card
-          // ==========================================
-          TreatCard(
-            padding: const EdgeInsets.all(18),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 36,
-                          height: 36,
-                          decoration: const BoxDecoration(
-                            color: TreatColors.secondaryContainer,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.account_balance_wallet_rounded,
-                            size: 20,
-                            color: TreatColors.secondary,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Treat Wallet & Quick Pay',
-                              style: GoogleFonts.plusJakartaSans(
-                                fontWeight: FontWeight.w800,
-                                fontSize: 15,
-                                color: TreatColors.onSurface,
-                              ),
-                            ),
-                            Text(
-                              'Instant partner settlement credits',
-                              style: TreatTypography.bodySmall.copyWith(fontSize: 11),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: TreatColors.tertiaryFixed,
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Text(
-                        'Auto-Settle',
-                        style: GoogleFonts.plusJakartaSans(
-                          color: TreatColors.onTertiaryFixedVariant,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-
-                // Balance Container
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: TreatColors.surfaceContainerLow,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: const Color(0xFFF0E4F2)),
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Available Balance',
-                                style: GoogleFonts.plusJakartaSans(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: TreatColors.onSurfaceVariant,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                '\$${persona.walletBalance.toStringAsFixed(2)}',
-                                style: GoogleFonts.plusJakartaSans(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.w900,
-                                  color: TreatColors.secondary,
-                                  letterSpacing: -0.5,
-                                ),
-                              ),
-                            ],
-                          ),
-                          ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: TreatColors.primary,
-                              foregroundColor: Colors.white,
-                              shape: const StadiumBorder(),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 12),
-                              elevation: 3,
-                              shadowColor: TreatColors.primary.withValues(alpha: 0.4),
-                            ),
-                            onPressed: () =>
-                                _showAddCustomFundsDialog(context, dinerState),
-                            icon: const Icon(Icons.add_rounded, size: 18),
-                            label: Text(
-                              'Add Funds',
-                              style: GoogleFonts.plusJakartaSans(
-                                fontWeight: FontWeight.w800,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 14),
-
-                      // Quick Top-Up Preset Chips
-                      Row(
-                        children: [
-                          Text(
-                            'Quick Top-Up:',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              color: TreatColors.outline,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [10.0, 25.0, 50.0].map((amt) {
-                                return InkWell(
-                                  onTap: () {
-                                    dinerState.addWalletFunds(amt);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                            'Added +\$${amt.toInt()}.00 Treat Credits! 🍰'),
-                                        backgroundColor: TreatColors.secondary,
-                                        duration: const Duration(seconds: 2),
-                                      ),
-                                    );
-                                  },
-                                  borderRadius: BorderRadius.circular(999),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 14, vertical: 6),
-                                    decoration: BoxDecoration(
-                                      color: TreatColors.surfaceContainerLowest,
-                                      borderRadius: BorderRadius.circular(999),
-                                      border: Border.all(
-                                        color: TreatColors.secondary
-                                            .withValues(alpha: 0.30),
-                                      ),
-                                      boxShadow: const [
-                                        BoxShadow(
-                                          color: Colors.black12,
-                                          blurRadius: 4,
-                                          offset: Offset(0, 1),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Text(
-                                      '+\$${amt.toInt()}',
-                                      style: GoogleFonts.plusJakartaSans(
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 12,
-                                        color: TreatColors.secondary,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 18),
-
-          // ==========================================
-          // 3. Taste Radar & Diet Tags
-          // ==========================================
-          TreatCard(
-            padding: const EdgeInsets.all(18),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Taste Radar & Diet Tags',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 15,
-                            color: TreatColors.onSurface,
-                          ),
-                        ),
-                        Text(
-                          'Used to personalize platter recommendations',
-                          style: TreatTypography.bodySmall.copyWith(fontSize: 11),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: TreatColors.primaryFixed,
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Text(
-                        '${persona.dietTags.length} Active',
-                        style: GoogleFonts.plusJakartaSans(
-                          color: TreatColors.primary,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 14),
-
-                // Multi-select tags grid
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 9,
-                  children: allTags.map((tag) {
-                    final isSelected = persona.dietTags.contains(tag['name']);
-                    return InkWell(
-                      onTap: () => dinerState.toggleDietTag(tag['name'] as String),
-                      borderRadius: BorderRadius.circular(999),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 180),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 13, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? TreatColors.secondary
-                              : TreatColors.surfaceContainerLow,
-                          borderRadius: BorderRadius.circular(999),
-                          border: Border.all(
-                            color: isSelected
-                                ? TreatColors.secondary
-                                : const Color(0xFFEADBEE),
-                          ),
-                          boxShadow: isSelected
-                              ? [
-                                  BoxShadow(
-                                    color: TreatColors.secondary
-                                        .withValues(alpha: 0.35),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ]
-                              : null,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              tag['icon'] as IconData,
-                              size: 15,
-                              color: isSelected
-                                  ? Colors.white
-                                  : TreatColors.onSurfaceVariant,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              tag['name'] as String,
-                              style: GoogleFonts.plusJakartaSans(
-                                color: isSelected
-                                    ? Colors.white
-                                    : TreatColors.onSurface,
-                                fontSize: 11,
-                                fontWeight: isSelected
-                                    ? FontWeight.w800
-                                    : FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 18),
-
-          // ==========================================
-          // 4. Budget & Split Dining Settings
-          // ==========================================
-          TreatCard(
-            padding: const EdgeInsets.all(18),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Budget & Split Dining',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 15,
-                    color: TreatColors.onSurface,
-                  ),
-                ),
-                Text(
-                  'Default preferences applied when matching food squads',
-                  style: TreatTypography.bodySmall.copyWith(fontSize: 11),
-                ),
-                const SizedBox(height: 16),
-
-                // Squad Size Stepper
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: TreatColors.surfaceContainerLow,
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: const Color(0xFFEADBEE)),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              color: TreatColors.secondaryFixed,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.groups_rounded,
-                              size: 18,
-                              color: TreatColors.secondary,
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Preferred Squad Size',
-                                style: GoogleFonts.plusJakartaSans(
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 13,
-                                  color: TreatColors.onSurface,
-                                ),
-                              ),
-                              Text(
-                                'Including you',
-                                style: TreatTypography.bodySmall.copyWith(fontSize: 11),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: TreatColors.surfaceContainerHighest,
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        child: Row(
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.remove_rounded, size: 18),
-                              onPressed: persona.preferredSquadSize > 1
-                                  ? () => dinerState.setPreferredSquadSize(
-                                      persona.preferredSquadSize - 1)
-                                  : null,
-                              constraints:
-                                  const BoxConstraints(minWidth: 32, minHeight: 32),
-                              padding: EdgeInsets.zero,
-                              color: TreatColors.onSurface,
-                            ),
-                            Text(
-                              '${persona.preferredSquadSize}',
-                              style: GoogleFonts.plusJakartaSans(
-                                fontWeight: FontWeight.w800,
-                                fontSize: 14,
-                                color: TreatColors.onSurface,
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.add_rounded, size: 18),
-                              onPressed: persona.preferredSquadSize < 12
-                                  ? () => dinerState.setPreferredSquadSize(
-                                      persona.preferredSquadSize + 1)
-                                  : null,
-                              constraints:
-                                  const BoxConstraints(minWidth: 32, minHeight: 32),
-                              padding: EdgeInsets.zero,
-                              color: TreatColors.onSurface,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Target Spend Slider
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Target Spend / Diner',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 13,
-                        color: TreatColors.onSurface,
-                      ),
-                    ),
-                    Text(
-                      '\$$lowerBudget - \$$upperBudget',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                        color: TreatColors.secondary,
-                      ),
-                    ),
-                  ],
-                ),
-                SliderTheme(
-                  data: SliderTheme.of(context).copyWith(
-                    activeTrackColor: TreatColors.secondary,
-                    inactiveTrackColor: TreatColors.surfaceContainerHighest,
-                    thumbColor: TreatColors.secondary,
-                    overlayColor: TreatColors.secondary.withValues(alpha: 0.15),
-                    trackHeight: 6,
-                  ),
-                  child: Slider(
-                    value: _budgetSliderVal,
-                    min: 15,
-                    max: 90,
-                    divisions: 15,
-                    onChanged: (val) {
-                      setState(() {
-                        _budgetSliderVal = val;
-                      });
-                      dinerState.setBudgetTarget(val * persona.preferredSquadSize);
-                    },
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('\$15 Quick Bite',
-                        style: TreatTypography.bodySmall.copyWith(fontSize: 10)),
-                    Text('\$50 Shared Feast',
-                        style: TreatTypography.bodySmall.copyWith(fontSize: 10)),
-                    Text('\$90 Tasting Menu',
-                        style: TreatTypography.bodySmall.copyWith(fontSize: 10)),
-                  ],
-                ),
-                const SizedBox(height: 16),
-
-                // Auto-Split Bill Toggle
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: TreatColors.surfaceContainerLow,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 32,
-                              height: 32,
-                              decoration: const BoxDecoration(
-                                color: TreatColors.tertiaryFixed,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.call_split_rounded,
-                                size: 18,
-                                color: TreatColors.tertiary,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Auto-Split Bill via Treat Credits',
-                                    style: GoogleFonts.plusJakartaSans(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Instant settle at partner checkout',
-                                    style: TreatTypography.bodySmall
-                                        .copyWith(fontSize: 10),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Switch(
-                        value: persona.autoSplitBill,
-                        activeThumbColor: TreatColors.secondary,
-                        onChanged: (val) => dinerState.toggleAutoSplitBill(val),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 18),
-
-          // ==========================================
-          // 5. Privacy & Ghosting Controls
-          // ==========================================
-          TreatCard(
-            padding: const EdgeInsets.all(18),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 32,
-                      height: 32,
-                      decoration: const BoxDecoration(
-                        color: TreatColors.secondaryFixed,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.visibility_off_rounded,
-                        size: 18,
-                        color: TreatColors.secondary,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Privacy & Ghosting',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 15,
-                            color: TreatColors.onSurface,
-                          ),
-                        ),
-                        Text(
-                          'Control who sees you at the shared table',
-                          style: TreatTypography.bodySmall.copyWith(fontSize: 11),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 14),
-
-                _buildToggleRow(
-                  title: 'Hide real name completely',
-                  subtitle: "Only show persona tag '@treat_nomad'",
+              _buildDivider(),
+              _buildSettingRow(
+                icon: Icons.visibility_off_outlined,
+                title: 'Anonymous Mode',
+                subtitle: 'Hide real name on public food tables',
+                trailing: Switch(
                   value: persona.hideRealName,
                   onChanged: (val) => dinerState.toggleHideRealName(val),
+                  activeColor: const Color(0xFF7C52AA),
                 ),
-                const SizedBox(height: 10),
-
-                _buildToggleRow(
-                  title: 'Allow squad invite via shareable link',
-                  subtitle: 'Friends can hop directly onto your table',
-                  value: persona.allowSquadInvite,
-                  onChanged: (val) => dinerState.toggleAllowSquadInvite(val),
+              ),
+              _buildDivider(),
+              _buildSettingRow(
+                icon: Icons.restaurant_outlined,
+                title: 'Dietary Preferences',
+                subtitle: persona.dietTags.isNotEmpty
+                    ? persona.dietTags.join(', ')
+                    : 'Spicy, Halal, Veg +3',
+                trailing: const Icon(
+                  Icons.chevron_right_rounded,
+                  color: Color(0xFFA098A5),
+                  size: 20,
                 ),
-                const SizedBox(height: 10),
-
-                _buildToggleRow(
-                  title: 'Ghost browsing in Food Bar',
-                  subtitle: 'Browse partner counter without live check-in tag',
-                  value: persona.ghostBrowsing,
-                  onChanged: (val) => dinerState.toggleGhostBrowsing(val),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 18),
-
-          // ==========================================
-          // 6. Live Drop Alerts
-          // ==========================================
-          TreatCard(
-            padding: const EdgeInsets.all(18),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 32,
-                      height: 32,
-                      decoration: const BoxDecoration(
-                        color: TreatColors.primaryFixed,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.notifications_active_rounded,
-                        size: 18,
-                        color: TreatColors.primary,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      'Live Drop Alerts',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontWeight: FontWeight.w800,
-                        fontSize: 15,
-                        color: TreatColors.onSurface,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 14),
-
-                _buildAlertToggle(
-                  dotColor: TreatColors.primary,
-                  title: 'Instant Platter Drop Alerts',
-                  value: persona.instantDropAlerts,
-                  onChanged: (val) => dinerState.toggleInstantDropAlerts(val),
-                ),
-                const SizedBox(height: 8),
-
-                _buildAlertToggle(
-                  dotColor: TreatColors.secondary,
-                  title: '15-min Table Hold Reminders',
-                  value: persona.tableHoldReminders,
-                  onChanged: (val) => dinerState.toggleTableHoldReminders(val),
-                ),
-                const SizedBox(height: 8),
-
-                _buildAlertToggle(
-                  dotColor: TreatColors.tertiary,
-                  title: 'Neighborhood Deal Radar',
-                  value: persona.dealRadarAlerts,
-                  onChanged: (val) => dinerState.toggleDealRadarAlerts(val),
-                ),
-              ],
-            ),
+                onTap: () => _showDietaryPreferencesDialog(context),
+              ),
+            ],
           ),
           const SizedBox(height: 22),
 
           // ==========================================
-          // 7. Account Action Buttons
+          // 3. Section: PREFERENCES & DINING
           // ==========================================
-          TreatButton(
-            text: 'Switch Active Persona',
-            icon: Icons.switch_account_rounded,
-            variant: TreatButtonVariant.purpleGradient,
-            onPressed: () {
-              dinerState.shufflePersona();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content:
-                      Text('Switched to ${dinerState.currentPersona.handle}! 🎉'),
-                  duration: const Duration(seconds: 2),
-                  backgroundColor: TreatColors.secondary,
+          _buildSectionHeader('PREFERENCES & DINING'),
+          const SizedBox(height: 8),
+          _buildCardContainer(
+            children: [
+              _buildSettingRow(
+                icon: Icons.payments_outlined,
+                title: 'Target Spend per Diner',
+                subtitle: '\$$lowerBudget – \$$upperBudget • Shared Feast',
+                trailing: IconButton(
+                  icon: const Icon(
+                    Icons.tune_rounded,
+                    color: Color(0xFF706776),
+                    size: 20,
+                  ),
+                  onPressed: () => _showTargetSpendDialog(context),
                 ),
-              );
-            },
+                onTap: () => _showTargetSpendDialog(context),
+              ),
+              _buildDivider(),
+              _buildSettingRow(
+                icon: Icons.groups_outlined,
+                title: 'Default Squad Size',
+                subtitle:
+                    '${persona.preferredSquadSize}-${persona.preferredSquadSize + 1} guests including you',
+                trailing: const Icon(
+                  Icons.chevron_right_rounded,
+                  color: Color(0xFFA098A5),
+                  size: 20,
+                ),
+                onTap: () => _showSquadSizeDialog(context),
+              ),
+            ],
+          ),
+          const SizedBox(height: 22),
+
+          // ==========================================
+          // 4. Section: TREAT SQUAD & GAMES
+          // ==========================================
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(child: _buildSectionHeader('TREAT SQUAD & GAMES')),
+              const SizedBox(width: 6),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEDE4F7),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.casino_outlined,
+                      size: 13,
+                      color: Color(0xFF653993),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '4-Player Live',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFF653993),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          _buildSquadLudoCard(context),
+          const SizedBox(height: 22),
+
+          // ==========================================
+          // 5. Section: PRIVACY & DISCOVERY
+          // ==========================================
+          _buildSectionHeader('PRIVACY & DISCOVERY'),
+          const SizedBox(height: 8),
+          _buildCardContainer(
+            children: [
+              _buildSettingRow(
+                icon: Icons.radar_rounded,
+                title: 'Ghost Browsing in Food Bar',
+                subtitle: 'Browse counters without live check-in tag',
+                trailing: Switch(
+                  value: persona.ghostBrowsing,
+                  onChanged: (val) => dinerState.toggleGhostBrowsing(val),
+                  activeColor: const Color(0xFF7C52AA),
+                ),
+              ),
+              _buildDivider(),
+              _buildSettingRow(
+                icon: Icons.link_rounded,
+                title: 'Direct Squad Invites',
+                subtitle: 'Allow friends to join table via link',
+                trailing: Switch(
+                  value: persona.allowSquadInvite,
+                  onChanged: (val) => dinerState.toggleAllowSquadInvite(val),
+                  activeColor: const Color(0xFF7C52AA),
+                ),
+              ),
+              _buildDivider(),
+              _buildSettingRow(
+                icon: Icons.location_on_outlined,
+                title: 'Neighborhood Location Sharing',
+                subtitle: 'Show nearby platter drops & offers',
+                trailing: Switch(
+                  value: dinerState.isFoodieLoggedIn,
+                  onChanged: (val) => dinerState.setFoodieLoggedIn(val),
+                  activeColor: const Color(0xFF7C52AA),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 22),
+
+          // ==========================================
+          // 6. Section: NOTIFICATIONS
+          // ==========================================
+          _buildSectionHeader('NOTIFICATIONS'),
+          const SizedBox(height: 8),
+          _buildCardContainer(
+            children: [
+              _buildSettingRow(
+                icon: Icons.notifications_active_outlined,
+                title: 'Platter Drops & Deal Radar',
+                subtitle: 'Instant alerts when dishes open up',
+                trailing: Switch(
+                  value: persona.dealRadarAlerts,
+                  onChanged: (val) => dinerState.toggleDealRadarAlerts(val),
+                  activeColor: const Color(0xFF7C52AA),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+
+          // ==========================================
+          // 7. Bottom Action Buttons
+          // ==========================================
+          // Button 1: Export Dining History
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => _showExportHistoryDialog(context),
+              borderRadius: BorderRadius.circular(999),
+              child: Ink(
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(
+                    color: const Color(0xFFE2D6EE),
+                    width: 1.2,
+                  ),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color.fromRGBO(124, 82, 170, 0.06),
+                      blurRadius: 10,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.receipt_long_outlined,
+                      color: Color(0xFF7C52AA),
+                      size: 18,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Export Dining History',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFF7C52AA),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
           const SizedBox(height: 12),
 
+          // Button 2: Log Out
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => _showLogOutDialog(context),
+              borderRadius: BorderRadius.circular(999),
+              child: Ink(
+                height: 48,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFDF0ED),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.logout_rounded,
+                      color: Color(0xFFDC2626),
+                      size: 18,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Log Out',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFFDC2626),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
+  // -------------------------------------------------------------
+  // Header App Bar matching screenshot
+  // -------------------------------------------------------------
+  PreferredSizeWidget _buildTopAppBar(BuildContext context) {
+    return AppBar(
+      backgroundColor: Colors.white,
+      elevation: 0,
+      scrolledUnderElevation: 1.5,
+      automaticallyImplyLeading: false,
+      titleSpacing: 16,
+      toolbarHeight: 62,
+      title: Row(
+        children: [
+          // Drawer / Logo Leading
+          Expanded(
+            child: InkWell(
+              onTap: widget.onOpenDrawer,
+              borderRadius: BorderRadius.circular(8),
+              child: Row(
+                children: [
+                  Image.asset(
+                    AssetConstants.logo,
+                    height: 28,
+                    errorBuilder: (_, __, ___) => Container(
+                      width: 28,
+                      height: 28,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [Color(0xFFE040A0), Color(0xFF7C52AA)],
+                        ),
+                      ),
+                      child: const Center(
+                        child: Text('🎉', style: TextStyle(fontSize: 14)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'TREATS & CO',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.8,
+                            color: const Color(0xFF7C52AA),
+                          ),
+                        ),
+                        Text(
+                          'Community Treats',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w900,
+                            color: const Color(0xFF201A24),
+                            letterSpacing: -0.4,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Notification Bell Icon Button
+          IconButton(
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('No new alerts! You are all caught up. 🎉'),
+                  duration: Duration(seconds: 1),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+            icon: const Icon(
+              Icons.notifications_none_rounded,
+              color: Color(0xFF201A24),
+              size: 24,
+            ),
+            tooltip: 'Notifications',
+          ),
+
+          // Profile Avatar Icon Button
+          Container(
+            width: 36,
+            height: 36,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: Color(0xFFD6228A),
+            ),
+            child: const Icon(
+              Icons.person,
+              color: Colors.white,
+              size: 20,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // -------------------------------------------------------------
+  // 1. Hero Profile & Identity Card
+  // -------------------------------------------------------------
+  Widget _buildHeroProfileCard(
+      BuildContext context, DinerState dinerState, DinerPersona persona) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: const Color(0xFFF3E8FC),
+          width: 1.2,
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color.fromRGBO(124, 82, 170, 0.08),
+            blurRadius: 16,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Avatar with Verified Checkmark Badge
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    width: 66,
+                    height: 66,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: const Color(0xFF7C52AA),
+                        width: 2.2,
+                      ),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color.fromRGBO(224, 64, 160, 0.20),
+                          blurRadius: 10,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: Image.network(
+                      persona.avatarUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        color: const Color(0xFFF3E8FC),
+                        alignment: Alignment.center,
+                        child: Text(
+                          persona.avatarEmoji,
+                          style: const TextStyle(fontSize: 30),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: -1,
+                    right: -1,
+                    child: Container(
+                      width: 22,
+                      height: 22,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF7C52AA),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.verified_rounded,
+                        color: Colors.white,
+                        size: 14,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 14),
+
+              // Name, Tag, Handle, and VIP Row
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            persona.handle,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w800,
+                              color: const Color(0xFF201A24),
+                              letterSpacing: -0.3,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '#FD-882',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF8E8295),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '@treat_nomad',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF706776),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 8,
+                      runSpacing: 4,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF5E8FF),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.card_giftcard_rounded,
+                                size: 12,
+                                color: Color(0xFF7C52AA),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'VIP Level 2',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.w800,
+                                  color: const Color(0xFF7C52AA),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          '34 Treats Claimed',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF706776),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          // Bottom Action Buttons: Switch Persona & Edit
           Row(
             children: [
+              // Button 1: Switch Persona
               Expanded(
-                child: OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: TreatColors.secondary,
-                    side: const BorderSide(color: TreatColors.outlineVariant),
-                    shape: const StadiumBorder(),
-                    padding: const EdgeInsets.symmetric(vertical: 13),
-                  ),
-                  onPressed: () => _showExportHistoryDialog(context),
-                  icon: const Icon(Icons.history_edu_rounded, size: 17),
-                  label: Text(
-                    'Export History',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 12,
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => _showSwitchPersonaDialog(context),
+                    borderRadius: BorderRadius.circular(999),
+                    child: Ink(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE0F4FC),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.switch_account_outlined,
+                            size: 16,
+                            color: Color(0xFF0284C7),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Switch Persona',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                              color: const Color(0xFF0284C7),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: TreatColors.error,
-                    backgroundColor: TreatColors.errorContainer,
-                    side: BorderSide.none,
-                    shape: const StadiumBorder(),
-                    padding: const EdgeInsets.symmetric(vertical: 13),
-                  ),
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (ctx) => AlertDialog(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20)),
-                        title: const Text('Log Out of Treat?'),
-                        content: const Text(
-                            'Are you sure you want to end your current anonymous session?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(ctx).pop(),
-                            child: const Text('Cancel'),
+              const SizedBox(width: 10),
+
+              // Button 2: Edit
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => _showEditPersonaDialog(context),
+                  borderRadius: BorderRadius.circular(999),
+                  child: Ink(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 18, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF8EEFC),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.edit_outlined,
+                          size: 15,
+                          color: Color(0xFF6A1B9A),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Edit',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF6A1B9A),
                           ),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: TreatColors.error,
-                              foregroundColor: Colors.white,
-                              shape: const StadiumBorder(),
-                            ),
-                            onPressed: () {
-                              Navigator.of(ctx).pop();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Logged out of session 👋'),
-                                  duration: Duration(seconds: 2),
-                                ),
-                              );
-                            },
-                            child: const Text('Log Out'),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.logout_rounded, size: 17),
-                  label: Text(
-                    'Log Out',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 12,
+                        ),
+                      ],
                     ),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 36),
         ],
       ),
     );
   }
 
-  Widget _buildToggleRow({
+  // -------------------------------------------------------------
+  // Helpers for Setting Rows & Cards
+  // -------------------------------------------------------------
+  Widget _buildSectionHeader(String title) {
+    return Text(
+      title,
+      style: GoogleFonts.plusJakartaSans(
+        fontSize: 11.5,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 0.8,
+        color: const Color(0xFF7C52AA),
+      ),
+    );
+  }
+
+  Widget _buildCardContainer({required List<Widget> children}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: const Color(0xFFF3E8FC),
+          width: 1.2,
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color.fromRGBO(124, 82, 170, 0.05),
+            blurRadius: 14,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      child: Column(
+        children: children,
+      ),
+    );
+  }
+
+  Widget _buildSettingRow({
+    required IconData icon,
     required String title,
     required String subtitle,
-    required bool value,
-    required ValueChanged<bool> onChanged,
+    required Widget trailing,
+    VoidCallback? onTap,
   }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: TreatColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFF0E4F2)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.plusJakartaSans(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 12,
-                    color: TreatColors.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: TreatTypography.bodySmall.copyWith(fontSize: 11),
-                ),
-              ],
-            ),
-          ),
-          Switch(
-            value: value,
-            activeThumbColor: TreatColors.secondary,
-            onChanged: onChanged,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAlertToggle({
-    required Color dotColor,
-    required String title,
-    required bool value,
-    required ValueChanged<bool> onChanged,
-  }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 2),
+        child: Row(
           children: [
+            // Circular icon container
             Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(
-                color: dotColor,
+              width: 36,
+              height: 36,
+              decoration: const BoxDecoration(
+                color: Color(0xFFF3E8FC),
                 shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: dotColor.withValues(alpha: 0.5),
-                    blurRadius: 4,
+              ),
+              child: Icon(
+                icon,
+                color: const Color(0xFF7C52AA),
+                size: 19,
+              ),
+            ),
+            const SizedBox(width: 12),
+
+            // Title & Subtitle
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xFF201A24),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: GoogleFonts.dmSans(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF706776),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 10),
-            Text(
-              title,
-              style: GoogleFonts.plusJakartaSans(
-                fontWeight: FontWeight.w600,
-                fontSize: 13,
-                color: TreatColors.onSurface,
-              ),
-            ),
+
+            const SizedBox(width: 8),
+            trailing,
           ],
         ),
-        Switch(
-          value: value,
-          activeThumbColor: TreatColors.secondary,
-          onChanged: onChanged,
-        ),
-      ],
+      ),
     );
   }
 
-  Widget _buildPersonaPill(
-    String text,
-    Color bg,
-    Color textCol, {
-    bool isPrimary = false,
-  }) {
+  Widget _buildDivider() {
+    return const Divider(
+      color: Color(0xFFF7EFFB),
+      height: 1,
+      thickness: 1,
+      indent: 48,
+    );
+  }
+
+  // -------------------------------------------------------------
+  // 4. Treat Squad & Games Card
+  // -------------------------------------------------------------
+  Widget _buildSquadLudoCard(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(999),
-        boxShadow: isPrimary
-            ? const [
-                BoxShadow(
-                  color: Color.fromRGBO(224, 64, 160, 0.30),
-                  blurRadius: 8,
-                  offset: Offset(0, 2),
-                ),
-              ]
-            : null,
+        color: const Color(0xFFFCF4FA),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: const Color(0xFFFCE7F3),
+          width: 1.2,
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color.fromRGBO(224, 64, 160, 0.08),
+            blurRadius: 14,
+            offset: Offset(0, 3),
+          ),
+        ],
       ),
-      child: Text(
-        text,
-        style: GoogleFonts.plusJakartaSans(
-          color: textCol,
-          fontSize: 11,
-          fontWeight: FontWeight.w800,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Magenta Square Icon
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE040A0),
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color.fromRGBO(224, 64, 160, 0.30),
+                      blurRadius: 10,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: const Center(
+                  child: Icon(
+                    Icons.casino_rounded,
+                    color: Colors.white,
+                    size: 22,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Treat Squad Ludo',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFF201A24),
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      'Challenge your foodie crew, roll the dice, and win exclusive feast vouchers!',
+                      style: GoogleFonts.dmSans(
+                        fontSize: 12,
+                        color: const Color(0xFF706776),
+                        height: 1.35,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(color: const Color(0xFFF3DCEB)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.groups_rounded,
+                            size: 13,
+                            color: Color(0xFF7C52AA),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Live Squad Rooms',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w800,
+                              color: const Color(0xFF7C52AA),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          // Play Squad Ludo Magenta Pill Button
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: _showSquadLudoModal,
+              borderRadius: BorderRadius.circular(999),
+              child: Ink(
+                height: 44,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFD6228A),
+                      Color(0xFFE040A0),
+                      Color(0xFFF43F5E),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(999),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color.fromRGBO(214, 34, 138, 0.35),
+                      blurRadius: 14,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Play Squad Ludo',
+                      style: GoogleFonts.plusJakartaSans(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 14,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    const Icon(
+                      Icons.arrow_forward_rounded,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// -------------------------------------------------------------
+// Interactive Squad Ludo Minigame Dialog for Profile Settings
+// -------------------------------------------------------------
+class _SquadLudoProfileModal extends StatefulWidget {
+  final ValueChanged<String> onRewardClaimed;
+
+  const _SquadLudoProfileModal({required this.onRewardClaimed});
+
+  @override
+  State<_SquadLudoProfileModal> createState() => _SquadLudoProfileModalState();
+}
+
+class _SquadLudoProfileModalState extends State<_SquadLudoProfileModal>
+    with SingleTickerProviderStateMixin {
+  int _currentDice = 6;
+  bool _isRolling = false;
+  String? _wonPerk;
+  int _score = 420;
+  late final AnimationController _diceController;
+
+  final List<String> _rewards = [
+    '25% OFF Squad Feast Platter Voucher 🎫',
+    'Free Mochi Dessert Tower 🍓',
+    '1 Free Pitcher of Craft Berry Slush 🍹',
+    '\$10 Treat Quick Credit for Group 💰',
+    'VIP Fast Pass Table Hold ⚡',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _diceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+  }
+
+  @override
+  void dispose() {
+    _diceController.dispose();
+    super.dispose();
+  }
+
+  void _rollDice() {
+    if (_isRolling) return;
+    setState(() {
+      _isRolling = true;
+      _wonPerk = null;
+    });
+
+    _diceController.forward(from: 0.0);
+
+    Future.delayed(const Duration(milliseconds: 650), () {
+      if (!mounted) return;
+      final roll = math.Random().nextInt(6) + 1;
+      final reward = _rewards[math.Random().nextInt(_rewards.length)];
+      setState(() {
+        _currentDice = roll;
+        _isRolling = false;
+        _score += roll * 10;
+        _wonPerk = reward;
+      });
+      widget.onRewardClaimed(reward);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+      child: Padding(
+        padding: const EdgeInsets.all(22),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 38,
+                      height: 38,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFFCE4EC),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Center(
+                        child: Text('🎲', style: TextStyle(fontSize: 20)),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      'Treat Squad Ludo',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                        color: const Color(0xFF201A24),
+                      ),
+                    ),
+                  ],
+                ),
+                IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.close_rounded,
+                      color: Color(0xFF706776)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Roll the magic dice with your squad to land on sweet perks & discount platters!',
+              style: GoogleFonts.dmSans(
+                fontSize: 13,
+                color: const Color(0xFF706776),
+                height: 1.35,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+
+            // Animated Dice Box
+            Container(
+              width: 110,
+              height: 110,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF7C52AA), Color(0xFFE040A0)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color.fromRGBO(224, 64, 160, 0.35),
+                    blurRadius: 18,
+                    offset: Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Center(
+                child: RotationTransition(
+                  turns: Tween<double>(begin: 0.0, end: 2.0)
+                      .animate(_diceController),
+                  child: Text(
+                    _isRolling ? '🎲' : '$_currentDice',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 48,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            Text(
+              'Squad Score: $_score pts',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFF7C52AA),
+              ),
+            ),
+
+            if (_wonPerk != null) ...[
+              const SizedBox(height: 12),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF2E8FC),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFE2D6EE)),
+                ),
+                child: Text(
+                  '🎁 You Won:\n$_wonPerk',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF653993),
+                  ),
+                ),
+              ),
+            ],
+
+            const SizedBox(height: 18),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF7C52AA),
+                      foregroundColor: Colors.white,
+                      shape: const StadiumBorder(),
+                      padding: const EdgeInsets.symmetric(vertical: 13),
+                      elevation: 0,
+                    ),
+                    onPressed: _isRolling ? null : _rollDice,
+                    child: Text(
+                      _isRolling ? 'Rolling...' : 'Roll Dice! 🎲',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(
+                    'Close',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF706776),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

@@ -9,12 +9,14 @@ import '../../models/platter_deal.dart';
 class CommunityFoodBarScreen extends StatefulWidget {
   final VoidCallback onOpenDrawer;
   final VoidCallback onExploreTreats;
+  final VoidCallback? onOpenFilter;
   final Function(PlatterDeal deal)? onSelectDeal;
 
   const CommunityFoodBarScreen({
     super.key,
     required this.onOpenDrawer,
     required this.onExploreTreats,
+    this.onOpenFilter,
     this.onSelectDeal,
   });
 
@@ -34,20 +36,32 @@ class _CommunityFoodBarScreenState extends State<CommunityFoodBarScreen> {
         onMenuTap: widget.onOpenDrawer,
         actionLabel: 'Treat',
         actionIcon: Icons.celebration,
-        onActionTap: widget.onExploreTreats,
+        onActionTap: widget.onOpenFilter ?? widget.onExploreTreats,
       ),
       body: ListView(
         padding: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 36),
         children: [
-          // Filter Tabs
-          Row(
-            children: [
-              _buildTabButton('Feast Platters', Icons.lunch_dining_outlined, 0),
-              const SizedBox(width: 8),
-              _buildTabButton('Group Combos', Icons.groups_rounded, 1, hasBadge: true),
-              const SizedBox(width: 8),
-              _buildTabButton('Dessert Towers', Icons.cake_outlined, 2),
-            ],
+          // Filter Tabs (Slidable Categories)
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: Row(
+              children: [
+                _buildTabButton('Feast Platters', Icons.lunch_dining_outlined, 0),
+                const SizedBox(width: 8),
+                _buildTabButton('Group Combos', Icons.groups_rounded, 1, hasBadge: true),
+                const SizedBox(width: 8),
+                _buildTabButton('Dessert Towers', Icons.cake_outlined, 2),
+                const SizedBox(width: 8),
+                _buildTabButton('Taco & Nacho Trays', Icons.lunch_dining, 3),
+                const SizedBox(width: 8),
+                _buildTabButton('Slushie Pitchers', Icons.local_drink_outlined, 4),
+                const SizedBox(width: 8),
+                _buildTabButton('Late Night Bites', Icons.nights_stay_outlined, 5),
+                const SizedBox(width: 8),
+                _buildTabButton('Ocean Feasts', Icons.set_meal_outlined, 6),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
 
@@ -65,39 +79,45 @@ class _CommunityFoodBarScreenState extends State<CommunityFoodBarScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            shape: BoxShape.circle,
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.local_fire_department, color: Colors.white, size: 20),
                           ),
-                          child: const Icon(Icons.local_fire_department, color: Colors.white, size: 20),
-                        ),
-                        const SizedBox(width: 10),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'LIVE HOTLIST PULSE',
-                              style: TreatTypography.labelSmall.copyWith(
-                                color: TreatColors.primaryFixed,
-                                letterSpacing: 1.2,
-                                fontSize: 9,
-                              ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'LIVE HOTLIST PULSE',
+                                  style: TreatTypography.labelSmall.copyWith(
+                                    color: TreatColors.primaryFixed,
+                                    letterSpacing: 1.2,
+                                    fontSize: 9,
+                                  ),
+                                ),
+                                Text(
+                                  'Food Bar Rush Hour',
+                                  style: TreatTypography.titleMedium.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
                             ),
-                            Text(
-                              'Food Bar Rush Hour',
-                              style: TreatTypography.titleMedium.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
@@ -195,13 +215,18 @@ class _CommunityFoodBarScreenState extends State<CommunityFoodBarScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  const Icon(Icons.trending_up, size: 20, color: TreatColors.primary),
-                  const SizedBox(width: 6),
-                  Text('Trending Budget Feasts', style: TreatTypography.titleMedium),
-                ],
+              Expanded(
+                child: Row(
+                  children: [
+                    const Icon(Icons.trending_up, size: 20, color: TreatColors.primary),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Text('Trending Budget Feasts', style: TreatTypography.titleMedium, overflow: TextOverflow.ellipsis),
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               InkWell(
                 onTap: widget.onExploreTreats,
                 child: Row(
@@ -256,13 +281,18 @@ class _CommunityFoodBarScreenState extends State<CommunityFoodBarScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  const Icon(Icons.diversity_3, size: 20, color: TreatColors.secondary),
-                  const SizedBox(width: 6),
-                  Text('Foodie Savings Feed', style: TreatTypography.titleMedium),
-                ],
+              Expanded(
+                child: Row(
+                  children: [
+                    const Icon(Icons.diversity_3, size: 20, color: TreatColors.secondary),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Text('Foodie Savings Feed', style: TreatTypography.titleMedium, overflow: TextOverflow.ellipsis),
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
@@ -313,51 +343,48 @@ class _CommunityFoodBarScreenState extends State<CommunityFoodBarScreen> {
 
   Widget _buildTabButton(String label, IconData icon, int index, {bool hasBadge = false}) {
     final isActive = _activeTab == index;
-    return Expanded(
-      child: InkWell(
-        onTap: () => setState(() => _activeTab = index),
-        borderRadius: BorderRadius.circular(999),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          decoration: BoxDecoration(
-            color: isActive ? TreatColors.secondary : TreatColors.surfaceContainerLowest,
-            borderRadius: BorderRadius.circular(999),
-            boxShadow: isActive ? TreatColors.pillShadow : const [
-              BoxShadow(
-                color: Color.fromRGBO(124, 82, 170, 0.06),
-                blurRadius: 6,
-                offset: Offset(0, 2),
-              )
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 16, color: isActive ? Colors.white : TreatColors.onSurfaceVariant),
-              const SizedBox(width: 4),
-              Flexible(
-                child: Text(
-                  label,
-                  style: TreatTypography.labelSmall.copyWith(
-                    color: isActive ? Colors.white : TreatColors.onSurfaceVariant,
-                    fontSize: 10,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+    return InkWell(
+      onTap: () => setState(() => _activeTab = index),
+      borderRadius: BorderRadius.circular(999),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: isActive ? TreatColors.secondary : TreatColors.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(999),
+          boxShadow: isActive ? TreatColors.pillShadow : const [
+            BoxShadow(
+              color: Color.fromRGBO(124, 82, 170, 0.06),
+              blurRadius: 6,
+              offset: Offset(0, 2),
+            )
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 16, color: isActive ? Colors.white : TreatColors.onSurfaceVariant),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TreatTypography.labelSmall.copyWith(
+                color: isActive ? Colors.white : TreatColors.onSurfaceVariant,
+                fontSize: 11,
+                fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
+              ),
+            ),
+            if (hasBadge) ...[
+              const SizedBox(width: 5),
+              Container(
+                width: 6,
+                height: 6,
+                decoration: const BoxDecoration(
+                  color: TreatColors.tertiary,
+                  shape: BoxShape.circle,
                 ),
               ),
-              if (hasBadge) ...[
-                const SizedBox(width: 4),
-                Container(
-                  width: 6,
-                  height: 6,
-                  decoration: const BoxDecoration(
-                    color: TreatColors.tertiary,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ],
             ],
-          ),
+          ],
         ),
       ),
     );
@@ -479,41 +506,48 @@ class _CommunityFoodBarScreenState extends State<CommunityFoodBarScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      gradient: TreatColors.heroCardGradient,
-                      shape: BoxShape.circle,
+              Expanded(
+                child: Row(
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        gradient: TreatColors.heroCardGradient,
+                        shape: BoxShape.circle,
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(emoji, style: const TextStyle(fontSize: 18)),
                     ),
-                    alignment: Alignment.center,
-                    child: Text(emoji, style: const TextStyle(fontSize: 18)),
-                  ),
-                  const SizedBox(width: 8),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(author, style: TreatTypography.titleSmall),
-                          const SizedBox(width: 6),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                            decoration: BoxDecoration(
-                              color: TreatColors.surfaceContainerHigh,
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                            child: Text(district, style: TreatTypography.labelSmall.copyWith(fontSize: 9)),
+                          Row(
+                            children: [
+                              Flexible(
+                                child: Text(author, style: TreatTypography.titleSmall, overflow: TextOverflow.ellipsis),
+                              ),
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                                decoration: BoxDecoration(
+                                  color: TreatColors.surfaceContainerHigh,
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: Text(district, style: TreatTypography.labelSmall.copyWith(fontSize: 9)),
+                              ),
+                            ],
                           ),
+                          Text(timeAgo, style: TreatTypography.bodySmall.copyWith(fontSize: 10), overflow: TextOverflow.ellipsis),
                         ],
                       ),
-                      Text(timeAgo, style: TreatTypography.bodySmall.copyWith(fontSize: 10)),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(

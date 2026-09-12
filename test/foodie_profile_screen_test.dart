@@ -6,13 +6,14 @@ import 'package:treat/screens/diner/foodie_profile_settings_screen.dart';
 import 'package:treat/state/diner_state.dart';
 
 void main() {
-  testWidgets('FoodieProfileSettingsScreen renders all elevated sections and handles interactions',
+  testWidgets('FoodieProfileSettingsScreen renders exact redesigned wireframe and handles interactions',
       (WidgetTester tester) async {
-    tester.view.physicalSize = const Size(1200, 1600);
+    tester.view.physicalSize = const Size(1200, 2000);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() => tester.view.resetPhysicalSize());
 
     final dinerState = DinerState();
+    bool loggedOut = false;
 
     await tester.pumpWidget(
       MultiProvider(
@@ -23,61 +24,95 @@ void main() {
           theme: TreatTheme.lightTheme,
           home: FoodieProfileSettingsScreen(
             onOpenDrawer: () {},
+            onLogOut: () => loggedOut = true,
           ),
         ),
       ),
     );
 
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pumpAndSettle();
 
-    // 1. Verify Hero Profile Card elements
-    expect(find.text('ANONYMOUS VIP'), findsOneWidget);
+    // 1. Verify Top App Bar
+    expect(find.text('TREATS & CO'), findsOneWidget);
+    expect(find.text('Community Treats'), findsOneWidget);
+    expect(find.byIcon(Icons.notifications_none_rounded), findsOneWidget);
+
+    // 2. Verify Hero Profile Card elements
+    expect(find.text('MidnightDumpling'), findsAtLeastNWidgets(1));
     expect(find.text('#FD-882'), findsOneWidget);
-    expect(find.text('MidnightDumpling'), findsOneWidget);
-    expect(find.text('@treat_nomad • Foodie Adventurer'), findsOneWidget);
-    expect(find.text('Shuffle Persona'), findsOneWidget);
-    expect(find.text('VIP PASS LEVEL 2'), findsOneWidget);
+    expect(find.text('@treat_nomad'), findsAtLeastNWidgets(1));
+    expect(find.text('VIP Level 2'), findsOneWidget);
+    expect(find.text('34 Treats Claimed'), findsOneWidget);
+    expect(find.text('Switch Persona'), findsOneWidget);
+    expect(find.text('Edit'), findsOneWidget);
 
-    // 2. Verify Treat Wallet & Quick Pay Card
-    expect(find.text('Treat Wallet & Quick Pay'), findsOneWidget);
-    expect(find.text('Available Balance'), findsOneWidget);
-    expect(find.text('+\$10'), findsOneWidget);
-    expect(find.text('+\$25'), findsOneWidget);
-    expect(find.text('+\$50'), findsOneWidget);
-    expect(find.text('Add Funds'), findsOneWidget);
+    // 3. Verify ACCOUNT & PERSONA section
+    expect(find.text('ACCOUNT & PERSONA'), findsOneWidget);
+    expect(find.text('Display Persona'), findsOneWidget);
+    expect(find.text('Anonymous Mode'), findsOneWidget);
+    expect(find.text('Hide real name on public food tables'), findsOneWidget);
+    expect(find.text('Dietary Preferences'), findsOneWidget);
 
-    // Tap quick top-up chip '+$25'
-    await tester.tap(find.text('+\$25'));
-    await tester.pump();
-    expect(dinerState.currentPersona.walletBalance, 70.00); // 45 + 25
+    // 4. Verify PREFERENCES & DINING section
+    expect(find.text('PREFERENCES & DINING'), findsOneWidget);
+    expect(find.text('Target Spend per Diner'), findsOneWidget);
+    expect(find.text('Default Squad Size'), findsOneWidget);
 
-    // 3. Verify Taste Radar & Diet Tags
-    expect(find.text('Taste Radar & Diet Tags'), findsOneWidget);
-    expect(find.text('Spicy Lover'), findsOneWidget);
-    expect(find.text('Halal'), findsOneWidget);
-    expect(find.text('Vegetarian'), findsOneWidget);
+    // 5. Verify TREAT SQUAD & GAMES section
+    expect(find.text('TREAT SQUAD & GAMES'), findsOneWidget);
+    expect(find.text('4-Player Live'), findsOneWidget);
+    expect(find.text('Treat Squad Ludo'), findsOneWidget);
+    expect(find.text('Live Squad Rooms'), findsOneWidget);
+    expect(find.text('Play Squad Ludo'), findsOneWidget);
 
-    // 4. Verify Budget & Split Dining
-    expect(find.text('Budget & Split Dining'), findsOneWidget);
-    expect(find.text('Preferred Squad Size'), findsOneWidget);
-    expect(find.text('Auto-Split Bill via Treat Credits'), findsOneWidget);
+    // 6. Verify PRIVACY & DISCOVERY section
+    expect(find.text('PRIVACY & DISCOVERY'), findsOneWidget);
+    expect(find.text('Ghost Browsing in Food Bar'), findsOneWidget);
+    expect(find.text('Direct Squad Invites'), findsOneWidget);
+    expect(find.text('Neighborhood Location Sharing'), findsOneWidget);
 
-    // 5. Verify Privacy & Ghosting
-    expect(find.text('Privacy & Ghosting'), findsOneWidget);
-    expect(find.text('Hide real name completely'), findsOneWidget);
-    expect(find.text('Ghost browsing in Food Bar'), findsOneWidget);
+    // 7. Verify NOTIFICATIONS section
+    expect(find.text('NOTIFICATIONS'), findsOneWidget);
+    expect(find.text('Platter Drops & Deal Radar'), findsOneWidget);
 
-    // 6. Verify Live Drop Alerts
-    expect(find.text('Live Drop Alerts'), findsOneWidget);
-    expect(find.text('Instant Platter Drop Alerts'), findsOneWidget);
-    expect(find.text('15-min Table Hold Reminders'), findsOneWidget);
-
-    // 7. Verify Account Actions
-    await tester.drag(find.byType(ListView).first, const Offset(0, -800));
-    await tester.pump();
-    expect(find.text('Switch Active Persona'), findsOneWidget);
-    expect(find.text('Export History'), findsOneWidget);
+    // 8. Verify Bottom Action Buttons
+    expect(find.text('Export Dining History'), findsOneWidget);
     expect(find.text('Log Out'), findsOneWidget);
+
+    // 9. Test Tap 'Edit' to open Edit Persona modal
+    await tester.tap(find.text('Edit'));
+    await tester.pumpAndSettle();
+    expect(find.text('Edit Display Persona'), findsOneWidget);
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+
+    // 10. Test Tap 'Switch Persona' to open persona modal
+    await tester.tap(find.text('Switch Persona'));
+    await tester.pumpAndSettle();
+    expect(find.text('Switch Active Persona'), findsOneWidget);
+    await tester.tap(find.text('Shuffle'));
+    await tester.pumpAndSettle();
+
+    // 11. Test Tap 'Play Squad Ludo' to open Ludo modal
+    await tester.tap(find.text('Play Squad Ludo'));
+    await tester.pumpAndSettle();
+    expect(find.text('Roll Dice! 🎲'), findsOneWidget);
+    await tester.tap(find.text('Close'));
+    await tester.pumpAndSettle();
+
+    // 12. Test Tap 'Export Dining History'
+    await tester.tap(find.text('Export Dining History'));
+    await tester.pumpAndSettle();
+    expect(find.text('treat_diner_pass_history_2026.csv\n• 34 Verified Treats Claimed\n• \$185 Total Community Savings\n• Zero PII Disclosed'), findsOneWidget);
+    await tester.tap(find.text('Dismiss'));
+    await tester.pumpAndSettle();
+
+    // 13. Test Tap 'Log Out'
+    await tester.tap(find.text('Log Out'));
+    await tester.pumpAndSettle();
+    expect(find.text('Log Out of Foodie?'), findsOneWidget);
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Log Out'));
+    await tester.pumpAndSettle();
+    expect(loggedOut, isTrue);
   });
 }

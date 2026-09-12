@@ -1,161 +1,576 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../../core/constants/asset_constants.dart';
 import '../../core/theme/treat_colors.dart';
-import '../../core/theme/treat_typography.dart';
+import '../../models/favorite_item.dart';
 import '../../models/platter_deal.dart';
 import '../../state/budget_planner_state.dart';
-import '../../widgets/treat_button.dart';
-import '../../widgets/treat_header.dart';
+import '../../state/diner_state.dart';
 
-class PlatterPackagesScreen extends StatelessWidget {
+class PlatterPackagesScreen extends StatefulWidget {
   final VoidCallback onOpenDrawer;
   final Function(PlatterDeal platter) onSelectPlatter;
   final VoidCallback onEditBudget;
+  final VoidCallback? onBackToLogin;
 
   const PlatterPackagesScreen({
     super.key,
     required this.onOpenDrawer,
     required this.onSelectPlatter,
     required this.onEditBudget,
+    this.onBackToLogin,
   });
 
   @override
-  Widget build(BuildContext context) {
-    final plannerState = context.watch<BudgetPlannerState>();
-    final platters = PlatterDeal.sampleDeals;
+  State<PlatterPackagesScreen> createState() => _PlatterPackagesScreenState();
+}
 
-    return Scaffold(
-      backgroundColor: TreatColors.background,
-      appBar: TreatHeader(
-        onMenuTap: onOpenDrawer,
-        actionLabel: 'Filter',
-        actionIcon: Icons.tune,
-        onActionTap: onEditBudget,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 36),
-        children: [
-          // Filter Review Capsule
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: TreatColors.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: TreatColors.outlineVariant.withValues(alpha: 0.5)),
-            ),
-            child: Row(
+class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
+  final TextEditingController _searchController =
+      TextEditingController(text: 'food platters & packs');
+  String _searchQuery = 'food platters & packs';
+  int _selectedSort = 0; // 0: Recommended for You, 1: Lowest Price First
+  String _selectedCategory = 'All';
+
+  final List<Map<String, String>> _categories = const [
+    {'label': 'Recommended for You', 'icon': '🔥', 'type': 'sort', 'val': '0'},
+    {'label': 'Lowest Price First', 'icon': '💰', 'type': 'sort', 'val': '1'},
+    {'label': 'Sliders & Burgers', 'icon': '🍔', 'type': 'cat', 'val': 'sliders'},
+    {'label': 'Ocean Seafood', 'icon': '🍤', 'type': 'cat', 'val': 'seafood'},
+    {'label': 'Fiesta & Nachos', 'icon': '🌮', 'type': 'cat', 'val': 'nachos'},
+    {'label': 'Mega Feast Boards', 'icon': '🍕', 'type': 'cat', 'val': 'feast'},
+    {'label': 'Sweet Treats', 'icon': '🍰', 'type': 'cat', 'val': 'sweet'},
+    {'label': 'Slushies & Shakes', 'icon': '🥤', 'type': 'cat', 'val': 'drinks'},
+  ];
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _shareWithSquad(PlatterDeal deal) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: TreatColors.surfaceContainerLowest,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          border: Border.all(
+            color: TreatColors.outlineVariant.withValues(alpha: 0.5),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
                 Container(
-                  width: 34,
-                  height: 34,
-                  decoration: BoxDecoration(
-                    color: TreatColors.primaryFixed,
+                  width: 44,
+                  height: 44,
+                  decoration: const BoxDecoration(
+                    color: TreatColors.secondaryFixed,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.tune, color: TreatColors.primary, size: 18),
+                  child: const Icon(Icons.group_add_rounded,
+                      color: TreatColors.secondary, size: 24),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          Text('Budget: \$${plannerState.budget.toInt()}', style: TreatTypography.labelSmall),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 4),
-                            child: Text('•', style: TextStyle(color: TreatColors.primary, fontWeight: FontWeight.bold)),
-                          ),
-                          Text('${plannerState.partySize} Guests', style: TreatTypography.bodySmall),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 4),
-                            child: Text('•', style: TextStyle(color: TreatColors.primary, fontWeight: FontWeight.bold)),
-                          ),
-                          Text(plannerState.selectedCategory, style: TreatTypography.bodySmall),
-                        ],
+                      Text(
+                        'Share with Squad',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: TreatColors.onSurface,
+                        ),
                       ),
                       Text(
-                        'Tax Included & Service Matched • \$${(plannerState.budget / plannerState.partySize).toStringAsFixed(0)}/person',
-                        style: TreatTypography.bodySmall.copyWith(color: TreatColors.secondary, fontSize: 10),
+                        deal.title,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 12,
+                          color: TreatColors.onSurfaceVariant,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
                 ),
-                TreatButton(
-                  text: 'Edit',
-                  height: 32,
-                  width: 64,
-                  variant: TreatButtonVariant.softSecondary,
-                  onPressed: onEditBudget,
-                ),
               ],
             ),
-          ),
-          const SizedBox(height: 16),
-
-          // Header Title Box
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Platter Packages', style: TreatTypography.headlineSmall),
-                  Text('Community feasts ready for instant reserve', style: TreatTypography.bodySmall),
-                ],
+            const SizedBox(height: 18),
+            Text(
+              'Squad link for ${deal.restaurantName} is ready! Split the feast bill: \$${deal.price.toStringAsFixed(2)} total (${deal.perPersonText ?? "\$8/person"}).',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 13,
+                color: TreatColors.onSurfaceVariant,
+                height: 1.4,
               ),
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: TreatColors.secondaryContainer,
-                  shape: BoxShape.circle,
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Row(
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.white, size: 18),
+                        SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            'Squad Invite Link copied to clipboard! 📋',
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    backgroundColor: TreatColors.secondary,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: TreatColors.secondaryDark,
+                foregroundColor: Colors.white,
+                minimumSize: const Size(double.infinity, 48),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(999)),
+              ),
+              child: Text(
+                'Copy Squad Invite Link',
+                style: GoogleFonts.plusJakartaSans(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 14,
                 ),
-                child: const Icon(Icons.celebration, color: TreatColors.secondary, size: 20),
               ),
-            ],
-          ),
-          const SizedBox(height: 12),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-          // Squad Savings Mini Meter
-          Container(
-            padding: const EdgeInsets.all(12),
+  void _toggleLoved(PlatterDeal deal) {
+    final added = context
+        .read<DinerState>()
+        .toggleFavorite(FavoriteItem.fromPlatterDeal(deal));
+
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              added ? Icons.favorite : Icons.favorite_border,
+              color: Colors.white,
+              size: 18,
+            ),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                added
+                    ? 'Added "${deal.title}" to your Loved Favorites! ❤️'
+                    : 'Removed from Favorites',
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: const Color(0xFFD6228A),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final dinerState = context.watch<DinerState>();
+    final isFoodieLoggedIn = dinerState.isFoodieLoggedIn;
+
+    // Build the list of platters to display
+    List<PlatterDeal> platters = List.from(PlatterDeal.wireframePlatters);
+
+    // Apply category filter if active
+    if (_selectedCategory != 'All') {
+      final filtered = platters.where((p) {
+        final title = p.title.toLowerCase();
+        final sub = p.subtitle.toLowerCase();
+        final inc = p.inclusions.map((e) => e.toLowerCase()).join(' ');
+        switch (_selectedCategory) {
+          case 'sliders':
+            return title.contains('slider') || title.contains('burger') || inc.contains('slider');
+          case 'seafood':
+            return title.contains('calamari') || title.contains('prawn') || title.contains('ocean') || inc.contains('calamari');
+          case 'nachos':
+            return title.contains('nacho') || title.contains('fiesta') || title.contains('wings') || inc.contains('nacho');
+          case 'feast':
+            return title.contains('feast') || title.contains('mega') || inc.contains('tray') || inc.contains('board');
+          case 'sweet':
+            return title.contains('dessert') || title.contains('sweet') || inc.contains('churro') || inc.contains('waffle');
+          case 'drinks':
+            return inc.contains('shake') || inc.contains('soda') || inc.contains('slush') || inc.contains('drink');
+          default:
+            return true;
+        }
+      }).toList();
+      if (filtered.isNotEmpty) {
+        platters = filtered;
+      }
+    }
+
+    // Apply sorting
+    if (_selectedSort == 1) {
+      platters.sort((a, b) => a.price.compareTo(b.price));
+    }
+
+    // Apply search filter if active and not default
+    if (_searchQuery.isNotEmpty &&
+        _searchQuery.toLowerCase() != 'food platters & packs') {
+      final q = _searchQuery.toLowerCase();
+      platters = platters.where((p) {
+        return p.title.toLowerCase().contains(q) ||
+            p.restaurantName.toLowerCase().contains(q) ||
+            p.inclusions.any((inc) => inc.toLowerCase().contains(q));
+      }).toList();
+    }
+
+    return Scaffold(
+      backgroundColor: TreatColors.background,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60),
+        child: SafeArea(
+          bottom: false,
+          child: Container(
+            height: 56,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
-              color: TreatColors.secondaryContainer.withValues(alpha: 0.6),
-              borderRadius: BorderRadius.circular(16),
+              color: TreatColors.surfaceContainerLowest,
+              border: Border(
+                bottom: BorderSide(
+                  color: TreatColors.outlineVariant.withValues(alpha: 0.5),
+                  width: 1,
+                ),
+              ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                IconButton(
+                  icon: Icon(
+                    isFoodieLoggedIn ? Icons.menu : Icons.arrow_back_ios_new_rounded,
+                    color: TreatColors.onSurface,
+                    size: isFoodieLoggedIn ? 24 : 20,
+                  ),
+                  tooltip: isFoodieLoggedIn ? 'Menu' : 'Back to Login',
+                  onPressed: isFoodieLoggedIn ? widget.onOpenDrawer : widget.onBackToLogin,
+                ),
+                Image.asset(
+                  AssetConstants.logo,
+                  height: 28,
+                  errorBuilder: (_, __, ___) => Text(
+                    'Treat',
+                    style: GoogleFonts.righteous(
+                      fontSize: 24,
+                      color: TreatColors.primary,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
                 Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.savings, color: TreatColors.secondary, size: 20),
-                    const SizedBox(width: 8),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Squad Allocation: \$${plannerState.budget.toStringAsFixed(2)}',
-                          style: TreatTypography.labelSmall.copyWith(fontWeight: FontWeight.w800),
+                    IconButton(
+                      icon: const Icon(Icons.notifications_none_rounded,
+                          color: TreatColors.onSurfaceVariant, size: 22),
+                      onPressed: () {},
+                    ),
+                    if (isFoodieLoggedIn) ...[
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [TreatColors.secondary, TreatColors.primary],
+                          ),
+                          shape: BoxShape.circle,
                         ),
-                        Text(
-                          'All platters leave ample budget for drinks & dessert!',
-                          style: TreatTypography.bodySmall.copyWith(fontSize: 10),
+                        child: const Icon(Icons.person,
+                            color: Colors.white, size: 18),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 36),
+        children: [
+          // Search & Filter Bar Row
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 44,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: TreatColors.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(
+                      color: TreatColors.outlineVariant.withValues(alpha: 0.6),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: TreatColors.secondary.withValues(alpha: 0.04),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.search,
+                          size: 18, color: TreatColors.secondary),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: TextField(
+                          controller: _searchController,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: TreatColors.onSurface,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: 'Search platters & packs',
+                            hintStyle: TextStyle(
+                              color: TreatColors.onSurfaceVariant.withValues(alpha: 0.6),
+                              fontSize: 13,
+                            ),
+                            border: InputBorder.none,
+                            isDense: true,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                          onChanged: (val) =>
+                              setState(() => _searchQuery = val),
+                        ),
+                      ),
+                      if (_searchController.text.isNotEmpty)
+                        InkWell(
+                          onTap: () {
+                            _searchController.clear();
+                            setState(() => _searchQuery = '');
+                          },
+                          child: const Icon(Icons.close,
+                              size: 16, color: TreatColors.onSurfaceVariant),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              // Treat Button (visible for logged-in Foodie, hidden in Explore Without Sign In)
+              if (isFoodieLoggedIn) ...[
+                const SizedBox(width: 10),
+                InkWell(
+                  onTap: widget.onEditBudget,
+                  borderRadius: BorderRadius.circular(999),
+                  child: Container(
+                    height: 44,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [
+                          TreatColors.primary,
+                          TreatColors.secondary,
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(999),
+                      boxShadow: [
+                        BoxShadow(
+                          color: TreatColors.primary.withValues(alpha: 0.35),
+                          blurRadius: 16,
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),
-                  ],
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(999),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.celebration, size: 18, color: Colors.white),
+                        const SizedBox(width: 5),
+                        Text(
+                          'TREAT',
+                          style: GoogleFonts.plusJakartaSans(
+                            color: Colors.white,
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.8,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Text(
-                    '${platters.length} Matched',
-                    style: TreatTypography.labelSmall.copyWith(color: TreatColors.primary, fontSize: 10),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Sort Pills & Food Bar Categories (Horizontally Slidable)
+          SizedBox(
+            height: 42,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              child: Row(
+                children: _categories.map((cat) {
+                  final isSort = cat['type'] == 'sort';
+                  final isSelected = isSort
+                      ? (_selectedSort.toString() == cat['val'] && _selectedCategory == 'All')
+                      : (_selectedCategory == cat['val']);
+
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: InkWell(
+                      onTap: () {
+                        setState(() {
+                          if (isSort) {
+                            _selectedSort = int.parse(cat['val']!);
+                            _selectedCategory = 'All';
+                          } else {
+                            _selectedCategory = isSelected ? 'All' : cat['val']!;
+                          }
+                        });
+                      },
+                      borderRadius: BorderRadius.circular(999),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? TreatColors.secondary
+                              : TreatColors.surfaceContainerLowest,
+                          borderRadius: BorderRadius.circular(999),
+                          border: Border.all(
+                            color: isSelected
+                                ? Colors.transparent
+                                : TreatColors.outlineVariant.withValues(alpha: 0.6),
+                          ),
+                          boxShadow: isSelected
+                              ? const [
+                                  BoxShadow(
+                                    color: Color.fromRGBO(124, 82, 170, 0.28),
+                                    blurRadius: 8,
+                                    offset: Offset(0, 2),
+                                  )
+                                ]
+                              : null,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(cat['icon']!, style: const TextStyle(fontSize: 13)),
+                            const SizedBox(width: 6),
+                            Text(
+                              cat['label']!,
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: isSelected
+                                    ? Colors.white
+                                    : TreatColors.onSurfaceVariant,
+                              ),
+                            ),
+                            if (isSelected && isSort && cat['val'] == '1') ...[
+                              const SizedBox(width: 4),
+                              const Icon(
+                                Icons.check,
+                                size: 14,
+                                color: Colors.white,
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Smart Recommendations Callout Card
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: TreatColors.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: TreatColors.outlineVariant.withValues(alpha: 0.5),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: TreatColors.secondary.withValues(alpha: 0.03),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [TreatColors.secondary, TreatColors.primary],
+                    ),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.auto_awesome,
+                      color: Colors.white, size: 16),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text.rich(
+                    TextSpan(
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12,
+                        color: TreatColors.onSurfaceVariant,
+                        height: 1.35,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: 'Smart Recommendations: ',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontWeight: FontWeight.w800,
+                            color: TreatColors.secondaryDark,
+                          ),
+                        ),
+                        const TextSpan(
+                          text:
+                              'Curated strictly by lowest cost per foodie & highest culinary reviews.',
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -163,195 +578,423 @@ class PlatterPackagesScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // Platters Feed Cards
-          ...platters.map((platter) {
-            final perPerson = platter.perPersonCost(plannerState.partySize);
+          // Cards Feed
+          ...platters.map((deal) => _buildPlatterCard(deal)),
 
-            return Container(
-              margin: const EdgeInsets.only(bottom: 18),
-              decoration: BoxDecoration(
-                color: TreatColors.surfaceContainerLowest,
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: TreatColors.candyShadow,
-                border: Border.all(color: TreatColors.outlineVariant.withValues(alpha: 0.4)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Top badge
-                  Padding(
-                    padding: const EdgeInsets.all(14),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: TreatColors.primaryFixed,
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.verified, size: 13, color: TreatColors.primary),
-                              const SizedBox(width: 4),
-                              Text(
-                                platter.badgeText,
-                                style: TreatTypography.labelSmall.copyWith(
-                                  color: TreatColors.onPrimaryFixedVariant,
-                                  fontSize: 10,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const Icon(Icons.favorite_border, size: 20, color: TreatColors.primary),
-                      ],
-                    ),
+          // Footer Loading Section
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+            alignment: Alignment.center,
+            child: Column(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: const BoxDecoration(
+                    color: TreatColors.secondaryFixed,
+                    shape: BoxShape.circle,
                   ),
+                  child: const Icon(Icons.thumb_up_alt_rounded,
+                      color: TreatColors.secondary, size: 22),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'More Delicious Deals Loading...',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: TreatColors.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'We scan menus 24/7 to guarantee you and your squad the biggest bites for the lowest bucks.',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12,
+                    color: TreatColors.onSurfaceVariant,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-                  // Image banner
-                  Stack(
+  Widget _buildPlatterCard(PlatterDeal deal) {
+    final dinerState = context.watch<DinerState>();
+    final isLoved = dinerState.isFavorite(deal.id);
+
+    // Color theme for top badge based on deal
+    Color badgeColor = TreatColors.secondary;
+    IconData badgeIcon = Icons.sell_outlined;
+
+    if (deal.id == 'deal-ocean-calamari') {
+      badgeColor = TreatColors.tertiary;
+      badgeIcon = Icons.location_on;
+    } else if (deal.id == 'deal-fiesta-nachos') {
+      badgeColor = TreatColors.primary;
+      badgeIcon = Icons.loyalty_outlined;
+    }
+
+    final reviewText = deal.reviewsCount >= 1000
+        ? '${(deal.reviewsCount / 1000).toStringAsFixed(1)}k'
+        : '${deal.reviewsCount}';
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+        color: TreatColors.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+            color: TreatColors.outlineVariant.withValues(alpha: 0.6)),
+        boxShadow: TreatColors.candyShadow,
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Image with Overlays
+          Stack(
+            children: [
+              Image.network(
+                deal.imageUrl,
+                height: 190,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  height: 190,
+                  color: TreatColors.secondaryFixed,
+                  alignment: Alignment.center,
+                  child: const Icon(Icons.fastfood,
+                      size: 48, color: TreatColors.secondary),
+                ),
+              ),
+
+              // Top-Left Badge (Guarantee / Top Rated / Steal)
+              Positioned(
+                top: 10,
+                left: 10,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: badgeColor,
+                    borderRadius: BorderRadius.circular(999),
+                    boxShadow: TreatColors.pillShadow,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Image.network(
-                        platter.imageUrl,
-                        height: 150,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(height: 150, color: TreatColors.primaryFixed),
-                      ),
-                      Positioned(
-                        bottom: 8,
-                        left: 10,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.75),
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.storefront, size: 12, color: TreatColors.primaryFixed),
-                              const SizedBox(width: 4),
-                              Text(
-                                '${platter.restaurantName} (#${platter.restaurantCode})',
-                                style: TreatTypography.bodySmall.copyWith(color: Colors.white, fontSize: 10),
-                              ),
-                            ],
-                          ),
+                      Icon(badgeIcon, color: Colors.white, size: 12),
+                      const SizedBox(width: 4),
+                      Text(
+                        deal.badgeText,
+                        style: GoogleFonts.plusJakartaSans(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ],
                   ),
+                ),
+              ),
 
-                  // Content
-                  Padding(
-                    padding: const EdgeInsets.all(14),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(platter.title, style: TreatTypography.titleMedium),
-                                Text(
-                                  'Serves ${platter.servesCountMin}-${platter.servesCountMax} Foodies (\$${perPerson.toStringAsFixed(2)} / person)',
-                                  style: TreatTypography.bodySmall.copyWith(color: TreatColors.secondary),
-                                ),
-                              ],
+              // Top-Right Badge (Rating & Reviews)
+              Positioned(
+                top: 10,
+                right: 10,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.95),
+                    borderRadius: BorderRadius.circular(999),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 4,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.star,
+                          size: 14, color: TreatColors.primary),
+                      const SizedBox(width: 3),
+                      Text(
+                        '${deal.rating.toStringAsFixed(deal.rating == 4.9 ? 1 : 2)} ($reviewText)',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          color: TreatColors.onSurface,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Bottom-Left Badge (Feeds 4 Foodies)
+              Positioned(
+                bottom: 10,
+                left: 10,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.95),
+                    borderRadius: BorderRadius.circular(999),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 4,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.groups,
+                          size: 14, color: TreatColors.tertiary),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Feeds ${deal.servesCountMax} Foodies',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          color: TreatColors.tertiary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          // Details Content
+          Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Title
+                Text(
+                  deal.title,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: TreatColors.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 4),
+
+                // Venue Subtitle
+                Row(
+                  children: [
+                    const Icon(Icons.storefront_outlined,
+                        size: 14, color: TreatColors.onSurfaceVariant),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        deal.restaurantName,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 12,
+                          color: TreatColors.onSurfaceVariant,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+
+                // Inclusions Chips
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: deal.inclusions.map((chip) {
+                    Color chipBg =
+                        TreatColors.secondaryFixed.withValues(alpha: 0.6);
+                    if (deal.id == 'deal-ocean-calamari') {
+                      chipBg = TreatColors.tertiaryFixed.withValues(alpha: 0.6);
+                    } else if (deal.id == 'deal-fiesta-nachos') {
+                      chipBg = TreatColors.primaryFixed.withValues(alpha: 0.6);
+                    }
+
+                    return Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: chipBg,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        chip,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: TreatColors.onSurface,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 12),
+
+                // Price & Discount Row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
+                          Text(
+                            '\$${deal.price.toStringAsFixed(2)}',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w900,
+                              color: TreatColors.secondaryDark,
                             ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
+                          ),
+                          const SizedBox(width: 6),
+                          Flexible(
+                            child: Text(
+                              '\$${deal.originalPrice.toStringAsFixed(2)}',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 13,
+                                color: TreatColors.outline,
+                                decoration: TextDecoration.lineThrough,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: TreatColors.primaryFixed,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        deal.saveText ??
+                            'Save ${deal.discountPercent}% OFF',
+                        style: GoogleFonts.plusJakartaSans(
+                          color: TreatColors.onPrimaryFixedVariant,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+
+                // Action Buttons Row (Loved It & Share with Squad)
+                Row(
+                  children: [
+                    // Loved It Button (Only available for logged-in Foodies; NOT available for Explore Without Sign In)
+                    if (dinerState.isFoodieLoggedIn) ...[
+                      Expanded(
+                        child: InkWell(
+                          onTap: () => _toggleLoved(deal),
+                          borderRadius: BorderRadius.circular(999),
+                          child: Container(
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: isLoved
+                                  ? TreatColors.primaryFixed
+                                  : TreatColors.surfaceContainerLowest,
+                              borderRadius: BorderRadius.circular(999),
+                              border: Border.all(
+                                color: isLoved
+                                    ? TreatColors.primary
+                                    : TreatColors.outlineVariant,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      '\$${platter.originalPrice.toStringAsFixed(2)}',
-                                      style: TreatTypography.bodySmall.copyWith(
-                                        decoration: TextDecoration.lineThrough,
-                                        fontSize: 11,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      '\$${platter.price.toStringAsFixed(2)}',
-                                      style: TreatTypography.headlineSmall.copyWith(
-                                        color: TreatColors.primary,
-                                        fontWeight: FontWeight.w900,
-                                      ),
-                                    ),
-                                  ],
+                                Icon(
+                                  isLoved
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
+                                  color: TreatColors.primary,
+                                  size: 16,
                                 ),
+                                const SizedBox(width: 6),
                                 Text(
-                                  'Save \$${platter.savings.toStringAsFixed(0)} today',
-                                  style: TreatTypography.labelSmall.copyWith(
-                                    color: TreatColors.secondary,
-                                    fontSize: 10,
+                                  'Loved It',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    color: TreatColors.primary,
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 12,
                                   ),
                                 ),
                               ],
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-
-                        // Package Inclusions
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: TreatColors.surfaceContainerLow,
-                            borderRadius: BorderRadius.circular(16),
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                    ],
+
+                    // Share with Squad Button
+                    Expanded(
+                      child: InkWell(
+                        onTap: () => _shareWithSquad(deal),
+                        borderRadius: BorderRadius.circular(999),
+                        child: Container(
+                          height: 40,
+                          decoration: BoxDecoration(
+                            gradient: TreatColors.purpleGradient,
+                            borderRadius: BorderRadius.circular(999),
+                            boxShadow: TreatColors.pillShadow,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(
-                                'PACKAGE INCLUSIONS',
-                                style: TreatTypography.labelSmall.copyWith(
-                                  color: TreatColors.onSurfaceVariant,
-                                  fontSize: 9,
+                              const Icon(Icons.group_add_rounded,
+                                  color: Colors.white, size: 16),
+                              const SizedBox(width: 6),
+                              Flexible(
+                                child: Text(
+                                  'Share with Squad',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 12,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              ),
-                              const SizedBox(height: 6),
-                              Wrap(
-                                spacing: 10,
-                                runSpacing: 6,
-                                children: platter.inclusions.map((inc) {
-                                  return Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Icon(Icons.check_circle, size: 13, color: TreatColors.tertiary),
-                                      const SizedBox(width: 4),
-                                      Text(inc, style: TreatTypography.bodySmall),
-                                    ],
-                                  );
-                                }).toList(),
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 14),
-
-                        // Select button
-                        TreatButton(
-                          text: 'Select This Platter',
-                          icon: Icons.arrow_forward,
-                          height: 48,
-                          variant: TreatButtonVariant.solidSecondary,
-                          onPressed: () {
-                            plannerState.selectPlatter(platter);
-                            onSelectPlatter(platter);
-                          },
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            );
-          }),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

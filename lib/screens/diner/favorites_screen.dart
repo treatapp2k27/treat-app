@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../../core/theme/treat_colors.dart';
+import '../../models/favorite_item.dart';
 import '../../models/platter_deal.dart';
+import '../../state/diner_state.dart';
 import '../../widgets/treat_header.dart';
 
 class FavoritesScreen extends StatefulWidget {
@@ -22,82 +25,54 @@ class FavoritesScreen extends StatefulWidget {
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
   int _selectedFilter = 0; // 0: All, 1: Feast Boards, 2: Sweet Lounges
-  final Set<String> _lovedItemIds = {'fav_1', 'fav_2', 'fav_3'};
 
-  final List<Map<String, dynamic>> _favorites = [
-    {
-      'id': 'fav_1',
-      'title': 'Sugar Bloom Cafe & Brunch',
-      'description': 'Sweet & savory sharing board with drinks',
-      'price': '\$105.00',
-      'splitPrice': '\$35/person',
-      'saveBadge': 'Save \$28 • Pass',
-      'distance': '0.4 mi • 8 mins walk',
-      'rating': '4.9',
-      'reviews': '420',
-      'category': 'Feast Boards',
-      'imageUrl':
-          'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=800&q=80',
-    },
-    {
-      'id': 'fav_2',
-      'title': 'Sprinkle & Sizzle Social',
-      'description': 'Loaded signature waffles & group smash slider tray',
-      'price': '\$96.00',
-      'splitPrice': '\$32/person',
-      'saveBadge': 'Save \$20 • Pass',
-      'distance': '0.6 mi • 12 mins walk',
-      'rating': '4.9',
-      'reviews': '128',
-      'category': 'Sweet Lounges',
-      'imageUrl':
-          'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80',
-    },
-    {
-      'id': 'fav_3',
-      'title': 'Sugar Smash & Patty Lounge',
-      'description': 'Artisan sparkling dessert milkshakes & combo platters',
-      'price': '\$84.00',
-      'splitPrice': '\$28/person',
-      'saveBadge': 'Save \$18 • Pass',
-      'distance': '0.9 mi • 16 mins walk',
-      'rating': '4.8',
-      'reviews': '94',
-      'category': 'Sweet Lounges',
-      'imageUrl':
-          'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80',
-    },
-  ];
+  void _removeFavorite(FavoriteItem item) {
+    final dinerState = context.read<DinerState>();
+    dinerState.removeFavorite(item.id);
 
-  void _toggleLoved(String id) {
-    setState(() {
-      if (_lovedItemIds.contains(id)) {
-        _lovedItemIds.remove(id);
-      } else {
-        _lovedItemIds.add(id);
-      }
-    });
-
-    final isNowLoved = _lovedItemIds.contains(id);
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              isNowLoved ? Icons.favorite : Icons.favorite_border,
-              color: Colors.white,
-              size: 18,
-            ),
+            const Icon(Icons.delete_outline, color: Colors.white, size: 18),
             const SizedBox(width: 8),
             Flexible(
               child: Text(
-                isNowLoved
-                    ? 'Added to your Loved Favorites! ❤️'
-                    : 'Removed from Favorites',
+                'Removed "${item.title}" from Favorites',
                 overflow: TextOverflow.ellipsis,
               ),
             ),
+          ],
+        ),
+        action: SnackBarAction(
+          label: 'Undo',
+          textColor: const Color(0xFFFFD166),
+          onPressed: () {
+            dinerState.addFavorite(item);
+          },
+        ),
+        backgroundColor: TreatColors.secondary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  void _addSampleFavorite() {
+    final dinerState = context.read<DinerState>();
+    dinerState.addFavorite(
+      FavoriteItem.fromPlatterDeal(PlatterDeal.sunsetSlidersPlatter),
+    );
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Row(
+          children: [
+            Icon(Icons.favorite, color: Colors.white, size: 18),
+            SizedBox(width: 8),
+            Text('Added "The Sunset Sliders & Fries Feast" to Favorites! ❤️'),
           ],
         ),
         backgroundColor: TreatColors.secondary,
@@ -110,9 +85,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final filteredFavorites = _favorites.where((item) {
-      if (_selectedFilter == 1) return item['category'] == 'Feast Boards';
-      if (_selectedFilter == 2) return item['category'] == 'Sweet Lounges';
+    final dinerState = context.watch<DinerState>();
+    final allFavorites = dinerState.favorites;
+
+    final filteredFavorites = allFavorites.where((item) {
+      if (_selectedFilter == 1) return item.category == 'Feast Boards';
+      if (_selectedFilter == 2) return item.category == 'Sweet Lounges';
       return true;
     }).toList();
 
@@ -131,7 +109,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           // Filter Chips
           Row(
             children: [
-              _buildFilterChip('All Loved (${_lovedItemIds.length})', 0),
+              _buildFilterChip('All Loved (${allFavorites.length})', 0),
               const SizedBox(width: 8),
               _buildFilterChip('Feast Boards', 1),
               const SizedBox(width: 8),
@@ -242,10 +220,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     );
   }
 
-  Widget _buildFavoriteCard(Map<String, dynamic> item) {
-    final id = item['id'] as String;
-    final isLoved = _lovedItemIds.contains(id);
-
+  Widget _buildFavoriteCard(FavoriteItem item) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -263,11 +238,11 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Hero Image with Overlays (matching screenshot)
+          // Hero Image with Overlays
           Stack(
             children: [
               Image.network(
-                item['imageUrl'] as String,
+                item.imageUrl,
                 height: 180,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -275,7 +250,34 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   height: 180,
                   color: const Color(0xFFF3E6FB),
                   alignment: Alignment.center,
-                  child: const Icon(Icons.restaurant, size: 48, color: TreatColors.primary),
+                  child: const Icon(Icons.restaurant,
+                      size: 48, color: TreatColors.primary),
+                ),
+              ),
+
+              // Top Right Delete / Trash Button
+              Positioned(
+                top: 10,
+                right: 10,
+                child: InkWell(
+                  onTap: () => _removeFavorite(item),
+                  borderRadius: BorderRadius.circular(999),
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.92),
+                      shape: BoxShape.circle,
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 4,
+                          offset: Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(Icons.delete_outline_rounded,
+                        size: 16, color: Color(0xFFEF4444)),
+                  ),
                 ),
               ),
 
@@ -284,7 +286,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 bottom: 12,
                 left: 12,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.65),
                     borderRadius: BorderRadius.circular(999),
@@ -296,10 +299,11 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.directions_walk_rounded, size: 14, color: Color(0xFF80D0F0)),
+                      const Icon(Icons.directions_walk_rounded,
+                          size: 14, color: Color(0xFF80D0F0)),
                       const SizedBox(width: 4),
                       Text(
-                        item['distance'] as String,
+                        item.distance,
                         style: GoogleFonts.plusJakartaSans(
                           color: Colors.white,
                           fontSize: 11,
@@ -316,7 +320,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 bottom: 12,
                 right: 12,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.95),
                     borderRadius: BorderRadius.circular(999),
@@ -331,10 +336,11 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.star_rounded, size: 15, color: Color(0xFFFFB703)),
+                      const Icon(Icons.star_rounded,
+                          size: 15, color: Color(0xFFFFB703)),
                       const SizedBox(width: 4),
                       Text(
-                        '${item['rating']} (${item['reviews']})',
+                        '${item.rating} (${item.reviews})',
                         style: GoogleFonts.plusJakartaSans(
                           color: const Color(0xFF2B2035),
                           fontSize: 11,
@@ -348,7 +354,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             ],
           ),
 
-          // Card Content
+          // Content Box
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -356,107 +362,134 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               children: [
                 // Title and Price Row
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Title & Description
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            item['title'] as String,
+                            item.title,
                             style: GoogleFonts.plusJakartaSans(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: -0.3,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
                               color: TreatColors.onSurface,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(height: 3),
+                          const SizedBox(height: 4),
                           Text(
-                            item['description'] as String,
+                            item.description,
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 12,
                               color: TreatColors.onSurfaceVariant,
+                              fontWeight: FontWeight.w500,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
                     ),
                     const SizedBox(width: 12),
-
-                    // Price & Split
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          item['price'] as String,
+                          item.price,
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 18,
                             fontWeight: FontWeight.w900,
-                            color: const Color(0xFFE040A0), // Hot pink accent from image
-                            letterSpacing: -0.5,
+                            color: TreatColors.secondary,
                           ),
                         ),
                         Text(
-                          item['splitPrice'] as String,
+                          item.splitPrice,
                           style: GoogleFonts.plusJakartaSans(
-                            fontSize: 11,
-                            color: TreatColors.onSurfaceVariant,
+                            fontSize: 10,
                             fontWeight: FontWeight.w600,
+                            color: TreatColors.onSurfaceVariant,
                           ),
                         ),
                       ],
                     ),
                   ],
                 ),
+
+                // Inclusions if any
+                if (item.items.isNotEmpty) ...[
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: item.items.map((it) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF8EEFC),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          it,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF6A1B9A),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+
                 const SizedBox(height: 14),
 
-                // Bottom Action Buttons (matching screenshot)
+                // Bottom Action Buttons
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Save Pass Pill Button
-                    InkWell(
-                      onTap: () {
-                        widget.onSelectDeal?.call(PlatterDeal.sampleDeals.first);
-                      },
-                      borderRadius: BorderRadius.circular(999),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF3E6FB), // Soft lavender pill
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              item['saveBadge'] as String,
+                    // Save badge button
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          widget.onSelectDeal?.call(
+                            PlatterDeal.sampleDeals.firstWhere(
+                              (d) => d.id == item.id,
+                              orElse: () => PlatterDeal.sampleDeals.first,
+                            ),
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(999),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF8EEFC),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Center(
+                            child: Text(
+                              item.saveBadge.isNotEmpty
+                                  ? item.saveBadge
+                                  : 'View Feast Details',
                               style: GoogleFonts.plusJakartaSans(
-                                color: TreatColors.primary,
-                                fontSize: 11.5,
+                                color: const Color(0xFF6A1B9A),
+                                fontSize: 12,
                                 fontWeight: FontWeight.w800,
                               ),
                             ),
-                          ],
+                          ),
                         ),
                       ),
                     ),
+                    const SizedBox(width: 10),
 
-                    // Loved It Action Button
+                    // Loved It / Remove Favorite Button
                     InkWell(
-                      onTap: () => _toggleLoved(id),
+                      onTap: () => _removeFavorite(item),
                       borderRadius: BorderRadius.circular(999),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 10),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF7C52AA), // Deep purple button from screenshot
+                          color: TreatColors.secondary,
                           borderRadius: BorderRadius.circular(999),
                           boxShadow: const [
                             BoxShadow(
@@ -478,8 +511,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                               ),
                             ),
                             const SizedBox(width: 4),
-                            Icon(
-                              isLoved ? Icons.favorite : Icons.favorite_border,
+                            const Icon(
+                              Icons.favorite,
                               size: 15,
                               color: Colors.white,
                             ),
@@ -523,24 +556,52 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             ),
           ),
           const SizedBox(height: 18),
-          InkWell(
-            onTap: widget.onExploreMore,
-            borderRadius: BorderRadius.circular(999),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              decoration: BoxDecoration(
-                color: TreatColors.secondary,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              InkWell(
+                onTap: widget.onExploreMore,
                 borderRadius: BorderRadius.circular(999),
-              ),
-              child: Text(
-                'Explore Spots ➔',
-                style: GoogleFonts.plusJakartaSans(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 12,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: TreatColors.secondary,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    'Explore Spots ➔',
+                    style: GoogleFonts.plusJakartaSans(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 12,
+                    ),
+                  ),
                 ),
               ),
-            ),
+              const SizedBox(width: 10),
+              InkWell(
+                onTap: _addSampleFavorite,
+                borderRadius: BorderRadius.circular(999),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF3E8FF),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: const Color(0xFFD8B4FE)),
+                  ),
+                  child: Text(
+                    '+ Add Sample Feast',
+                    style: GoogleFonts.plusJakartaSans(
+                      color: const Color(0xFF7C52AA),
+                      fontWeight: FontWeight.w800,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
