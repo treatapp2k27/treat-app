@@ -99,7 +99,7 @@ void main() {
 
     // Should now be on the Login Page (WelcomeAnonymousScreen)
     expect(find.byType(WelcomeAnonymousScreen), findsOneWidget);
-    expect(find.text('Enter as Anonymous Guest'), findsOneWidget);
+    expect(find.text('Google'), findsOneWidget);
 
     // Go back to gateway & re-enter Explore Without Sign In
     final backFromLoginBtn = find.byIcon(Icons.arrow_back);

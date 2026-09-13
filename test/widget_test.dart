@@ -93,9 +93,9 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 350));
 
-    // 3. Login Page (WelcomeAnonymousScreen): verify and tap Enter
-    expect(find.text('Enter as Anonymous Guest'), findsOneWidget);
-    await tester.tap(find.text('Enter as Anonymous Guest'));
+    // 3. Login Page (WelcomeAnonymousScreen): verify and tap Google sign-in
+    expect(find.text('Google'), findsOneWidget);
+    await tester.tap(find.text('Google'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 350));
 

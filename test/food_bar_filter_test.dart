@@ -43,7 +43,7 @@ void main() {
       await tester.tap(foodieSignIn);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 350));
-      await tester.tap(find.text('Enter as Anonymous Guest'));
+      await tester.tap(find.text('Google'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 350));
       await tester.tap(find.text('Allow Location Access'));

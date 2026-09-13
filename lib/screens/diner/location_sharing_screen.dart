@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/asset_constants.dart';
@@ -184,7 +185,9 @@ class _LocationSharingScreenState extends State<LocationSharingScreen> {
                 return SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 8),
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: constraints.maxHeight - 16),
+                    constraints: BoxConstraints(
+                      minHeight: math.max(0.0, constraints.maxHeight - 16),
+                    ),
                     child: IntrinsicHeight(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,

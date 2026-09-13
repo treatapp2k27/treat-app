@@ -10,12 +10,14 @@ import '../../state/diner_state.dart';
 class FoodieProfileSettingsScreen extends StatefulWidget {
   final VoidCallback onOpenDrawer;
   final VoidCallback? onNavigateHome;
+  final VoidCallback? onNavigateProfile;
   final VoidCallback? onLogOut;
 
   const FoodieProfileSettingsScreen({
     super.key,
     required this.onOpenDrawer,
     this.onNavigateHome,
+    this.onNavigateProfile,
     this.onLogOut,
   });
 
@@ -40,6 +42,19 @@ class _FoodieProfileSettingsScreenState
   ];
 
   double _budgetSliderVal = 45.0;
+  late final ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   void _showEditPersonaDialog(BuildContext context) {
     final dinerState = context.read<DinerState>();
@@ -832,6 +847,7 @@ class _FoodieProfileSettingsScreenState
       backgroundColor: const Color(0xFFFEF7FF),
       appBar: _buildTopAppBar(context),
       body: ListView(
+        controller: _scrollController,
         physics: const BouncingScrollPhysics(),
         padding:
             const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 44),
@@ -1135,6 +1151,20 @@ class _FoodieProfileSettingsScreenState
       toolbarHeight: 62,
       title: Row(
         children: [
+          // Left Sidebar Drawer Hamburger Button
+          IconButton(
+            icon: const Icon(
+              Icons.menu,
+              color: Color(0xFF201A24),
+              size: 24,
+            ),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            tooltip: 'Open menu',
+            onPressed: widget.onOpenDrawer,
+          ),
+          const SizedBox(width: 12),
+
           // Drawer / Logo Leading
           Expanded(
             child: InkWell(
@@ -1212,18 +1242,36 @@ class _FoodieProfileSettingsScreenState
             tooltip: 'Notifications',
           ),
 
-          // Profile Avatar Icon Button
-          Container(
-            width: 36,
-            height: 36,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: Color(0xFFD6228A),
-            ),
-            child: const Icon(
-              Icons.person,
-              color: Colors.white,
-              size: 20,
+          // Profile Avatar Icon Button - Redirects to Profile Settings
+          InkWell(
+            onTap: () {
+              if (widget.onNavigateProfile != null) {
+                widget.onNavigateProfile!();
+              }
+              if (_scrollController.hasClients) {
+                _scrollController.animateTo(
+                  _scrollController.offset > 50 ? 0.0 : 250.0,
+                  duration: const Duration(milliseconds: 350),
+                  curve: Curves.easeOutCubic,
+                );
+              }
+            },
+            borderRadius: BorderRadius.circular(999),
+            child: Tooltip(
+              message: 'Profile Settings',
+              child: Container(
+                width: 36,
+                height: 36,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color(0xFFD6228A),
+                ),
+                child: const Icon(
+                  Icons.person,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
             ),
           ),
         ],

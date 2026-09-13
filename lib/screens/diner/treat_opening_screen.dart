@@ -11,11 +11,10 @@ import '../../widgets/treat_map_loading_track.dart';
 /// - Gradient background (#f8f0fc -> #f3e6fb -> #eedef7)
 /// - Ambient pastel blurred blobs (#fed7ea, #ebdcf9, #e0f4fb)
 /// - 8 Floating subtle foodie vector icons with gentle drift animation
-/// - Modern iOS status bar / Dynamic Island notch
-/// - Centered Treat logo with continuous breathing pulse & glow
-/// - Custom animated map trail loading track with hopping character and 3D swinging door
-/// - Bottom home indicator pill
-/// - Interactive tap-to-skip and optional auto-transition
+/// - Responsive animated canvas with floating foodie vector icons
+/// - Center branded logo with gentle breathing pulse
+/// - Custom animated map track with path dot trail and foodie destination icon
+/// - Smooth progress status label cycle and automatic navigation transition-skip and optional auto-transition
 class TreatOpeningScreen extends StatefulWidget {
   final VoidCallback onContinue;
   final bool autoContinue;
@@ -126,47 +125,54 @@ class _TreatOpeningScreenState extends State<TreatOpeningScreen>
               // 2. Floating Subtle Vector Foodie Icons (SVGs with gentle drift)
               _buildFloatingFoodieIcons(),
 
-              // 3. Main Content (iOS status bar, Logo, Map Loading Track, Home Bar)
+              // 3. Main Content (Logo, Map Loading Track, Text Pill - perfectly centered on all screen sizes)
               SafeArea(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Top Status Bar & Dynamic Island
-                    _buildTopStatusBar(),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
+                          minWidth: constraints.maxWidth,
+                        ),
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // Centered Treat Logo with continuous breathing / blinking pulse
+                                Center(child: _buildBreathingLogo()),
 
-                    // Centered Branding & Animated Custom Loading Track
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // Centered Treat Logo with continuous breathing / blinking pulse
-                          _buildBreathingLogo(),
+                                const SizedBox(height: 36),
 
-                          const SizedBox(height: 36),
+                                // Custom Animated Map Trail Loading Track (Center icon & trail)
+                                Center(
+                                  child: TreatMapLoadingTrack(
+                                    width: 320,
+                                    height: 140,
+                                    onCycleCompleted: () {
+                                      if (widget.autoContinue) {
+                                        _handleContinue();
+                                      }
+                                    },
+                                  ),
+                                ),
 
-                          // Custom Animated Map Trail Loading Track
-                          TreatMapLoadingTrack(
-                            width: 320,
-                            height: 140,
-                            onCycleCompleted: () {
-                              // If auto-continue is enabled, complete on cycle end
-                              if (widget.autoContinue) {
-                                _handleContinue();
-                              }
-                            },
+                                const SizedBox(height: 28),
+
+                                // Subtle Skip / Continue Action Pill (Center text & skip button)
+                                Center(child: _buildSkipButton()),
+                              ],
+                            ),
                           ),
-
-                          const SizedBox(height: 28),
-
-                          // Subtle Skip / Continue Action Pill
-                          _buildSkipButton(),
-                        ],
+                        ),
                       ),
-                    ),
-
-                    // Bottom Safe-Area Bar Indicator
-                    _buildBottomIndicator(),
-                  ],
+                    );
+                  },
                 ),
               ),
             ],
@@ -409,97 +415,6 @@ class _TreatOpeningScreenState extends State<TreatOpeningScreen>
     );
   }
 
-  // --- Top Status Bar ---
-  Widget _buildTopStatusBar() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8, left: 24, right: 24),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Left subtle dot indicator
-          Container(
-            width: 6,
-            height: 6,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: const Color(0xFF7C52AA).withValues(alpha: 0.4),
-            ),
-          ),
-
-          // Center Dynamic Island / Camera Notch
-          Container(
-            width: 112,
-            height: 24,
-            decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(999),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.15),
-                  blurRadius: 4,
-                  offset: const Offset(0, 1),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Container(
-                  width: 10,
-                  height: 10,
-                  margin: const EdgeInsets.only(right: 10),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: const Color(0xFF0F172A),
-                    border: Border.all(
-                      color: const Color(0xFF1E293B),
-                      width: 1,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Right Minimal Status Indicators (Signal bars & Battery)
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Cellular signal bars
-              CustomPaint(
-                size: const Size(16, 12),
-                painter: _SignalBarsPainter(color: const Color(0xFF4C267A).withValues(alpha: 0.7)),
-              ),
-              const SizedBox(width: 6),
-              // Battery icon
-              Container(
-                width: 20,
-                height: 10,
-                padding: const EdgeInsets.all(1.5),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(3),
-                  border: Border.all(
-                    color: const Color(0xFF4C267A).withValues(alpha: 0.7),
-                    width: 1.5,
-                  ),
-                ),
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  width: 10,
-                  height: double.infinity,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF4C267A).withValues(alpha: 0.7),
-                    borderRadius: BorderRadius.circular(1),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
   // --- Centered Breathing Logo ---
   Widget _buildBreathingLogo() {
     return AnimatedBuilder(
@@ -605,48 +520,6 @@ class _TreatOpeningScreenState extends State<TreatOpeningScreen>
     );
   }
 
-  // --- Bottom Safe-Area Bar Indicator ---
-  Widget _buildBottomIndicator() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12, top: 4),
-      child: Container(
-        width: 144,
-        height: 5,
-        decoration: BoxDecoration(
-          color: const Color(0xFF7C52AA).withValues(alpha: 0.22),
-          borderRadius: BorderRadius.circular(999),
-        ),
-      ),
-    );
-  }
-}
-
-// Custom Painter for Signal Bars
-class _SignalBarsPainter extends CustomPainter {
-  final Color color;
-
-  _SignalBarsPainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = color;
-    final barW = size.width / 4.5;
-    // 4 bars with increasing height
-    for (int i = 0; i < 4; i++) {
-      final barH = size.height * (0.35 + (0.65 * i / 3));
-      final x = i * (barW + 1.5);
-      final y = size.height - barH;
-      final rrect = RRect.fromRectAndRadius(
-        Rect.fromLTWH(x, y, barW, barH),
-        const Radius.circular(1),
-      );
-      canvas.drawRRect(rrect, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _SignalBarsPainter oldDelegate) =>
-      oldDelegate.color != color;
 }
 
 // Enum for Foodie Vector Icons

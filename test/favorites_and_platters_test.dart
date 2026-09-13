@@ -50,7 +50,7 @@ void main() {
       await tester.tap(foodieSignIn);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 350));
-      await tester.tap(find.text('Enter as Anonymous Guest'));
+      await tester.tap(find.text('Google'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 350));
       await tester.tap(find.text('Allow Location Access'));
@@ -88,9 +88,10 @@ void main() {
     // VERIFICATION 1: Successfully redirected to PlatterPackagesScreen
     expect(find.byType(PlatterPackagesScreen), findsOneWidget);
 
-    // VERIFICATION 2: Check Search, Treat button, and Sorting elements
+    // VERIFICATION 2: Check Search, Filter button, and Sorting elements
     expect(find.text('food platters & packs'), findsOneWidget);
-    expect(find.text('TREAT'), findsAtLeastNWidgets(1));
+    expect(find.text('Filter'), findsOneWidget);
+    expect(find.text('2'), findsOneWidget);
     expect(find.text('Recommended for You'), findsOneWidget);
     expect(find.text('Lowest Price First'), findsOneWidget);
 
@@ -159,8 +160,7 @@ void main() {
     expect(find.text('Save 42% OFF'), findsOneWidget);
 
     await tester.drag(find.byType(ListView), const Offset(0, -600));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 350));
+    await tester.pumpAndSettle();
 
     expect(find.text('More Delicious Deals Loading...'), findsOneWidget);
     expect(find.textContaining('We scan menus 24/7'), findsOneWidget);
@@ -186,33 +186,20 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 350));
 
-    // Verify Favorites screen renders items and delete action
+    // Verify Favorites screen renders items and interacts matching Image 1
     expect(find.byType(FavoritesScreen), findsOneWidget);
-    expect(find.text('Your Loved Treat Spots'), findsOneWidget);
+    expect(find.text('My Loved Packages'), findsOneWidget);
+    expect(find.text('5 Saved'), findsOneWidget);
+    expect(find.text('The Sunset Sliders & Fries Feast'), findsOneWidget);
 
-    // Delete one item from favorites
-    final deleteIcons = find.byIcon(Icons.delete_outline_rounded);
-    expect(deleteIcons, findsWidgets);
+    // Toggle heart button on package card
+    final heartBtn = find.byKey(const ValueKey('fav_btn_sunset-sliders'));
+    expect(heartBtn, findsOneWidget);
 
-    ScaffoldMessenger.of(tester.element(find.byType(FavoritesScreen)))
-        .clearSnackBars();
+    await tester.tap(heartBtn);
     await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
 
-    final beforeCount = dinerState.favorites.length;
-    await tester.tap(deleteIcons.first);
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-    await tester.pump(const Duration(milliseconds: 400));
-
-    expect(dinerState.favorites.length, equals(beforeCount - 1));
-
-    // Verify Undo action
-    final undoButton = find.text('Undo');
-    expect(undoButton, findsOneWidget);
-    await tester.tap(undoButton);
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-
-    expect(dinerState.favorites.length, equals(beforeCount));
+    expect(find.text('4 Saved'), findsOneWidget);
   });
 }

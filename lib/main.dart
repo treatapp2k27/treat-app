@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'core/theme/treat_theme.dart';
@@ -31,6 +32,18 @@ void main() {
   );
 }
 
+class TreatAppScrollBehavior extends MaterialScrollBehavior {
+  const TreatAppScrollBehavior();
+
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.trackpad,
+        PointerDeviceKind.stylus,
+      };
+}
+
 class TreatApp extends StatelessWidget {
   const TreatApp({super.key});
 
@@ -40,7 +53,9 @@ class TreatApp extends StatelessWidget {
       title: 'Treat - Culinary Social & Food Deals',
       theme: TreatTheme.lightTheme,
       debugShowCheckedModeBanner: false,
+      scrollBehavior: const TreatAppScrollBehavior(),
       home: const AppShell(),
     );
   }
 }
+

@@ -94,8 +94,8 @@ void main() {
     // 8. Verify Carousel Navigation Chevron Icons removed and Auto-Sliding works
     expect(find.byIcon(Icons.chevron_right_rounded), findsNothing);
     expect(find.byIcon(Icons.chevron_left_rounded), findsNothing);
-    await tester.pump(const Duration(seconds: 1));
-    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pump(const Duration(milliseconds: 600));
 
     // 9. Verify Section: Exploring Current Events (WHAT'S ON NOW)
     expect(find.text("WHAT'S ON NOW"), findsOneWidget);
@@ -105,26 +105,9 @@ void main() {
     expect(find.text('Join Gathering'), findsOneWidget);
     expect(find.text('RSVP Table'), findsOneWidget);
 
-    // 10. Verify Section: Mia's Sweet Treat Perks & Squad Ludo Modal
-    expect(find.text("Mia's Sweet Treat Perks"), findsOneWidget);
-    expect(find.text('Play Squad Ludo 🎲'), findsOneWidget);
-
-    // Tap Play Squad Ludo to open interactive modal
-    await tester.tap(find.text('Play Squad Ludo 🎲'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('🎲 Treat Squad Ludo'), findsOneWidget);
-    expect(find.text('Roll Dice! 🎲'), findsOneWidget);
-
-    // Roll the dice in the modal
-    await tester.tap(find.text('Roll Dice! 🎲'));
-    await tester.pump(const Duration(milliseconds: 1000));
-    await tester.pumpAndSettle();
-
-    // Close the modal
-    await tester.tap(find.text('Close'));
-    await tester.pumpAndSettle();
-    expect(find.text('🎲 Treat Squad Ludo'), findsNothing);
+    // 10. Verify Section: Squad Minigame is removed from Explore page (relocated to sidebar drawer)
+    expect(find.text("Mia's Sweet Treat Perks"), findsNothing);
+    expect(find.text('Play Squad Ludo 🎲'), findsNothing);
 
     // 11. Test Header Back to Login Button in Guest Mode
     await tester.tap(find.byIcon(Icons.arrow_back_ios_new_rounded));

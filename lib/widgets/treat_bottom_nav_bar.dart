@@ -122,17 +122,24 @@ class TreatBottomNavBar extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Clean icon with smooth scale - NO round overlay or button container
-              SizedBox(
-                height: 30,
-                child: Center(
-                  child: AnimatedScale(
-                    scale: isActive ? 1.08 : 1.0,
-                    duration: const Duration(milliseconds: 200),
-                    curve: Curves.easeOutCubic,
+              // Active icon pill indicator matching mockup
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOutCubic,
+                padding: EdgeInsets.symmetric(
+                  horizontal: isActive ? 16 : 0,
+                  vertical: isActive ? 3 : 0,
+                ),
+                decoration: BoxDecoration(
+                  color: isActive ? const Color(0xFFEDE8FC) : Colors.transparent,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: SizedBox(
+                  height: 26,
+                  child: Center(
                     child: Icon(
                       isActive ? activeIcon : icon,
-                      size: 24,
+                      size: 22,
                       color: isActive ? activeColor : inactiveColor,
                     ),
                   ),

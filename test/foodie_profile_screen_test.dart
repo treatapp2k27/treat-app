@@ -14,6 +14,8 @@ void main() {
 
     final dinerState = DinerState();
     bool loggedOut = false;
+    bool drawerOpened = false;
+    bool profileRedirected = false;
 
     await tester.pumpWidget(
       MultiProvider(
@@ -23,7 +25,8 @@ void main() {
         child: MaterialApp(
           theme: TreatTheme.lightTheme,
           home: FoodieProfileSettingsScreen(
-            onOpenDrawer: () {},
+            onOpenDrawer: () => drawerOpened = true,
+            onNavigateProfile: () => profileRedirected = true,
             onLogOut: () => loggedOut = true,
           ),
         ),
@@ -32,10 +35,22 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    // 1. Verify Top App Bar
+    // 1. Verify Top App Bar (Left Sidebar hamburger menu, Title, Notifications, Profile Redirect)
     expect(find.text('TREATS & CO'), findsOneWidget);
     expect(find.text('Community Treats'), findsOneWidget);
+    expect(find.byIcon(Icons.menu), findsOneWidget);
     expect(find.byIcon(Icons.notifications_none_rounded), findsOneWidget);
+    expect(find.byTooltip('Profile Settings'), findsOneWidget);
+
+    // Test tapping Left Sidebar hamburger menu
+    await tester.tap(find.byIcon(Icons.menu));
+    await tester.pumpAndSettle();
+    expect(drawerOpened, isTrue);
+
+    // Test tapping Profile Avatar to redirect
+    await tester.tap(find.byTooltip('Profile Settings'));
+    await tester.pumpAndSettle();
+    expect(profileRedirected, isTrue);
 
     // 2. Verify Hero Profile Card elements
     expect(find.text('MidnightDumpling'), findsAtLeastNWidgets(1));

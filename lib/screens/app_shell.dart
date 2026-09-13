@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../core/theme/treat_colors.dart';
-import '../core/theme/treat_typography.dart';
 import '../state/diner_state.dart';
 import '../widgets/diner_drawer.dart';
 import '../widgets/treat_bottom_nav_bar.dart';
@@ -41,10 +40,12 @@ class _AppShellState extends State<AppShell> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isDesktop = constraints.maxWidth > 500;
         final isFoodieLoggedIn = context.watch<DinerState>().isFoodieLoggedIn;
+        final isDiner = _isDinerScreen();
 
-        Widget content = Scaffold(
+        // Responsive Panel Design:
+        // Full width on mobile (<960), centered with generous 960px panel on desktop/tablet
+        return Scaffold(
           key: _scaffoldKey,
           backgroundColor: TreatColors.background,
           drawer: isFoodieLoggedIn
@@ -54,73 +55,52 @@ class _AppShellState extends State<AppShell> {
                     Navigator.of(context).pop();
                     _navigateTo(route);
                   },
+                  onLogOut: () {
+                    context.read<DinerState>().setFoodieLoggedIn(false);
+                    Navigator.of(context).pop();
+                    _navigateTo('welcome');
+                  },
                 )
               : null,
-          body: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 280),
-            switchInCurve: Curves.easeOutCubic,
-            switchOutCurve: Curves.easeInCubic,
-            transitionBuilder: (Widget child, Animation<double> animation) {
-              return FadeTransition(
-                opacity: CurvedAnimation(
-                  parent: animation,
-                  curve: const Interval(0.1, 1.0, curve: Curves.easeOut),
-                ),
-                child: SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(0.0, 0.02),
-                    end: Offset.zero,
-                  ).animate(CurvedAnimation(
-                    parent: animation,
-                    curve: Curves.easeOutCubic,
-                  )),
-                  child: child,
-                ),
-              );
-            },
-            child: KeyedSubtree(
-              key: ValueKey<String>(_currentScreen),
-              child: _buildCurrentScreen(),
+          body: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 960),
+              child: _buildCurrentScreenWithSwitcher(),
             ),
           ),
-          bottomNavigationBar: _isDinerScreen() ? _buildDinerBottomNav() : null,
+          bottomNavigationBar: isDiner ? _buildDinerBottomNav() : null,
         );
-
-        if (isDesktop) {
-          final frameHeight = constraints.maxHeight > 920 ? 890.0 : (constraints.maxHeight * 0.96);
-          // Centered mock device frame on desktop/browser
-          return Container(
-            color: const Color(0xFF1E1624),
-            child: Center(
-              child: Container(
-                width: 420,
-                height: frameHeight,
-                margin: const EdgeInsets.symmetric(vertical: 12),
-                clipBehavior: Clip.antiAlias,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(40),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color.fromRGBO(224, 64, 160, 0.25),
-                      blurRadius: 40,
-                      spreadRadius: 2,
-                    ),
-                    BoxShadow(
-                      color: Colors.black54,
-                      blurRadius: 30,
-                      offset: Offset(0, 10),
-                    )
-                  ],
-                  border: Border.all(color: const Color(0xFF3B2A45), width: 8),
-                ),
-                child: content,
-              ),
-            ),
-          );
-        }
-
-        return content;
       },
+    );
+  }
+
+  Widget _buildCurrentScreenWithSwitcher() {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 280),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      transitionBuilder: (Widget child, Animation<double> animation) {
+        return FadeTransition(
+          opacity: CurvedAnimation(
+            parent: animation,
+            curve: const Interval(0.1, 1.0, curve: Curves.easeOut),
+          ),
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0.0, 0.02),
+              end: Offset.zero,
+            ).animate(CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutCubic,
+            )),
+            child: child,
+          ),
+        );
+      },
+      child: KeyedSubtree(
+        key: ValueKey<String>(_currentScreen),
+        child: _buildCurrentScreen(),
+      ),
     );
   }
 
@@ -131,6 +111,7 @@ class _AppShellState extends State<AppShell> {
       'food_bar',
       'favorites',
       'social',
+      'groups',
       'budget',
       'platters',
       'profile',
@@ -149,6 +130,7 @@ class _AppShellState extends State<AppShell> {
       case 'favorites':
         return TreatNavTab.favorites;
       case 'social':
+      case 'groups':
         return TreatNavTab.social;
       case 'profile':
         return TreatNavTab.profile;
@@ -159,28 +141,34 @@ class _AppShellState extends State<AppShell> {
 
   Widget _buildDinerBottomNav() {
     final dinerState = context.watch<DinerState>();
-    return TreatBottomNavBar(
-      currentTab: _getCurrentNavTab(),
-      isGuest: !dinerState.isFoodieLoggedIn,
-      onTabSelected: (tab) {
-        switch (tab) {
-          case TreatNavTab.explore:
-            _navigateTo('home');
-            break;
-          case TreatNavTab.foodBar:
-            _navigateTo('food_bar');
-            break;
-          case TreatNavTab.favorites:
-            _navigateTo('favorites');
-            break;
-          case TreatNavTab.social:
-            _navigateTo('social');
-            break;
-          case TreatNavTab.profile:
-            _navigateTo('profile');
-            break;
-        }
-      },
+    return Center(
+      heightFactor: 1.0,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 960),
+        child: TreatBottomNavBar(
+          currentTab: _getCurrentNavTab(),
+          isGuest: !dinerState.isFoodieLoggedIn,
+          onTabSelected: (tab) {
+            switch (tab) {
+              case TreatNavTab.explore:
+                _navigateTo('home');
+                break;
+              case TreatNavTab.foodBar:
+                _navigateTo('food_bar');
+                break;
+              case TreatNavTab.favorites:
+                _navigateTo('favorites');
+                break;
+              case TreatNavTab.social:
+                _navigateTo('social');
+                break;
+              case TreatNavTab.profile:
+                _navigateTo('profile');
+                break;
+            }
+          },
+        ),
+      ),
     );
   }
 
@@ -241,12 +229,27 @@ class _AppShellState extends State<AppShell> {
           onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
           onSelectDeal: (_) => _navigateTo('platters'),
           onExploreMore: () => _navigateTo('home'),
+          onNavigateProfile: () => _navigateTo('profile'),
+        );
+
+      case 'groups':
+        return TreatSocialScreen(
+          key: const ValueKey('groups_screen'),
+          onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
+          onExploreTreats: () => _navigateTo('home'),
+          onNavigateProfile: () => _navigateTo('profile'),
+          initialTab: 0,
+          showSwitcher: false,
         );
 
       case 'social':
         return TreatSocialScreen(
+          key: const ValueKey('social_screen'),
           onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
           onExploreTreats: () => _navigateTo('home'),
+          onNavigateProfile: () => _navigateTo('profile'),
+          initialTab: 1,
+          showSwitcher: true,
         );
 
       case 'budget':
@@ -312,6 +315,7 @@ class _AppShellState extends State<AppShell> {
         return FoodieProfileSettingsScreen(
           onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
           onNavigateHome: () => _navigateTo('home'),
+          onNavigateProfile: () => _navigateTo('profile'),
           onLogOut: () {
             context.read<DinerState>().setFoodieLoggedIn(false);
             _navigateTo('welcome');

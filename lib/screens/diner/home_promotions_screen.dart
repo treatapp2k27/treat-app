@@ -35,6 +35,7 @@ class _HomePromotionsScreenState extends State<HomePromotionsScreen> {
   int _selectedFilterIndex = 0;
   final Set<String> _lovedItems = {'platter-1'};
   late final PageController _carouselController;
+  final ScrollController _categoryScrollController = ScrollController();
   Timer? _carouselTimer;
   int _activeCarouselPage = 0;
   final TextEditingController _searchController = TextEditingController();
@@ -82,13 +83,13 @@ class _HomePromotionsScreenState extends State<HomePromotionsScreen> {
     super.initState();
     _carouselController = PageController(viewportFraction: 0.92);
 
-    // Automatic slider after 1 sec
-    _carouselTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    // Automatic slider after 3 sec
+    _carouselTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
       if (!mounted || !_carouselController.hasClients || _platters.isEmpty) return;
       final nextPage = (_activeCarouselPage + 1) % _platters.length;
       _carouselController.animateToPage(
         nextPage,
-        duration: const Duration(milliseconds: 500),
+        duration: const Duration(milliseconds: 600),
         curve: Curves.easeInOutCubic,
       );
     });
@@ -177,6 +178,7 @@ class _HomePromotionsScreenState extends State<HomePromotionsScreen> {
   void dispose() {
     _carouselTimer?.cancel();
     _carouselController.dispose();
+    _categoryScrollController.dispose();
     _searchController.dispose();
     super.dispose();
   }
@@ -226,25 +228,6 @@ class _HomePromotionsScreenState extends State<HomePromotionsScreen> {
     );
   }
 
-  void _showSquadLudoModal() {
-    showDialog(
-      context: context,
-      builder: (ctx) {
-        return _SquadLudoModal(
-          onRewardClaimed: (reward) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('🎉 Awesome! You won $reward!'),
-                backgroundColor: TreatColors.primary,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -295,11 +278,6 @@ class _HomePromotionsScreenState extends State<HomePromotionsScreen> {
           ),
           const SizedBox(height: 26),
 
-          // 6. Section: SQUAD MINIGAME - Mia's Sweet Treat Perks
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: _buildSquadMinigameBanner(),
-          ),
         ],
       ),
     );
@@ -902,6 +880,7 @@ class _HomePromotionsScreenState extends State<HomePromotionsScreen> {
     return SizedBox(
       height: 42,
       child: SingleChildScrollView(
+        controller: _categoryScrollController,
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -917,7 +896,17 @@ class _HomePromotionsScreenState extends State<HomePromotionsScreen> {
             return Padding(
               padding: EdgeInsets.only(right: index < _filters.length - 1 ? 8 : 0),
               child: InkWell(
-                onTap: () => setState(() => _selectedFilterIndex = index),
+                onTap: () {
+                  setState(() => _selectedFilterIndex = index);
+                  if (_categoryScrollController.hasClients) {
+                    final target = (index * 130.0).clamp(0.0, _categoryScrollController.position.maxScrollExtent);
+                    _categoryScrollController.animateTo(
+                      target,
+                      duration: const Duration(milliseconds: 350),
+                      curve: Curves.easeOutCubic,
+                    );
+                  }
+                },
                 borderRadius: BorderRadius.circular(999),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
@@ -1078,38 +1067,6 @@ class _HomePromotionsScreenState extends State<HomePromotionsScreen> {
               final item = _platters[index];
               return _buildCarouselCard(item, index);
             },
-          ),
-        ),
-
-        const SizedBox(height: 12),
-
-        // Animated Page Indicator Dots (Clickable to jump)
-        FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(_platters.length, (dotIndex) {
-              final isActive = dotIndex == _activeCarouselPage;
-              return GestureDetector(
-                onTap: () {
-                  _carouselController.animateToPage(
-                    dotIndex,
-                    duration: const Duration(milliseconds: 350),
-                    curve: Curves.easeOutCubic,
-                  );
-                },
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  width: isActive ? 24 : 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: isActive ? TreatColors.secondary : TreatColors.outlineVariant,
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                ),
-              );
-            }),
           ),
         ),
       ],
@@ -2073,468 +2030,5 @@ class _HomePromotionsScreenState extends State<HomePromotionsScreen> {
         ],
       ),
     );
-  }
-
-  // -------------------------------------------------------------
-  // SQUAD MINIGAME - Mia's Sweet Treat Perks
-  // -------------------------------------------------------------
-  Widget _buildSquadMinigameBanner() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            Color(0xFF5E35B1),
-            Color(0xFF8E24AA),
-            Color(0xFFE040A0),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(26),
-        boxShadow: const [
-          BoxShadow(
-            color: Color.fromRGBO(124, 82, 170, 0.35),
-            blurRadius: 22,
-            offset: Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Top Badges Row: ⚡ SQUAD MINIGAME and Season 4
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.20),
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.30),
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.videogame_asset_rounded,
-                      size: 13,
-                      color: Colors.white,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'SQUAD MINIGAME',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 0.6,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.22),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Text(
-                  'Season 4',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-
-          // Title & Description
-          Text(
-            "Mia's Sweet Treat Perks",
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 20,
-              fontWeight: FontWeight.w900,
-              color: Colors.white,
-              letterSpacing: -0.3,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            'Play Treat Squad Ludo to win 50% platter vouchers, unlock secret dishes, and level up your neighborhood food rank!',
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 12.5,
-              fontWeight: FontWeight.w500,
-              color: Colors.white.withValues(alpha: 0.90),
-              height: 1.35,
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Social Friends Activity Pill
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.25),
-              ),
-            ),
-            child: Row(
-              children: [
-                // Overlapping Avatar Circles: M, J, K
-                SizedBox(
-                  width: 58,
-                  height: 24,
-                  child: Stack(
-                    children: [
-                      _buildInitialsAvatar('M', const Color(0xFFFFD6EE), 0),
-                      _buildInitialsAvatar('J', const Color(0xFFC8EAFF), 16),
-                      _buildInitialsAvatar('K', const Color(0xFFEEDCFF), 32),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '3 friends playing in Soho',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        'Roll 6 for Golden Sundae unlock',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white.withValues(alpha: 0.85),
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Big Interactive Button: Play Squad Ludo 🎲
-          SizedBox(
-            width: double.infinity,
-            height: 48,
-            child: ElevatedButton(
-              onPressed: _showSquadLudoModal,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: TreatColors.secondary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                elevation: 3,
-                shadowColor: Colors.black26,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Play Squad Ludo 🎲',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.w900,
-                      color: TreatColors.secondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInitialsAvatar(String letter, Color color, double left) {
-    return Positioned(
-      left: left,
-      child: Container(
-        width: 24,
-        height: 24,
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 1.5),
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          letter,
-          style: GoogleFonts.plusJakartaSans(
-            fontSize: 10,
-            fontWeight: FontWeight.w900,
-            color: TreatColors.onSurface,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Interactive Squad Ludo Minigame Modal Dialog
-class _SquadLudoModal extends StatefulWidget {
-  final ValueChanged<String> onRewardClaimed;
-
-  const _SquadLudoModal({required this.onRewardClaimed});
-
-  @override
-  State<_SquadLudoModal> createState() => _SquadLudoModalState();
-}
-
-class _SquadLudoModalState extends State<_SquadLudoModal>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _rollController;
-  late Animation<double> _rollAnimation;
-  bool _isRolling = false;
-  int _diceNumber = 6;
-  String? _wonReward;
-
-  final List<String> _possibleRewards = [
-    '50% Off Platter Voucher (Code: SQUADLUDO50)',
-    'Golden Sparkler Sundae Unlocked!',
-    '+200 Sweet Squad Points!',
-    'Free Craft Slushie Pitcher!',
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _rollController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
-    _rollAnimation = CurvedAnimation(
-      parent: _rollController,
-      curve: Curves.elasticOut,
-    );
-  }
-
-  @override
-  void dispose() {
-    _rollController.dispose();
-    super.dispose();
-  }
-
-  void _rollDice() {
-    if (_isRolling) return;
-    setState(() {
-      _isRolling = true;
-    });
-
-    _rollController.forward(from: 0.0).then((_) {
-      final random = math.Random();
-      final rolled = random.nextInt(6) + 1;
-      final reward = _possibleRewards[random.nextInt(_possibleRewards.length)];
-
-      setState(() {
-        _isRolling = false;
-        _diceNumber = rolled;
-        _wonReward = reward;
-      });
-
-      widget.onRewardClaimed(reward);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-      backgroundColor: TreatColors.surfaceContainerLowest,
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.videogame_asset_rounded,
-                    color: TreatColors.secondary,
-                    size: 22,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    '🎲 Treat Squad Ludo',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w900,
-                      color: TreatColors.onSurface,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              'Roll the magic dice to advance your squad on the Soho food map and win secret platter vouchers!',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 12,
-                color: TreatColors.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Animated Dice
-            AnimatedBuilder(
-              animation: _rollAnimation,
-              builder: (context, child) {
-                final angle = _rollAnimation.value * 2 * math.pi * 2;
-                final scale = 1.0 + (_rollAnimation.value * 0.2);
-
-                return Transform.scale(
-                  scale: scale,
-                  child: Transform.rotate(
-                    angle: angle,
-                    child: Container(
-                      width: 84,
-                      height: 84,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [
-                            Color(0xFFE040A0),
-                            Color(0xFF7C52AA),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: TreatColors.secondary.withValues(alpha: 0.4),
-                            blurRadius: 18,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Text(
-                          _getDiceEmoji(_diceNumber),
-                          style: const TextStyle(fontSize: 42),
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 18),
-
-            if (_wonReward != null) ...[
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  color: TreatColors.primaryFixed,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      'You Rolled a $_diceNumber! 🎯',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontWeight: FontWeight.w900,
-                        fontSize: 13,
-                        color: TreatColors.onPrimaryFixed,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      _wonReward!,
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.plusJakartaSans(
-                        fontWeight: FontWeight.w800,
-                        fontSize: 13.5,
-                        color: TreatColors.primary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
-
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton(
-                onPressed: _isRolling ? null : _rollDice,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: TreatColors.secondary,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                ),
-                child: Text(
-                  _isRolling
-                      ? 'Rolling...'
-                      : (_wonReward != null ? 'Roll Again! 🎲' : 'Roll Dice! 🎲'),
-                  style: GoogleFonts.plusJakartaSans(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 6),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                'Close',
-                style: GoogleFonts.plusJakartaSans(
-                  color: TreatColors.onSurfaceVariant,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _getDiceEmoji(int num) {
-    switch (num) {
-      case 1:
-        return '⚀';
-      case 2:
-        return '⚁';
-      case 3:
-        return '⚂';
-      case 4:
-        return '⚃';
-      case 5:
-        return '⚄';
-      case 6:
-      default:
-        return '⚅';
-    }
   }
 }

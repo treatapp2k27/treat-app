@@ -5,7 +5,6 @@ import '../../core/constants/asset_constants.dart';
 import '../../core/theme/treat_colors.dart';
 import '../../models/favorite_item.dart';
 import '../../models/platter_deal.dart';
-import '../../state/budget_planner_state.dart';
 import '../../state/diner_state.dart';
 
 class PlatterPackagesScreen extends StatefulWidget {
@@ -195,6 +194,180 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
     );
   }
 
+  void _openFilterModal() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) {
+          return Container(
+            padding: const EdgeInsets.all(22),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.tune_rounded,
+                            color: Color(0xFF7C52AA), size: 22),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Filters & Sort',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF2B1A3A),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF9D174D),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: const Text(
+                            '2 Active',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.grey),
+                      onPressed: () => Navigator.pop(ctx),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'SORT BY',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF655B6E),
+                    letterSpacing: 0.8,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    ChoiceChip(
+                      label: const Text('Recommended for You'),
+                      selected: _selectedSort == 0,
+                      onSelected: (val) {
+                        setState(() => _selectedSort = 0);
+                        setModalState(() {});
+                      },
+                      selectedColor: const Color(0xFFEDE8FC),
+                      labelStyle: TextStyle(
+                        color: _selectedSort == 0
+                            ? const Color(0xFF7C52AA)
+                            : const Color(0xFF655B6E),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    ChoiceChip(
+                      label: const Text('Lowest Price First'),
+                      selected: _selectedSort == 1,
+                      onSelected: (val) {
+                        setState(() => _selectedSort = 1);
+                        setModalState(() {});
+                      },
+                      selectedColor: const Color(0xFFEDE8FC),
+                      labelStyle: TextStyle(
+                        color: _selectedSort == 1
+                            ? const Color(0xFF7C52AA)
+                            : const Color(0xFF655B6E),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'CRAVING CATEGORIES',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF655B6E),
+                    letterSpacing: 0.8,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: _categories
+                      .where((c) => c['type'] == 'cat')
+                      .map((cat) {
+                    final isSel = _selectedCategory == cat['val'];
+                    return ChoiceChip(
+                      label: Text('${cat['icon']} ${cat['label']}'),
+                      selected: isSel,
+                      onSelected: (val) {
+                        setState(() {
+                          _selectedCategory = val ? cat['val']! : 'All';
+                        });
+                        setModalState(() {});
+                      },
+                      selectedColor: const Color(0xFFEDE8FC),
+                      labelStyle: TextStyle(
+                        color: isSel
+                            ? const Color(0xFF7C52AA)
+                            : const Color(0xFF655B6E),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  height: 46,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      widget.onEditBudget();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF7C52AA),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    ),
+                    child: Text(
+                      'Open Smart Budget Planner',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final dinerState = context.watch<DinerState>();
@@ -211,15 +384,15 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
         final inc = p.inclusions.map((e) => e.toLowerCase()).join(' ');
         switch (_selectedCategory) {
           case 'sliders':
-            return title.contains('slider') || title.contains('burger') || inc.contains('slider');
+            return title.contains('slider') || sub.contains('slider') || inc.contains('slider');
           case 'seafood':
-            return title.contains('calamari') || title.contains('prawn') || title.contains('ocean') || inc.contains('calamari');
+            return title.contains('calamari') || sub.contains('calamari') || inc.contains('calamari');
           case 'nachos':
-            return title.contains('nacho') || title.contains('fiesta') || title.contains('wings') || inc.contains('nacho');
+            return title.contains('nacho') || sub.contains('nacho') || inc.contains('nacho');
           case 'feast':
-            return title.contains('feast') || title.contains('mega') || inc.contains('tray') || inc.contains('board');
+            return title.contains('feast') || sub.contains('feast') || inc.contains('board');
           case 'sweet':
-            return title.contains('dessert') || title.contains('sweet') || inc.contains('churro') || inc.contains('waffle');
+            return title.contains('sweet') || sub.contains('sweet') || inc.contains('churro');
           case 'drinks':
             return inc.contains('shake') || inc.contains('soda') || inc.contains('slush') || inc.contains('drink');
           default:
@@ -293,6 +466,11 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
+                      icon: const Icon(Icons.search,
+                          color: TreatColors.onSurface, size: 22),
+                      onPressed: () {},
+                    ),
+                    IconButton(
                       icon: const Icon(Icons.notifications_none_rounded,
                           color: TreatColors.onSurfaceVariant, size: 22),
                       onPressed: () {},
@@ -302,9 +480,7 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                         width: 32,
                         height: 32,
                         decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [TreatColors.secondary, TreatColors.primary],
-                          ),
+                          color: Color(0xFF5B2375),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(Icons.person,
@@ -321,24 +497,24 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
       body: ListView(
         padding: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 36),
         children: [
-          // Search & Filter Bar Row
+          // Search & Filter Bar Row matching mockup
           Row(
             children: [
               Expanded(
                 child: Container(
                   height: 44,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
                   decoration: BoxDecoration(
                     color: TreatColors.surfaceContainerLowest,
                     borderRadius: BorderRadius.circular(999),
                     border: Border.all(
                       color: TreatColors.outlineVariant.withValues(alpha: 0.6),
                     ),
-                    boxShadow: [
+                    boxShadow: const [
                       BoxShadow(
-                        color: TreatColors.secondary.withValues(alpha: 0.04),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
+                        color: Color.fromRGBO(124, 82, 170, 0.06),
+                        blurRadius: 10,
+                        offset: Offset(0, 2),
                       ),
                     ],
                   ),
@@ -382,45 +558,56 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                   ),
                 ),
               ),
-              // Treat Button (visible for logged-in Foodie, hidden in Explore Without Sign In)
+              // Filter Button with Badge '2' (visible for logged-in Foodie, hidden in Explore Without Sign In)
               if (isFoodieLoggedIn) ...[
                 const SizedBox(width: 10),
                 InkWell(
-                  onTap: widget.onEditBudget,
+                  onTap: _openFilterModal,
                   borderRadius: BorderRadius.circular(999),
                   child: Container(
                     height: 44,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [
-                          TreatColors.primary,
-                          TreatColors.secondary,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
+                      color: const Color(0xFFEDE8FC),
                       borderRadius: BorderRadius.circular(999),
-                      boxShadow: [
+                      boxShadow: const [
                         BoxShadow(
-                          color: TreatColors.primary.withValues(alpha: 0.35),
-                          blurRadius: 16,
-                          offset: const Offset(0, 4),
+                          color: Color.fromRGBO(124, 82, 170, 0.08),
+                          blurRadius: 8,
+                          offset: Offset(0, 2),
                         ),
                       ],
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.celebration, size: 18, color: Colors.white),
-                        const SizedBox(width: 5),
+                        const Icon(Icons.tune_rounded,
+                            size: 18, color: Color(0xFF7C52AA)),
+                        const SizedBox(width: 6),
                         Text(
-                          'TREAT',
+                          'Filter',
                           style: GoogleFonts.plusJakartaSans(
-                            color: Colors.white,
-                            fontSize: 12.5,
+                            color: const Color(0xFF7C52AA),
+                            fontSize: 13,
                             fontWeight: FontWeight.w800,
-                            letterSpacing: 0.8,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Container(
+                          width: 20,
+                          height: 20,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF9D174D),
+                            shape: BoxShape.circle,
+                          ),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            '2',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
                         ),
                       ],
@@ -628,45 +815,50 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
     final dinerState = context.watch<DinerState>();
     final isLoved = dinerState.isFavorite(deal.id);
 
-    // Color theme for top badge based on deal
-    Color badgeColor = TreatColors.secondary;
-    IconData badgeIcon = Icons.sell_outlined;
-
-    if (deal.id == 'deal-ocean-calamari') {
-      badgeColor = TreatColors.tertiary;
-      badgeIcon = Icons.location_on;
-    } else if (deal.id == 'deal-fiesta-nachos') {
-      badgeColor = TreatColors.primary;
-      badgeIcon = Icons.loyalty_outlined;
-    }
-
     final reviewText = deal.reviewsCount >= 1000
         ? '${(deal.reviewsCount / 1000).toStringAsFixed(1)}k'
         : '${deal.reviewsCount}';
 
+    String portionBadge = 'Feeds ${deal.servesCountMax} portion';
+    if (deal.id == 'deal-fiesta-nachos') {
+      portionBadge = '#2 Feeds 4-5 portion';
+    } else if (deal.id == 'deal-sunset-sliders') {
+      portionBadge = '#1 Feeds 4 portion';
+    } else if (deal.id == 'deal-ocean-calamari') {
+      portionBadge = '#3 Feeds 4 portion';
+    }
+
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: TreatColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(20),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
-            color: TreatColors.outlineVariant.withValues(alpha: 0.6)),
-        boxShadow: TreatColors.candyShadow,
+          color: const Color(0xFFF0EBF5),
+          width: 1.2,
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color.fromRGBO(124, 82, 170, 0.08),
+            blurRadius: 18,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Image with Overlays
+          // Image with Overlays matching mockup
           Stack(
             children: [
               Image.network(
                 deal.imageUrl,
-                height: 190,
+                height: 195,
                 width: double.infinity,
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) => Container(
-                  height: 190,
+                  height: 195,
                   color: TreatColors.secondaryFixed,
                   alignment: Alignment.center,
                   child: const Icon(Icons.fastfood,
@@ -674,7 +866,7 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                 ),
               ),
 
-              // Top-Left Badge (Guarantee / Top Rated / Steal)
+              // Top-Left Badge (Budget Steal / Lowest Price Guarantee with Per-portion cost)
               Positioned(
                 top: 10,
                 left: 10,
@@ -682,22 +874,44 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: badgeColor,
+                    color: Colors.white.withValues(alpha: 0.94),
                     borderRadius: BorderRadius.circular(999),
-                    boxShadow: TreatColors.pillShadow,
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 4,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(badgeIcon, color: Colors.white, size: 12),
-                      const SizedBox(width: 4),
-                      Text(
-                        deal.badgeText,
-                        style: GoogleFonts.plusJakartaSans(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                        ),
+                      const Icon(Icons.sell_outlined,
+                          size: 13, color: Color(0xFF7C52AA)),
+                      const SizedBox(width: 5),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            deal.badgeText,
+                            style: GoogleFonts.plusJakartaSans(
+                              color: const Color(0xFF2B1A3A),
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          if (deal.perPersonText != null)
+                            Text(
+                              deal.perPersonText!,
+                              style: GoogleFonts.plusJakartaSans(
+                                color: const Color(0xFF655B6E),
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                        ],
                       ),
                     ],
                   ),
@@ -710,9 +924,9 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                 right: 10,
                 child: Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.95),
+                    color: Colors.white.withValues(alpha: 0.94),
                     borderRadius: BorderRadius.circular(999),
                     boxShadow: const [
                       BoxShadow(
@@ -726,14 +940,14 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const Icon(Icons.star,
-                          size: 14, color: TreatColors.primary),
+                          size: 13, color: Color(0xFFF59E0B)),
                       const SizedBox(width: 3),
                       Text(
-                        '${deal.rating.toStringAsFixed(deal.rating == 4.9 ? 1 : 2)} ($reviewText)',
+                        '${deal.rating.toStringAsFixed(deal.rating == 4.9 ? 1 : 2)} ($reviewText+)',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 11,
                           fontWeight: FontWeight.w800,
-                          color: TreatColors.onSurface,
+                          color: const Color(0xFF2B1A3A),
                         ),
                       ),
                     ],
@@ -741,15 +955,15 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                 ),
               ),
 
-              // Bottom-Left Badge (Feeds 4 Foodies)
+              // Bottom-Left Badge (Feeds X Portion)
               Positioned(
                 bottom: 10,
                 left: 10,
                 child: Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.95),
+                    color: Colors.white.withValues(alpha: 0.94),
                     borderRadius: BorderRadius.circular(999),
                     boxShadow: const [
                       BoxShadow(
@@ -762,15 +976,15 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.groups,
-                          size: 14, color: TreatColors.tertiary),
+                      const Icon(Icons.groups_rounded,
+                          size: 13, color: Color(0xFF7C52AA)),
                       const SizedBox(width: 4),
                       Text(
-                        'Feeds ${deal.servesCountMax} Foodies',
+                        portionBadge,
                         style: GoogleFonts.plusJakartaSans(
-                          fontSize: 11,
+                          fontSize: 10.5,
                           fontWeight: FontWeight.w800,
-                          color: TreatColors.tertiary,
+                          color: const Color(0xFF7C52AA),
                         ),
                       ),
                     ],
@@ -780,9 +994,9 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
             ],
           ),
 
-          // Details Content
+          // Details Content Body
           Padding(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(15),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -790,9 +1004,9 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                 Text(
                   deal.title,
                   style: GoogleFonts.plusJakartaSans(
-                    fontSize: 16,
+                    fontSize: 16.5,
                     fontWeight: FontWeight.w800,
-                    color: TreatColors.onSurface,
+                    color: const Color(0xFF2B1A3A),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -801,14 +1015,14 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                 Row(
                   children: [
                     const Icon(Icons.storefront_outlined,
-                        size: 14, color: TreatColors.onSurfaceVariant),
+                        size: 14, color: Color(0xFF655B6E)),
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
                         deal.restaurantName,
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 12,
-                          color: TreatColors.onSurfaceVariant,
+                          color: const Color(0xFF655B6E),
                           fontWeight: FontWeight.w500,
                         ),
                         overflow: TextOverflow.ellipsis,
@@ -823,27 +1037,20 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                   spacing: 6,
                   runSpacing: 6,
                   children: deal.inclusions.map((chip) {
-                    Color chipBg =
-                        TreatColors.secondaryFixed.withValues(alpha: 0.6);
-                    if (deal.id == 'deal-ocean-calamari') {
-                      chipBg = TreatColors.tertiaryFixed.withValues(alpha: 0.6);
-                    } else if (deal.id == 'deal-fiesta-nachos') {
-                      chipBg = TreatColors.primaryFixed.withValues(alpha: 0.6);
-                    }
-
                     return Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: chipBg,
+                        color: const Color(0xFFF7F4FA),
                         borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: const Color(0xFFECE4F2)),
                       ),
                       child: Text(
                         chip,
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
-                          color: TreatColors.onSurface,
+                          color: const Color(0xFF4A3E54),
                         ),
                       ),
                     );
@@ -866,7 +1073,7 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 20,
                               fontWeight: FontWeight.w900,
-                              color: TreatColors.secondaryDark,
+                              color: const Color(0xFF2B1A3A),
                             ),
                           ),
                           const SizedBox(width: 6),
@@ -875,7 +1082,7 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                               '\$${deal.originalPrice.toStringAsFixed(2)}',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 13,
-                                color: TreatColors.outline,
+                                color: const Color(0xFF9E92A6),
                                 decoration: TextDecoration.lineThrough,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -888,16 +1095,16 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                     const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                          horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: TreatColors.primaryFixed,
+                        color: const Color(0xFFFCE7F3),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
                         deal.saveText ??
                             'Save ${deal.discountPercent}% OFF',
                         style: GoogleFonts.plusJakartaSans(
-                          color: TreatColors.onPrimaryFixedVariant,
+                          color: const Color(0xFFD6228A),
                           fontWeight: FontWeight.w800,
                           fontSize: 11,
                         ),
@@ -917,16 +1124,14 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                           onTap: () => _toggleLoved(deal),
                           borderRadius: BorderRadius.circular(999),
                           child: Container(
-                            height: 40,
+                            height: 42,
                             decoration: BoxDecoration(
                               color: isLoved
-                                  ? TreatColors.primaryFixed
-                                  : TreatColors.surfaceContainerLowest,
+                                  ? const Color(0xFFFCE7F3)
+                                  : const Color(0xFFFFF0F7),
                               borderRadius: BorderRadius.circular(999),
                               border: Border.all(
-                                color: isLoved
-                                    ? TreatColors.primary
-                                    : TreatColors.outlineVariant,
+                                color: const Color(0xFFFBCFE8),
                               ),
                             ),
                             child: Row(
@@ -936,16 +1141,16 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                                   isLoved
                                       ? Icons.favorite
                                       : Icons.favorite_border,
-                                  color: TreatColors.primary,
+                                  color: const Color(0xFFD6228A),
                                   size: 16,
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
                                   'Loved It',
                                   style: GoogleFonts.plusJakartaSans(
-                                    color: TreatColors.primary,
+                                    color: const Color(0xFFD6228A),
                                     fontWeight: FontWeight.w800,
-                                    fontSize: 12,
+                                    fontSize: 12.5,
                                   ),
                                 ),
                               ],
@@ -962,25 +1167,27 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                         onTap: () => _shareWithSquad(deal),
                         borderRadius: BorderRadius.circular(999),
                         child: Container(
-                          height: 40,
+                          height: 42,
                           decoration: BoxDecoration(
-                            gradient: TreatColors.purpleGradient,
+                            color: const Color(0xFFEDE8FC),
                             borderRadius: BorderRadius.circular(999),
-                            boxShadow: TreatColors.pillShadow,
+                            border: Border.all(
+                              color: const Color(0xFFDDD6FE),
+                            ),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Icon(Icons.group_add_rounded,
-                                  color: Colors.white, size: 16),
+                                  color: Color(0xFF7C52AA), size: 16),
                               const SizedBox(width: 6),
                               Flexible(
                                 child: Text(
                                   'Share with Squad',
                                   style: GoogleFonts.plusJakartaSans(
-                                    color: Colors.white,
+                                    color: const Color(0xFF7C52AA),
                                     fontWeight: FontWeight.w800,
-                                    fontSize: 12,
+                                    fontSize: 12.5,
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),

@@ -27,6 +27,13 @@ class CommunityFoodBarScreen extends StatefulWidget {
 class _CommunityFoodBarScreenState extends State<CommunityFoodBarScreen> {
   int _activeTab = 0; // 0: Platters, 1: Combos, 2: Desserts
   bool _joinedPot = false;
+  final ScrollController _categoryScrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _categoryScrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +50,7 @@ class _CommunityFoodBarScreenState extends State<CommunityFoodBarScreen> {
         children: [
           // Filter Tabs (Slidable Categories)
           SingleChildScrollView(
+            controller: _categoryScrollController,
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
             child: Row(
@@ -344,7 +352,17 @@ class _CommunityFoodBarScreenState extends State<CommunityFoodBarScreen> {
   Widget _buildTabButton(String label, IconData icon, int index, {bool hasBadge = false}) {
     final isActive = _activeTab == index;
     return InkWell(
-      onTap: () => setState(() => _activeTab = index),
+      onTap: () {
+        setState(() => _activeTab = index);
+        if (_categoryScrollController.hasClients) {
+          final target = (index * 120.0).clamp(0.0, _categoryScrollController.position.maxScrollExtent);
+          _categoryScrollController.animateTo(
+            target,
+            duration: const Duration(milliseconds: 320),
+            curve: Curves.easeOutCubic,
+          );
+        }
+      },
       borderRadius: BorderRadius.circular(999),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
