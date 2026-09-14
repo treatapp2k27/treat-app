@@ -8,12 +8,14 @@ import 'squad_minigame_banner.dart';
 class DinerDrawer extends StatelessWidget {
   final Function(String routeName) onNavigate;
   final String activeRoute;
+  final VoidCallback? onPlayLudo;
   final VoidCallback? onLogOut;
 
   const DinerDrawer({
     super.key,
     required this.onNavigate,
     this.activeRoute = 'home',
+    this.onPlayLudo,
     this.onLogOut,
   });
 
@@ -433,7 +435,9 @@ class DinerDrawer extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   // 3. Squad Minigame Banner (Relocated from Explore page to sidebar below page options)
-                  const SquadMinigameBanner(),
+                  SquadMinigameBanner(
+                    onPlay: onPlayLudo,
+                  ),
 
                   const SizedBox(height: 12),
 

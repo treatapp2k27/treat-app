@@ -20,8 +20,8 @@ class TreatHeader extends StatelessWidget implements PreferredSizeWidget {
     super.key,
     this.onMenuTap,
     this.onActionTap,
-    this.actionLabel = 'Treat',
-    this.actionIcon = Icons.celebration,
+    this.actionLabel = 'Filters',
+    this.actionIcon = Icons.tune,
     this.showSearch = true,
     this.onSearchChanged,
   });
@@ -198,7 +198,7 @@ class TreatHeader extends StatelessWidget implements PreferredSizeWidget {
                                 Icon(actionIcon, size: 18, color: Colors.white),
                                 const SizedBox(width: 4),
                                 Text(
-                                  actionLabel.toUpperCase(),
+                                  actionLabel,
                                   style: GoogleFonts.plusJakartaSans(
                                     color: Colors.white,
                                     fontSize: 12,

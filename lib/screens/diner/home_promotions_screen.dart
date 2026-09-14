@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -1291,7 +1290,7 @@ class _HomePromotionsScreenState extends State<HomePromotionsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Text(
-                            '\$${(item['price'] as double).toStringAsFixed(0)}',
+                            '৳${(item['price'] as double).toStringAsFixed(0)}',
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 22,
                               fontWeight: FontWeight.w900,
@@ -1300,7 +1299,7 @@ class _HomePromotionsScreenState extends State<HomePromotionsScreen> {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            '\$${(item['originalPrice'] as double).toStringAsFixed(0)}',
+                            '৳${(item['originalPrice'] as double).toStringAsFixed(0)}',
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
@@ -1498,9 +1497,9 @@ class _HomePromotionsScreenState extends State<HomePromotionsScreen> {
           tableBadge: 'Instant Table',
           tableBadgeIcon: Icons.bolt_rounded,
           location: 'Soho Quarter • 0.4 miles away',
-          costCategory: '\$\$ • Feasts',
+          costCategory: '৳৳ • Feasts',
           liveRibbon: '🎉 Live Event Tonight: Neon Dessert Rave',
-          price: '\$28',
+          price: '৳28',
           priceUnit: '/ person avg',
           tags: ['Waffle Sliders', 'Boba Cocktails', 'Funky Booths'],
           imageUrl:
@@ -1529,8 +1528,8 @@ class _HomePromotionsScreenState extends State<HomePromotionsScreen> {
           tableBadgeIcon: Icons.cake_rounded,
           location: 'Wardour St, Soho • Open till 11 PM',
           imageOverlaySubtitle: '0.4 mi • 8 mins walk',
-          costCategory: '\$\$ • Feasts',
-          price: '\$35',
+          costCategory: '৳৳ • Feasts',
+          price: '৳35',
           priceUnit: '/ person',
           tags: ['Sweet & Savory Board', 'Craft Milkshakes', 'Trivia Host'],
           imageUrl:

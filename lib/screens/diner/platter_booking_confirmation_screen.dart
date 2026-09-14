@@ -233,7 +233,7 @@ class _PlatterBookingConfirmationScreenState extends State<PlatterBookingConfirm
                               borderRadius: BorderRadius.circular(999),
                             ),
                             child: Text(
-                              '\$${platter.price.toStringAsFixed(2)}',
+                              '৳${platter.price.toStringAsFixed(2)}',
                               style: TreatTypography.titleMedium.copyWith(
                                 color: TreatColors.primary,
                                 fontWeight: FontWeight.w900,

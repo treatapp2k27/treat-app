@@ -89,7 +89,7 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
     {
       'author': 'WaffleKing',
       'avatar': '🧇',
-      'text': 'Use code WEEKENDVIBE for \$20 off group platters today guys!',
+      'text': 'Use code WEEKENDVIBE for ৳20 off group platters today guys!',
       'time': '12:08 PM',
       'isMe': false,
     },
@@ -110,9 +110,9 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
       'avatar': '🥟',
       'district': 'Midtown',
       'timeAgo': '12 mins ago',
-      'savedAmount': 'Saved \$32',
+      'savedAmount': 'Saved ৳32',
       'text':
-          'Just crushed the 4-person slider & shake platter at Sprinkle & Sizzle! Split 4 ways with @TacoFiend and it was only \$8 each!',
+          'Just crushed the 4-person slider & shake platter at Sprinkle & Sizzle! Split 4 ways with @TacoFiend and it was only ৳8 each!',
       'likes': 42,
       'isLiked': true,
       'replies': 8,
@@ -124,7 +124,7 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
       'avatar': '🌮',
       'district': 'SoHo Arts',
       'timeAgo': '35 mins ago',
-      'savedAmount': 'Saved \$20',
+      'savedAmount': 'Saved ৳20',
       'text':
           'Voucher TREAT50 worked like magic on the Fiesta Taco Tray. Table sparklers on the boba tower were unreal ✨',
       'likes': 89,
@@ -1629,7 +1629,7 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
 
           // Message
           Text(
-            'Just unlocked the \$6 Churro Sundae split at ChocoLuxe! Who\'s around campus right now to snag the 2nd bowl? 🤤 🍦',
+            'Just unlocked the ৳6 Churro Sundae split at ChocoLuxe! Who\'s around campus right now to snag the 2nd bowl? 🤤 🍦',
             style: GoogleFonts.plusJakartaSans(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -2495,7 +2495,7 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
           name: 'MidnightDumpling',
           avatar: '🥟',
           title: 'Platter Maestro',
-          saved: '\$480',
+          saved: '৳480',
           badge: '👑 Gold Tier',
           badgeColor: const Color(0xFFF59E0B),
         ),
@@ -2505,7 +2505,7 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
           name: 'TacoFiend',
           avatar: '🌮',
           title: 'BOGO Hunter',
-          saved: '\$395',
+          saved: '৳395',
           badge: '🥈 Silver VIP',
           badgeColor: const Color(0xFF94A3B8),
         ),
@@ -2515,7 +2515,7 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
           name: 'CheesyBoi99',
           avatar: '🍕',
           title: 'Pizza Baron',
-          saved: '\$310',
+          saved: '৳310',
           badge: '🥉 Bronze Elite',
           badgeColor: const Color(0xFFB45309),
         ),

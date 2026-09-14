@@ -107,7 +107,7 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
             ),
             const SizedBox(height: 18),
             Text(
-              'Squad link for ${deal.restaurantName} is ready! Split the feast bill: \$${deal.price.toStringAsFixed(2)} total (${deal.perPersonText ?? "\$8/person"}).',
+              'Squad link for ${deal.restaurantName} is ready! Split the feast bill: ৳${deal.price.toStringAsFixed(2)} total (${deal.perPersonText ?? "৳8/person"}).',
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 13,
                 color: TreatColors.onSurfaceVariant,
@@ -1069,7 +1069,7 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                         textBaseline: TextBaseline.alphabetic,
                         children: [
                           Text(
-                            '\$${deal.price.toStringAsFixed(2)}',
+                            '৳${deal.price.toStringAsFixed(2)}',
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 20,
                               fontWeight: FontWeight.w900,
@@ -1079,7 +1079,7 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                           const SizedBox(width: 6),
                           Flexible(
                             child: Text(
-                              '\$${deal.originalPrice.toStringAsFixed(2)}',
+                              '৳${deal.originalPrice.toStringAsFixed(2)}',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 13,
                                 color: const Color(0xFF9E92A6),

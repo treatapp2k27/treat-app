@@ -69,8 +69,8 @@ class PlatterDeal {
     walkTime: '0.4 mi • 8 mins walk',
     rating: 4.9,
     reviewsCount: 420,
-    saveText: 'Save \$28 • Pass',
-    perPersonText: '\$35/person',
+    saveText: 'Save ৳28 • Pass',
+    perPersonText: '৳35/person',
   );
 
   static const PlatterDeal sugarBloomFeastPlatter = PlatterDeal(
@@ -96,8 +96,8 @@ class PlatterDeal {
     walkTime: '0.4 mi • 8 mins walk',
     rating: 4.9,
     reviewsCount: 420,
-    saveText: 'Save \$28 • Pass',
-    perPersonText: '\$35/person',
+    saveText: 'Save ৳28 • Pass',
+    perPersonText: '৳35/person',
   );
 
   static const PlatterDeal fiestaPlatter = PlatterDeal(
@@ -117,14 +117,14 @@ class PlatterDeal {
       '4 Milkshakes',
       'Dipping Sauces'
     ],
-    badgeText: 'Best Match for \$120 Budget (Saves \$75 on Squad)',
+    badgeText: 'Best Match for ৳120 Budget (Saves ৳75 on Squad)',
     imageUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80',
     isHighDemand: true,
     walkTime: '0.8 mi • 15 mins walk',
     rating: 4.8,
     reviewsCount: 310,
-    saveText: 'Save \$20 • Pass',
-    perPersonText: '\$15/person',
+    saveText: 'Save ৳20 • Pass',
+    perPersonText: '৳15/person',
   );
 
   static const PlatterDeal megaFeastPlatter = PlatterDeal(
@@ -150,8 +150,8 @@ class PlatterDeal {
     walkTime: '1.1 mi • 22 mins walk',
     rating: 4.7,
     reviewsCount: 198,
-    saveText: 'Save \$26 • Pass',
-    perPersonText: '\$46/person',
+    saveText: 'Save ৳26 • Pass',
+    perPersonText: '৳46/person',
   );
 
   static const PlatterDeal sunsetSlidersPlatter = PlatterDeal(
@@ -170,14 +170,14 @@ class PlatterDeal {
       '🍟 Loaded Truffle Fries',
       '🥤 4 Milkshakes',
     ],
-    badgeText: 'Lowest Price Guarantee - \$32 Total',
+    badgeText: 'Lowest Price Guarantee - ৳32 Total',
     imageUrl: 'https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=800&q=80',
     isHighDemand: true,
     walkTime: '0.4 mi • 8 mins walk',
     rating: 4.9,
     reviewsCount: 840,
     saveText: 'Save 45% OFF',
-    perPersonText: '(\$8/portion)',
+    perPersonText: '(৳8/portion)',
   );
 
   static const PlatterDeal oceanCalamariPlatter = PlatterDeal(
@@ -197,14 +197,14 @@ class PlatterDeal {
       '🌶 Sweet Chili Glaze',
       '🥔 Wedges',
     ],
-    badgeText: "Chef's Top Rated - \$36 Total",
+    badgeText: "Chef's Top Rated - ৳36 Total",
     imageUrl: 'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80',
     isHighDemand: true,
     walkTime: '0.5 mi • 10 mins walk',
     rating: 4.95,
     reviewsCount: 1200,
     saveText: 'Save 40% OFF',
-    perPersonText: '(\$9/portion)',
+    perPersonText: '(৳9/portion)',
   );
 
   static const PlatterDeal fiestaNachosPlatter = PlatterDeal(
@@ -223,14 +223,14 @@ class PlatterDeal {
       '🧀 Loaded Nachos Grande',
       '🥖 Churros x4',
     ],
-    badgeText: 'Budget Steal - \$28 Total',
+    badgeText: 'Budget Steal - ৳28 Total',
     imageUrl: 'https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?auto=format&fit=crop&w=800&q=80',
     isHighDemand: false,
     walkTime: '0.7 mi • 14 mins walk',
     rating: 4.88,
     reviewsCount: 120,
     saveText: 'Save 42% OFF',
-    perPersonText: '(\$7/portion)',
+    perPersonText: '(৳7/portion)',
   );
 
   static const List<PlatterDeal> wireframePlatters = [

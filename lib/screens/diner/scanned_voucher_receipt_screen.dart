@@ -258,9 +258,9 @@ class ScannedVoucherReceiptScreen extends StatelessWidget {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  Text('\$${res.platter.price.toStringAsFixed(2)}', style: TreatTypography.titleSmall),
+                                  Text('৳${res.platter.price.toStringAsFixed(2)}', style: TreatTypography.titleSmall),
                                   Text(
-                                    '\$${res.platter.originalPrice.toStringAsFixed(2)}',
+                                    '৳${res.platter.originalPrice.toStringAsFixed(2)}',
                                     style: TreatTypography.bodySmall.copyWith(
                                       decoration: TextDecoration.lineThrough,
                                       fontSize: 10,
@@ -278,7 +278,7 @@ class ScannedVoucherReceiptScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text('Host Service Gratuity & Match', style: TreatTypography.bodySmall),
-                            Text('\$${res.gratuity.toStringAsFixed(2)}', style: TreatTypography.labelSmall),
+                            Text('৳${res.gratuity.toStringAsFixed(2)}', style: TreatTypography.labelSmall),
                           ],
                         ),
                         const SizedBox(height: 6),
@@ -286,7 +286,7 @@ class ScannedVoucherReceiptScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text('Subtotal & Taxes', style: TreatTypography.bodySmall),
-                            Text('\$${res.totalWithGratuity.toStringAsFixed(2)}', style: TreatTypography.labelSmall),
+                            Text('৳${res.totalWithGratuity.toStringAsFixed(2)}', style: TreatTypography.labelSmall),
                           ],
                         ),
                         const SizedBox(height: 6),
@@ -307,7 +307,7 @@ class ScannedVoucherReceiptScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 14),
 
-                        // Highlight Balance: $0.00
+                        // Highlight Balance: ৳0.00
                         Container(
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
@@ -325,7 +325,7 @@ class ScannedVoucherReceiptScreen extends StatelessWidget {
                                 ],
                               ),
                               Text(
-                                '\$${res.amountDueAtTable.toStringAsFixed(2)}',
+                                '৳${res.amountDueAtTable.toStringAsFixed(2)}',
                                 style: TreatTypography.headlineMedium.copyWith(
                                   color: TreatColors.secondary,
                                   fontWeight: FontWeight.w900,

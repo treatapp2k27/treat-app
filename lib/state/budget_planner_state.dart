@@ -3,7 +3,7 @@ import '../models/platter_deal.dart';
 
 class BudgetPlannerState extends ChangeNotifier {
   int _partySize = 3;
-  double _budget = 120.0;
+  double _budget = 15000.0;
   String _selectedCategory = 'Casual Dining';
   bool _includeTax = true;
   bool _walkableOnly = false;

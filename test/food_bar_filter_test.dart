@@ -58,22 +58,29 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 350));
 
-    // Verify on Food Bar screen: Hotlist Rush Hour, Feast Platters tab
-    expect(find.text('Food Bar Rush Hour'), findsOneWidget);
-    expect(find.text('Feast Platters'), findsOneWidget);
+    // Verify current CommunityFoodBarScreen (Rush Hour) was removed from Food Bar
+    expect(find.text('Food Bar Rush Hour'), findsNothing);
+    expect(find.text('TREAT'), findsNothing);
 
-    // Find the Treat button in the Food Bar TopBar
-    final treatButton = find.text('TREAT');
-    expect(treatButton, findsOneWidget);
-
-    // Tap the Treat button at Food Bar
-    await tester.tap(treatButton);
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 350));
-
-    // Verify that the Food Bar filter page (Smart Matcher) is displayed!
+    // Verify Food Bar panel directly displays the 'Treat' button page (Smart Matcher filter page)
     expect(find.text('SMART MATCHER'), findsOneWidget);
     expect(find.text('Calculate & Find Treats in Your Budget'), findsOneWidget);
+
+    // Verify 'Filters' button on the right side of the search bar
+    final filtersBtn = find.text('Filters');
+    expect(filtersBtn, findsOneWidget);
+
+    // Tapping 'Filters' opens the interactive Filters modal sheet
+    await tester.tap(filtersBtn);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 350));
+    expect(find.text('Smart Filters'), findsOneWidget);
+    expect(find.text('Apply Filters'), findsOneWidget);
+
+    // Close the filter sheet
+    await tester.tap(find.text('Apply Filters'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 350));
     expect(find.text('Set your sweet spot & feast like royalty without the wallet shock!'), findsOneWidget);
     expect(find.text('Party Crew'), findsOneWidget);
     expect(find.text("Who's joining the table?"), findsOneWidget);
@@ -97,11 +104,11 @@ void main() {
 
     // Verify Results section matching wireframe
     expect(find.text('Tasty Matches for Your Crew'), findsOneWidget);
-    expect(find.text('3 Spots'), findsOneWidget);
+    expect(find.text('4 Spots'), findsOneWidget);
     expect(find.text('Sugar Bloom Cafe & Brunch'), findsWidgets);
-    expect(find.text('\$105.00'), findsWidgets);
+    expect(find.text('৳105.00'), findsWidgets);
     expect(find.text('Sweet & savory sharing board with drinks'), findsWidgets);
-    expect(find.text('Save \$28 • Pass'), findsWidgets);
+    expect(find.text('Save ৳28 • Pass'), findsWidgets);
     expect(find.text('Loved It'), findsWidgets);
 
     // Verify clicking FIND IT WITHIN BUDGET navigates to platters

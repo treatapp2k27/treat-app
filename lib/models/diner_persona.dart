@@ -11,6 +11,8 @@ class DinerPersona {
   final int preferredSquadSize;
   final double budgetTarget;
   final double walletBalance;
+  final String email;
+  final String contactNumber;
   final bool autoSplitBill;
   final bool hideRealName;
   final bool allowSquadInvite;
@@ -39,6 +41,8 @@ class DinerPersona {
     this.preferredSquadSize = 3,
     this.budgetTarget = 120.0,
     this.walletBalance = 45.00,
+    this.email = 'foodie@treat.circle',
+    this.contactNumber = '+1 (555) 382-9012',
     this.autoSplitBill = true,
     this.hideRealName = true,
     this.allowSquadInvite = true,
@@ -61,6 +65,8 @@ class DinerPersona {
     int? preferredSquadSize,
     double? budgetTarget,
     double? walletBalance,
+    String? email,
+    String? contactNumber,
     bool? autoSplitBill,
     bool? hideRealName,
     bool? allowSquadInvite,
@@ -82,6 +88,8 @@ class DinerPersona {
       preferredSquadSize: preferredSquadSize ?? this.preferredSquadSize,
       budgetTarget: budgetTarget ?? this.budgetTarget,
       walletBalance: walletBalance ?? this.walletBalance,
+      email: email ?? this.email,
+      contactNumber: contactNumber ?? this.contactNumber,
       autoSplitBill: autoSplitBill ?? this.autoSplitBill,
       hideRealName: hideRealName ?? this.hideRealName,
       allowSquadInvite: allowSquadInvite ?? this.allowSquadInvite,

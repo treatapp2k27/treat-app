@@ -175,4 +175,14 @@ class DinerState extends ChangeNotifier {
     _currentPersona = _currentPersona.copyWith(dealRadarAlerts: val);
     notifyListeners();
   }
+
+  void setEmail(String email) {
+    _currentPersona = _currentPersona.copyWith(email: email);
+    notifyListeners();
+  }
+
+  void setContactNumber(String contactNumber) {
+    _currentPersona = _currentPersona.copyWith(contactNumber: contactNumber);
+    notifyListeners();
+  }
 }

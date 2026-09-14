@@ -15,6 +15,7 @@ class ChooseTreatBudgetScreen extends StatelessWidget {
   final Function(PlatterDeal deal) onSelectDeal;
   final VoidCallback? onBackToFoodBar;
   final VoidCallback? onFindWithinBudget;
+  final VoidCallback? onOpenFilters;
 
   const ChooseTreatBudgetScreen({
     super.key,
@@ -22,7 +23,186 @@ class ChooseTreatBudgetScreen extends StatelessWidget {
     required this.onSelectDeal,
     this.onBackToFoodBar,
     this.onFindWithinBudget,
+    this.onOpenFilters,
   });
+
+  void _showFilterSheet(BuildContext context, BudgetPlannerState state) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (modalCtx, setModalState) {
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFDDD3E2),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: const BoxDecoration(
+                                color: TreatColors.secondaryFixed,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.tune, color: TreatColors.secondary, size: 20),
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              'Smart Filters',
+                              style: TreatTypography.titleMedium.copyWith(
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ],
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            state.setBudget(15000.0);
+                            state.toggleWalkableOnly(false);
+                            state.toggleIncludeTax(true);
+                            setModalState(() {});
+                            Navigator.of(modalCtx).pop();
+                          },
+                          child: const Text('Reset All'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Total Squad Budget',
+                          style: TreatTypography.labelLarge.copyWith(fontWeight: FontWeight.w700),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: TreatColors.secondaryFixed,
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            '৳${state.budget.toInt()}',
+                            style: TreatTypography.labelSmall.copyWith(
+                              color: TreatColors.secondary,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SliderTheme(
+                      data: SliderTheme.of(context).copyWith(
+                        trackHeight: 4,
+                        activeTrackColor: TreatColors.secondary,
+                        inactiveTrackColor: TreatColors.surfaceContainerHighest,
+                        thumbColor: TreatColors.secondary,
+                      ),
+                      child: Slider(
+                        value: state.budget.clamp(500.0, 30000.0),
+                        min: 500.0,
+                        max: 30000.0,
+                        divisions: 59,
+                        onChanged: (val) {
+                          state.setBudget(val);
+                          setModalState(() {});
+                        },
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Min: ৳500', style: TreatTypography.bodySmall.copyWith(fontSize: 10)),
+                        Text('Max: ৳30000', style: TreatTypography.bodySmall.copyWith(fontSize: 10)),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Party Size (${state.partySize} guests)', style: TreatTypography.labelMedium),
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.remove_circle_outline),
+                              onPressed: state.partySize > 1
+                                  ? () {
+                                      state.decrementPartySize();
+                                      setModalState(() {});
+                                    }
+                                  : null,
+                            ),
+                            Text('${state.partySize}', style: TreatTypography.titleSmall),
+                            IconButton(
+                              icon: const Icon(Icons.add_circle_outline),
+                              onPressed: state.partySize < 12
+                                  ? () {
+                                      state.incrementPartySize();
+                                      setModalState(() {});
+                                    }
+                                  : null,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text('Walkable Only (< 15 mins)'),
+                      value: state.walkableOnly,
+                      activeColor: TreatColors.secondary,
+                      onChanged: (v) {
+                        state.toggleWalkableOnly(v);
+                        setModalState(() {});
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: TreatColors.secondary,
+                          foregroundColor: Colors.white,
+                          shape: const StadiumBorder(),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        onPressed: () => Navigator.of(modalCtx).pop(),
+                        child: const Text(
+                          'Apply Filters',
+                          style: TextStyle(fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,9 +213,9 @@ class ChooseTreatBudgetScreen extends StatelessWidget {
       backgroundColor: TreatColors.background,
       appBar: TreatHeader(
         onMenuTap: onOpenDrawer,
-        actionLabel: 'Treat',
-        actionIcon: Icons.celebration,
-        onActionTap: onBackToFoodBar,
+        actionLabel: 'Filters',
+        actionIcon: Icons.tune,
+        onActionTap: onOpenFilters ?? () => _showFilterSheet(context, state),
       ),
       body: ListView(
         padding: const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 36),
@@ -210,17 +390,29 @@ class ChooseTreatBudgetScreen extends StatelessWidget {
                                 const Icon(Icons.payments, size: 18, color: TreatColors.primary),
                                 const SizedBox(width: 6),
                                 Flexible(
-                                  child: Text(
-                                    'Total Squad Budget',
-                                    style: TreatTypography.titleSmall,
-                                    overflow: TextOverflow.ellipsis,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Total Squad Budget',
+                                        style: TreatTypography.titleSmall,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      Text(
+                                        'Adjust up to ৳30000',
+                                        style: TreatTypography.bodySmall.copyWith(
+                                          fontSize: 10,
+                                          color: TreatColors.onSurfaceVariant.withValues(alpha: 0.7),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
                           ),
                           Text(
-                            '\$${state.budget.toInt()}',
+                            '৳${state.budget.toInt()}',
                             style: TreatTypography.headlineSmall.copyWith(
                               color: TreatColors.secondary,
                               fontWeight: FontWeight.w900,
@@ -228,6 +420,7 @@ class ChooseTreatBudgetScreen extends StatelessWidget {
                           ),
                         ],
                       ),
+                      const SizedBox(height: 8),
                       SliderTheme(
                         data: SliderTheme.of(context).copyWith(
                           activeTrackColor: TreatColors.secondary,
@@ -237,17 +430,17 @@ class ChooseTreatBudgetScreen extends StatelessWidget {
                           trackHeight: 6,
                         ),
                         child: Slider(
-                          min: 30,
-                          max: 400,
-                          divisions: 74,
-                          value: state.budget,
+                          min: 500,
+                          max: 30000,
+                          divisions: 59,
+                          value: state.budget.clamp(500.0, 30000.0),
                           onChanged: (val) => state.setBudget(val),
                         ),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Min: \$30', style: TreatTypography.bodySmall.copyWith(fontSize: 10)),
+                          Text('Min: ৳500', style: TreatTypography.bodySmall.copyWith(fontSize: 10)),
                           Flexible(
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -262,7 +455,7 @@ class ChooseTreatBudgetScreen extends StatelessWidget {
                                   const SizedBox(width: 4),
                                   Flexible(
                                     child: Text(
-                                      '\$${state.perPersonBudget.toStringAsFixed(2)} / sweetie',
+                                      '৳${state.perPersonBudget.toStringAsFixed(0)} / sweetie',
                                       style: TreatTypography.labelSmall.copyWith(
                                         color: TreatColors.onPrimaryFixedVariant,
                                         fontSize: 10,
@@ -275,7 +468,7 @@ class ChooseTreatBudgetScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                          Text('Max: \$400', style: TreatTypography.bodySmall.copyWith(fontSize: 10)),
+                          Text('Max: ৳30000', style: TreatTypography.bodySmall.copyWith(fontSize: 10)),
                         ],
                       ),
                     ],
@@ -652,7 +845,7 @@ class ChooseTreatBudgetScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text(
-                                  '\$${deal.price.toStringAsFixed(2)}',
+                                  '৳${deal.price.toStringAsFixed(2)}',
                                   style: GoogleFonts.plusJakartaSans(
                                     color: const Color(0xFFD6228A),
                                     fontWeight: FontWeight.w900,
@@ -660,7 +853,7 @@ class ChooseTreatBudgetScreen extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  deal.perPersonText ?? '\$${(deal.price / state.partySize).toStringAsFixed(0)}/person',
+                                  deal.perPersonText ?? '৳${(deal.price / state.partySize).toStringAsFixed(0)}/person',
                                   style: TreatTypography.bodySmall.copyWith(
                                     color: TreatColors.onSurfaceVariant.withValues(alpha: 0.7),
                                     fontSize: 10,
@@ -699,7 +892,7 @@ class ChooseTreatBudgetScreen extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(999),
                                     child: Center(
                                       child: Text(
-                                        deal.saveText ?? 'Save \$28 • Pass',
+                                        deal.saveText ?? 'Save ৳28 • Pass',
                                         style: GoogleFonts.plusJakartaSans(
                                           color: const Color(0xFF7C52AA),
                                           fontWeight: FontWeight.w800,

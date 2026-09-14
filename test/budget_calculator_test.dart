@@ -12,21 +12,21 @@ void main() {
 
     test('Initial state defaults match specification', () {
       expect(state.partySize, 3);
-      expect(state.budget, 120.0);
-      expect(state.perPersonBudget, 40.0);
+      expect(state.budget, 15000.0);
+      expect(state.perPersonBudget, 5000.0);
       expect(state.includeTax, isTrue);
-      expect(state.effectiveBudget, closeTo(120.0 * 1.18, 0.01));
+      expect(state.effectiveBudget, closeTo(15000.0 * 1.18, 0.01));
     });
 
     test('Party size increments and decrements within bounds', () {
       state.incrementPartySize();
       expect(state.partySize, 4);
-      expect(state.perPersonBudget, 30.0);
+      expect(state.perPersonBudget, 3750.0);
 
       state.decrementPartySize();
       state.decrementPartySize();
       expect(state.partySize, 2);
-      expect(state.perPersonBudget, 60.0);
+      expect(state.perPersonBudget, 7500.0);
 
       // Decrement down to minimum 1
       state.decrementPartySize();

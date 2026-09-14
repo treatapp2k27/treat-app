@@ -16,6 +16,7 @@ void main() {
     bool loggedOut = false;
     bool drawerOpened = false;
     bool profileRedirected = false;
+    bool ludoOpened = false;
 
     await tester.pumpWidget(
       MultiProvider(
@@ -27,6 +28,7 @@ void main() {
           home: FoodieProfileSettingsScreen(
             onOpenDrawer: () => drawerOpened = true,
             onNavigateProfile: () => profileRedirected = true,
+            onPlayLudo: () => ludoOpened = true,
             onLogOut: () => loggedOut = true,
           ),
         ),
@@ -64,9 +66,14 @@ void main() {
     // 3. Verify ACCOUNT & PERSONA section
     expect(find.text('ACCOUNT & PERSONA'), findsOneWidget);
     expect(find.text('Display Persona'), findsOneWidget);
-    expect(find.text('Anonymous Mode'), findsOneWidget);
-    expect(find.text('Hide real name on public food tables'), findsOneWidget);
+    expect(find.text('Anonymous Mode'), findsNothing);
     expect(find.text('Dietary Preferences'), findsOneWidget);
+
+    // Verify ACCOUNT & CREDENTIALS section
+    expect(find.text('ACCOUNT & CREDENTIALS'), findsOneWidget);
+    expect(find.text('Change Password'), findsOneWidget);
+    expect(find.text('Change Email'), findsOneWidget);
+    expect(find.text('Contact Number'), findsOneWidget);
 
     // 4. Verify PREFERENCES & DINING section
     expect(find.text('PREFERENCES & DINING'), findsOneWidget);
@@ -82,7 +89,7 @@ void main() {
 
     // 6. Verify PRIVACY & DISCOVERY section
     expect(find.text('PRIVACY & DISCOVERY'), findsOneWidget);
-    expect(find.text('Ghost Browsing in Food Bar'), findsOneWidget);
+    expect(find.text('Ghost Browsing in Food Bar'), findsNothing);
     expect(find.text('Direct Squad Invites'), findsOneWidget);
     expect(find.text('Neighborhood Location Sharing'), findsOneWidget);
 
@@ -108,17 +115,15 @@ void main() {
     await tester.tap(find.text('Shuffle'));
     await tester.pumpAndSettle();
 
-    // 11. Test Tap 'Play Squad Ludo' to open Ludo modal
+    // 11. Test Tap 'Play Squad Ludo' to trigger ludo
     await tester.tap(find.text('Play Squad Ludo'));
     await tester.pumpAndSettle();
-    expect(find.text('Roll Dice! 🎲'), findsOneWidget);
-    await tester.tap(find.text('Close'));
-    await tester.pumpAndSettle();
+    expect(ludoOpened, isTrue);
 
     // 12. Test Tap 'Export Dining History'
     await tester.tap(find.text('Export Dining History'));
     await tester.pumpAndSettle();
-    expect(find.text('treat_diner_pass_history_2026.csv\n• 34 Verified Treats Claimed\n• \$185 Total Community Savings\n• Zero PII Disclosed'), findsOneWidget);
+    expect(find.text('treat_diner_pass_history_2026.csv\n• 34 Verified Treats Claimed\n• ৳185 Total Community Savings\n• Zero PII Disclosed'), findsOneWidget);
     await tester.tap(find.text('Dismiss'));
     await tester.pumpAndSettle();
 

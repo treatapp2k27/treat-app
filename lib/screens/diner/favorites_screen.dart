@@ -52,7 +52,7 @@ class FavoritesScreen extends StatefulWidget {
 }
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
-  int _selectedFilter = 0; // 0: All (5), 1: Under $35 (3), 2: Feasts for 4+ (2)
+  int _selectedFilter = 0; // 0: All (5), 1: Under ৳35 (3), 2: Feasts for 4+ (2)
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
@@ -64,8 +64,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       title: 'The Sunset Sliders & Fries Feast',
       restaurantName: 'Spice & Sizzle Bistro • 0.8 mi away',
       price: 32.0,
-      perPersonText: '(\$8/person)',
-      wasPrice: 'Was: \$50',
+      perPersonText: '(৳8/person)',
+      wasPrice: 'Was: ৳50',
       ratingText: '4.9 (840)',
       lovedDate: 'Loved May 18',
       imageUrl:
@@ -78,8 +78,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       title: 'Decadent Churro Sundae & Dip Bowl',
       restaurantName: 'Sugar Bloom Cafe & Brunch • 0.4 mi away',
       price: 22.0,
-      perPersonText: '(\$5.50/person)',
-      wasPrice: 'Was: \$38',
+      perPersonText: '(৳5.50/person)',
+      wasPrice: 'Was: ৳38',
       ratingText: '4.98 (2.1k)',
       lovedDate: 'Loved May 15',
       imageUrl: 'assets/images/churro_sundae.jpg',
@@ -92,8 +92,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       title: 'Crispy Ocean Calamari & Prawn Feast',
       restaurantName: 'Ocean Catch Lounge • 1.2 mi away',
       price: 36.0,
-      perPersonText: '(\$9/person)',
-      wasPrice: 'Was: \$60',
+      perPersonText: '(৳9/person)',
+      wasPrice: 'Was: ৳60',
       ratingText: '4.95 (1.2k)',
       lovedDate: 'Loved May 10',
       imageUrl:
@@ -106,8 +106,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       title: 'Fiesta Street Taco & Queso Mountain',
       restaurantName: 'Taco Bodega Cantina • 0.5 mi away',
       price: 28.0,
-      perPersonText: '(\$7/person)',
-      wasPrice: 'Was: \$45',
+      perPersonText: '(৳7/person)',
+      wasPrice: 'Was: ৳45',
       ratingText: '4.88 (950)',
       lovedDate: 'Loved May 08',
       imageUrl:
@@ -120,8 +120,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       title: 'Tokyo Midnight Ramen & Bao Board',
       restaurantName: 'Ramen Samurai Lounge • 1.0 mi away',
       price: 42.0,
-      perPersonText: '(\$10.50/person)',
-      wasPrice: 'Was: \$65',
+      perPersonText: '(৳10.50/person)',
+      wasPrice: 'Was: ৳65',
       ratingText: '4.92 (1.5k)',
       lovedDate: 'Loved May 02',
       imageUrl:
@@ -349,7 +349,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               children: [
                 _buildFilterPill('All ($totalSavedCount)', 0),
                 const SizedBox(width: 8),
-                _buildFilterPill('Under \$35 (3)', 1),
+                _buildFilterPill('Under ৳35 (3)', 1),
                 const SizedBox(width: 8),
                 _buildFilterPill('Feasts for 4+ (2)', 2),
               ],
@@ -749,7 +749,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            '\$${item.price.toStringAsFixed(2)}',
+                            '৳${item.price.toStringAsFixed(2)}',
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 20,
                               fontWeight: FontWeight.w900,

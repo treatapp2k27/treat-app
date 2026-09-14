@@ -5,7 +5,6 @@ import '../state/diner_state.dart';
 import '../widgets/diner_drawer.dart';
 import '../widgets/treat_bottom_nav_bar.dart';
 import 'diner/choose_treat_budget_screen.dart';
-import 'diner/community_food_bar_screen.dart';
 import 'diner/treat_social_screen.dart';
 import 'diner/favorites_screen.dart';
 import 'diner/foodie_profile_settings_screen.dart';
@@ -17,7 +16,9 @@ import 'diner/platter_packages_screen.dart';
 import 'diner/reservation_confirmed_slip_screen.dart';
 import 'diner/scanned_voucher_receipt_screen.dart';
 import 'diner/treat_opening_screen.dart';
-import 'diner/welcome_anonymous_screen.dart';
+import 'diner/login_page.dart';
+import 'diner/treat_ludo_game_screen.dart';
+import 'diner/treat_ludo_leaderboard_screen.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
@@ -54,6 +55,10 @@ class _AppShellState extends State<AppShell> {
                   onNavigate: (route) {
                     Navigator.of(context).pop();
                     _navigateTo(route);
+                  },
+                  onPlayLudo: () {
+                    Navigator.of(context).pop();
+                    _navigateTo('ludo_game');
                   },
                   onLogOut: () {
                     context.read<DinerState>().setFoodieLoggedIn(false);
@@ -191,7 +196,7 @@ class _AppShellState extends State<AppShell> {
 
       case 'welcome_persona':
       case 'foodie_signin':
-        return WelcomeAnonymousScreen(
+        return LoginPage(
           onBack: () => _navigateTo('welcome'),
           onEnterGuest: () => _navigateTo('location'),
         );
@@ -217,11 +222,11 @@ class _AppShellState extends State<AppShell> {
             onEditBudget: () => _navigateTo('budget'),
           );
         }
-        return CommunityFoodBarScreen(
+        return ChooseTreatBudgetScreen(
           onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
-          onExploreTreats: () => _navigateTo('budget'),
-          onOpenFilter: () => _navigateTo('budget'),
           onSelectDeal: (_) => _navigateTo('platters'),
+          onFindWithinBudget: () => _navigateTo('platters'),
+          onBackToFoodBar: () => _navigateTo('home'),
         );
 
       case 'favorites':
@@ -316,9 +321,43 @@ class _AppShellState extends State<AppShell> {
           onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
           onNavigateHome: () => _navigateTo('home'),
           onNavigateProfile: () => _navigateTo('profile'),
+          onPlayLudo: () => _navigateTo('ludo_game'),
           onLogOut: () {
             context.read<DinerState>().setFoodieLoggedIn(false);
             _navigateTo('welcome');
+          },
+        );
+
+      case 'ludo_game':
+        return TreatLudoGameScreen(
+          onBack: () => _navigateTo('profile'),
+          onShowLeaderboard: () => _navigateTo('ludo_leaderboard'),
+          onOpenProfile: () => _navigateTo('profile'),
+        );
+
+      case 'ludo_leaderboard':
+        return TreatLudoLeaderboardScreen(
+          onBack: () => _navigateTo('ludo_game'),
+          onRematch: () => _navigateTo('ludo_game'),
+          onBackToProfile: () => _navigateTo('profile'),
+          onNavigateTab: (tab) {
+            switch (tab) {
+              case TreatNavTab.explore:
+                _navigateTo('home');
+                break;
+              case TreatNavTab.foodBar:
+                _navigateTo('food_bar');
+                break;
+              case TreatNavTab.favorites:
+                _navigateTo('favorites');
+                break;
+              case TreatNavTab.social:
+                _navigateTo('social');
+                break;
+              case TreatNavTab.profile:
+                _navigateTo('profile');
+                break;
+            }
           },
         );
 

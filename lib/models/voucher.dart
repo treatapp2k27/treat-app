@@ -23,7 +23,7 @@ class Voucher {
     Voucher(
       code: 'TREAT50',
       title: '50% Off First Treat',
-      description: 'Min spend \$15 • All Bakeries',
+      description: 'Min spend ৳15 • All Bakeries',
       tag: 'HOT',
       discountAmount: 50.0,
       isPercentage: true,
@@ -31,7 +31,7 @@ class Voucher {
     ),
     Voucher(
       code: 'WEEKENDVIBE',
-      title: '\$20 Weekend Chill',
+      title: '৳20 Weekend Chill',
       description: 'Table of 3+ • Drink Lounges',
       tag: 'NEW',
       discountAmount: 20.0,

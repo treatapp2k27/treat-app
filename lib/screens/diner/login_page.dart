@@ -7,25 +7,26 @@ import '../../widgets/treat_animated_logo.dart';
 /// - 'Sign in with Treat Account' featured on top with visible 'Member Credentials' (Email & Password)
 /// - 'Treat Sign In' button replacing 'Authorize & Continue'
 /// - Rearranged Google & Facebook social login buttons below
-class WelcomeAnonymousScreen extends StatefulWidget {
+class LoginPage extends StatefulWidget {
   final VoidCallback onEnterGuest;
   final VoidCallback? onBack;
 
-  const WelcomeAnonymousScreen({
+  const LoginPage({
     super.key,
     required this.onEnterGuest,
     this.onBack,
   });
 
   @override
-  State<WelcomeAnonymousScreen> createState() => _WelcomeAnonymousScreenState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _WelcomeAnonymousScreenState extends State<WelcomeAnonymousScreen> {
-  final TextEditingController _emailController =
-      TextEditingController(text: 'foodie@treat.circle');
-  final TextEditingController _passwordController =
-      TextEditingController(text: '••••••••');
+/// Backwards compatibility alias
+typedef WelcomeAnonymousScreen = LoginPage;
+
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
   @override
@@ -209,26 +210,13 @@ class _WelcomeAnonymousScreenState extends State<WelcomeAnonymousScreen> {
                                   ),
                                   const SizedBox(width: 10),
                                   Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Sign in with Treat Account',
-                                          style: GoogleFonts.plusJakartaSans(
-                                            fontSize: 15.5,
-                                            fontWeight: FontWeight.w800,
-                                            color: const Color(0xFF1F1B1A),
-                                          ),
-                                        ),
-                                        Text(
-                                          'Member Credentials',
-                                          style: GoogleFonts.plusJakartaSans(
-                                            fontSize: 11.5,
-                                            fontWeight: FontWeight.w600,
-                                            color: const Color(0xFFB2107B),
-                                          ),
-                                        ),
-                                      ],
+                                    child: Text(
+                                      'Sign in with Treat Account',
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 15.5,
+                                        fontWeight: FontWeight.w800,
+                                        color: const Color(0xFF1F1B1A),
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -274,7 +262,7 @@ class _WelcomeAnonymousScreenState extends State<WelcomeAnonymousScreen> {
                                           color: const Color(0xFF1F1B1A),
                                         ),
                                         decoration: InputDecoration(
-                                          hintText: 'name@example.com',
+                                          hintText: 'Enter your email',
                                           hintStyle: GoogleFonts.plusJakartaSans(
                                             color: const Color(0xFF9E8E9B),
                                             fontSize: 13,

@@ -11,6 +11,7 @@ class FoodieProfileSettingsScreen extends StatefulWidget {
   final VoidCallback onOpenDrawer;
   final VoidCallback? onNavigateHome;
   final VoidCallback? onNavigateProfile;
+  final VoidCallback? onPlayLudo;
   final VoidCallback? onLogOut;
 
   const FoodieProfileSettingsScreen({
@@ -18,6 +19,7 @@ class FoodieProfileSettingsScreen extends StatefulWidget {
     required this.onOpenDrawer,
     this.onNavigateHome,
     this.onNavigateProfile,
+    this.onPlayLudo,
     this.onLogOut,
   });
 
@@ -41,7 +43,7 @@ class _FoodieProfileSettingsScreenState
     {'name': 'Boba Lover', 'icon': Icons.local_cafe_rounded},
   ];
 
-  double _budgetSliderVal = 45.0;
+  double _budgetSliderVal = 8000.0;
   late final ScrollController _scrollController;
 
   @override
@@ -428,8 +430,8 @@ class _FoodieProfileSettingsScreenState
       builder: (ctx) {
         return StatefulBuilder(
           builder: (context, setSheetState) {
-            final lower = (_budgetSliderVal - 15).clamp(15, 80).toInt();
-            final upper = (_budgetSliderVal + 15).clamp(30, 150).toInt();
+            final lower = (_budgetSliderVal * 0.75).clamp(500, 20000).toInt();
+            final upper = (_budgetSliderVal * 1.25).clamp(500, 20000).toInt();
 
             return SafeArea(
               child: Padding(
@@ -469,7 +471,7 @@ class _FoodieProfileSettingsScreenState
                     const SizedBox(height: 20),
                     Center(
                       child: Text(
-                        '\$$lower - \$$upper • Shared Feast',
+                        '৳$lower - ৳$upper • Shared Feast',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 22,
                           fontWeight: FontWeight.w900,
@@ -488,9 +490,9 @@ class _FoodieProfileSettingsScreenState
                       ),
                       child: Slider(
                         value: _budgetSliderVal,
-                        min: 25.0,
-                        max: 95.0,
-                        divisions: 14,
+                        min: 500.0,
+                        max: 20000.0,
+                        divisions: 39,
                         onChanged: (val) {
                           setState(() => _budgetSliderVal = val);
                           setSheetState(() {});
@@ -650,6 +652,357 @@ class _FoodieProfileSettingsScreenState
     );
   }
 
+  void _showChangePasswordDialog(BuildContext context) {
+    final currentPassCtrl = TextEditingController();
+    final newPassCtrl = TextEditingController();
+    final confirmPassCtrl = TextEditingController();
+    bool obscureCurrent = true;
+    bool obscureNew = true;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          backgroundColor: Colors.white,
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: const BoxDecoration(
+                  color: Color(0xFFEDE4F7),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.lock_reset_rounded,
+                  color: Color(0xFF7C52AA),
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                'Change Password',
+                style: GoogleFonts.plusJakartaSans(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 18,
+                  color: const Color(0xFF1F1B1A),
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Enter your current and new password to secure your account.',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 13,
+                  color: const Color(0xFF706776),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: currentPassCtrl,
+                obscureText: obscureCurrent,
+                decoration: InputDecoration(
+                  labelText: 'Current Password',
+                  hintText: 'Enter current password',
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      obscureCurrent ? Icons.visibility_off : Icons.visibility,
+                      size: 20,
+                      color: const Color(0xFF7C52AA),
+                    ),
+                    onPressed: () => setDialogState(() => obscureCurrent = !obscureCurrent),
+                  ),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: newPassCtrl,
+                obscureText: obscureNew,
+                decoration: InputDecoration(
+                  labelText: 'New Password',
+                  hintText: 'Enter new password',
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      obscureNew ? Icons.visibility_off : Icons.visibility,
+                      size: 20,
+                      color: const Color(0xFF7C52AA),
+                    ),
+                    onPressed: () => setDialogState(() => obscureNew = !obscureNew),
+                  ),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: confirmPassCtrl,
+                obscureText: obscureNew,
+                decoration: InputDecoration(
+                  labelText: 'Confirm New Password',
+                  hintText: 'Re-enter new password',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.plusJakartaSans(
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xFF706776),
+                ),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFE040A0),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              ),
+              onPressed: () {
+                if (newPassCtrl.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please enter a new password')),
+                  );
+                  return;
+                }
+                if (newPassCtrl.text != confirmPassCtrl.text) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('New passwords do not match')),
+                  );
+                  return;
+                }
+                Navigator.of(ctx).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text('🔒 Password updated successfully!'),
+                    backgroundColor: TreatColors.primary,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                );
+              },
+              child: Text(
+                'Save Password',
+                style: GoogleFonts.plusJakartaSans(
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showChangeEmailDialog(BuildContext context, String currentEmail) {
+    final emailCtrl = TextEditingController(text: currentEmail);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: Colors.white,
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: const BoxDecoration(
+                color: Color(0xFFEDE4F7),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.alternate_email_rounded,
+                color: Color(0xFF7C52AA),
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              'Change Email',
+              style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w800,
+                fontSize: 18,
+                color: const Color(0xFF1F1B1A),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Your email is used for receipts, reservation confirmations, and squad invites.',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 13,
+                color: const Color(0xFF706776),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: emailCtrl,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                labelText: 'Email Address',
+                hintText: 'Enter your email',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF706776),
+              ),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFE040A0),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            ),
+            onPressed: () {
+              final newEmail = emailCtrl.text.trim();
+              if (newEmail.isNotEmpty) {
+                context.read<DinerState>().setEmail(newEmail);
+                Navigator.of(ctx).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('✉️ Email updated to $newEmail!'),
+                    backgroundColor: TreatColors.primary,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                );
+              }
+            },
+            child: Text(
+              'Save Email',
+              style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showChangeContactNumberDialog(BuildContext context, String currentPhone) {
+    final phoneCtrl = TextEditingController(text: currentPhone);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: Colors.white,
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: const BoxDecoration(
+                color: Color(0xFFEDE4F7),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.phone_iphone_rounded,
+                color: Color(0xFF7C52AA),
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              'Contact Number',
+              style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w800,
+                fontSize: 18,
+                color: const Color(0xFF1F1B1A),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Used for table holds, instant SMS alerts, and kitchen floor confirmations.',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 13,
+                color: const Color(0xFF706776),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: phoneCtrl,
+              keyboardType: TextInputType.phone,
+              decoration: InputDecoration(
+                labelText: 'Phone Number',
+                hintText: 'Enter your phone number',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF706776),
+              ),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFE040A0),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            ),
+            onPressed: () {
+              final newPhone = phoneCtrl.text.trim();
+              if (newPhone.isNotEmpty) {
+                context.read<DinerState>().setContactNumber(newPhone);
+                Navigator.of(ctx).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('📱 Contact number updated to $newPhone!'),
+                    backgroundColor: TreatColors.primary,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                );
+              }
+            },
+            child: Text(
+              'Save Number',
+              style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showExportHistoryDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -703,7 +1056,7 @@ class _FoodieProfileSettingsScreenState
                 border: Border.all(color: const Color(0xFFEADBEE)),
               ),
               child: Text(
-                'treat_diner_pass_history_2026.csv\n• 34 Verified Treats Claimed\n• \$185 Total Community Savings\n• Zero PII Disclosed',
+                'treat_diner_pass_history_2026.csv\n• 34 Verified Treats Claimed\n• ৳185 Total Community Savings\n• Zero PII Disclosed',
                 style: GoogleFonts.sourceCodePro(
                   fontSize: 11,
                   color: const Color(0xFF493B52),
@@ -840,8 +1193,8 @@ class _FoodieProfileSettingsScreenState
     final dinerState = context.watch<DinerState>();
     final persona = dinerState.currentPersona;
 
-    final lowerBudget = (_budgetSliderVal - 15).clamp(15, 80).toInt();
-    final upperBudget = (_budgetSliderVal + 15).clamp(30, 150).toInt();
+    final lowerBudget = (_budgetSliderVal * 0.75).clamp(500, 20000).toInt();
+    final upperBudget = (_budgetSliderVal * 1.25).clamp(500, 20000).toInt();
 
     return Scaffold(
       backgroundColor: const Color(0xFFFEF7FF),
@@ -878,17 +1231,6 @@ class _FoodieProfileSettingsScreenState
               ),
               _buildDivider(),
               _buildSettingRow(
-                icon: Icons.visibility_off_outlined,
-                title: 'Anonymous Mode',
-                subtitle: 'Hide real name on public food tables',
-                trailing: Switch(
-                  value: persona.hideRealName,
-                  onChanged: (val) => dinerState.toggleHideRealName(val),
-                  activeColor: const Color(0xFF7C52AA),
-                ),
-              ),
-              _buildDivider(),
-              _buildSettingRow(
                 icon: Icons.restaurant_outlined,
                 title: 'Dietary Preferences',
                 subtitle: persona.dietTags.isNotEmpty
@@ -906,6 +1248,52 @@ class _FoodieProfileSettingsScreenState
           const SizedBox(height: 22),
 
           // ==========================================
+          // Section: ACCOUNT & CREDENTIALS
+          // ==========================================
+          _buildSectionHeader('ACCOUNT & CREDENTIALS'),
+          const SizedBox(height: 8),
+          _buildCardContainer(
+            children: [
+              _buildSettingRow(
+                icon: Icons.lock_reset_rounded,
+                title: 'Change Password',
+                subtitle: '•••••••••••• (Tap to update)',
+                trailing: const Icon(
+                  Icons.chevron_right_rounded,
+                  color: Color(0xFFA098A5),
+                  size: 20,
+                ),
+                onTap: () => _showChangePasswordDialog(context),
+              ),
+              _buildDivider(),
+              _buildSettingRow(
+                icon: Icons.alternate_email_rounded,
+                title: 'Change Email',
+                subtitle: persona.email,
+                trailing: const Icon(
+                  Icons.chevron_right_rounded,
+                  color: Color(0xFFA098A5),
+                  size: 20,
+                ),
+                onTap: () => _showChangeEmailDialog(context, persona.email),
+              ),
+              _buildDivider(),
+              _buildSettingRow(
+                icon: Icons.phone_iphone_rounded,
+                title: 'Contact Number',
+                subtitle: persona.contactNumber,
+                trailing: const Icon(
+                  Icons.chevron_right_rounded,
+                  color: Color(0xFFA098A5),
+                  size: 20,
+                ),
+                onTap: () => _showChangeContactNumberDialog(context, persona.contactNumber),
+              ),
+            ],
+          ),
+          const SizedBox(height: 22),
+
+          // ==========================================
           // 3. Section: PREFERENCES & DINING
           // ==========================================
           _buildSectionHeader('PREFERENCES & DINING'),
@@ -915,7 +1303,7 @@ class _FoodieProfileSettingsScreenState
               _buildSettingRow(
                 icon: Icons.payments_outlined,
                 title: 'Target Spend per Diner',
-                subtitle: '\$$lowerBudget – \$$upperBudget • Shared Feast',
+                subtitle: '৳$lowerBudget – ৳$upperBudget • Shared Feast',
                 trailing: IconButton(
                   icon: const Icon(
                     Icons.tune_rounded,
@@ -991,17 +1379,6 @@ class _FoodieProfileSettingsScreenState
           const SizedBox(height: 8),
           _buildCardContainer(
             children: [
-              _buildSettingRow(
-                icon: Icons.radar_rounded,
-                title: 'Ghost Browsing in Food Bar',
-                subtitle: 'Browse counters without live check-in tag',
-                trailing: Switch(
-                  value: persona.ghostBrowsing,
-                  onChanged: (val) => dinerState.toggleGhostBrowsing(val),
-                  activeColor: const Color(0xFF7C52AA),
-                ),
-              ),
-              _buildDivider(),
               _buildSettingRow(
                 icon: Icons.link_rounded,
                 title: 'Direct Squad Invites',
@@ -1763,7 +2140,7 @@ class _FoodieProfileSettingsScreenState
           Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: _showSquadLudoModal,
+              onTap: widget.onPlayLudo ?? _showSquadLudoModal,
               borderRadius: BorderRadius.circular(999),
               child: Ink(
                 height: 44,
@@ -1838,7 +2215,7 @@ class _SquadLudoProfileModalState extends State<_SquadLudoProfileModal>
     '25% OFF Squad Feast Platter Voucher 🎫',
     'Free Mochi Dessert Tower 🍓',
     '1 Free Pitcher of Craft Berry Slush 🍹',
-    '\$10 Treat Quick Credit for Group 💰',
+    '৳10 Treat Quick Credit for Group 💰',
     'VIP Fast Pass Table Hold ⚡',
   ];
 

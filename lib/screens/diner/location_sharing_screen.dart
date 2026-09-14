@@ -2,7 +2,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/asset_constants.dart';
-import '../../core/theme/treat_colors.dart';
 import '../../widgets/radar_pulse_widget.dart';
 
 class LocationSharingScreen extends StatefulWidget {

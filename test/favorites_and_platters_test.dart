@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:treat/core/theme/treat_theme.dart';
-import 'package:treat/models/platter_deal.dart';
 import 'package:treat/screens/app_shell.dart';
 import 'package:treat/screens/diner/choose_treat_budget_screen.dart';
 import 'package:treat/screens/diner/favorites_screen.dart';
@@ -65,16 +64,10 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 350));
 
-    // Tap Treat button at Food Bar to enter Food Bar filter page
-    final treatButton = find.text('TREAT');
-    expect(treatButton, findsOneWidget);
-    await tester.tap(treatButton);
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 350));
-
-    // Verify on ChooseTreatBudgetScreen
+    // Food Bar now directly displays ChooseTreatBudgetScreen
     expect(find.byType(ChooseTreatBudgetScreen), findsOneWidget);
     expect(find.text('Calculate & Find Treats in Your Budget'), findsOneWidget);
+    expect(find.text('Filters'), findsOneWidget);
 
     // Find and tap 'FIND IT WITHIN BUDGET' button
     final findWithinBudgetBtn = find.text('FIND IT WITHIN BUDGET');
@@ -101,8 +94,8 @@ void main() {
 
     // VERIFICATION 4: Exact Platter Deals from the wireframe
     expect(find.text('The Sunset Sliders & Fries Feast'), findsOneWidget);
-    expect(find.text('\$32.00'), findsOneWidget);
-    expect(find.text('\$58.00'), findsOneWidget);
+    expect(find.text('৳32.00'), findsOneWidget);
+    expect(find.text('৳58.00'), findsOneWidget);
     expect(find.text('Save 45% OFF'), findsOneWidget);
     expect(find.text('🍔 12 Crispy Sliders'), findsOneWidget);
     expect(find.text('🍟 Loaded Truffle Fries'), findsOneWidget);
@@ -156,7 +149,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 350));
 
     expect(find.text('Fiesta Loaded Nachos & BBQ Wings'), findsOneWidget);
-    expect(find.text('\$28.00'), findsOneWidget);
+    expect(find.text('৳28.00'), findsOneWidget);
     expect(find.text('Save 42% OFF'), findsOneWidget);
 
     await tester.drag(find.byType(ListView), const Offset(0, -600));
