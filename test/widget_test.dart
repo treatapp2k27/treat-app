@@ -127,12 +127,15 @@ void main() {
     expect(find.text('CHANGE'), findsOneWidget);
     expect(find.text('Within 2 mi'), findsOneWidget);
 
-    // 8. Verify all 5 nav options are present for Foodie login
+    // 8. Verify bottom nav has 4 options (Favorites removed, Social renamed to Feed)
     expect(find.text('Explore'), findsOneWidget);
     expect(find.text('Food Bar'), findsOneWidget);
-    expect(find.text('Favorites'), findsOneWidget);
-    expect(find.text('Social'), findsOneWidget);
+    expect(find.text('Favorites'), findsNothing);
+    expect(find.text('Feed'), findsOneWidget);
     expect(find.text('Profile'), findsOneWidget);
+
+    // Verify Favorites icon IS present in top bar
+    expect(find.byIcon(Icons.favorite_border_rounded), findsOneWidget);
 
     // 9. Tap Profile Avatar icon in TopBar to redirect to Profile Settings page
     final profileButtons = find.byWidgetPredicate((w) =>

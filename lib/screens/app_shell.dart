@@ -17,8 +17,10 @@ import 'diner/reservation_confirmed_slip_screen.dart';
 import 'diner/scanned_voucher_receipt_screen.dart';
 import 'diner/treat_opening_screen.dart';
 import 'diner/login_page.dart';
+import 'diner/notifications_screen.dart';
 import 'diner/treat_ludo_game_screen.dart';
 import 'diner/treat_ludo_leaderboard_screen.dart';
+import 'diner/viral_trending_screen.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
@@ -113,6 +115,7 @@ class _AppShellState extends State<AppShell> {
     return [
       'home',
       'explore',
+      'trending',
       'food_bar',
       'favorites',
       'social',
@@ -120,6 +123,7 @@ class _AppShellState extends State<AppShell> {
       'budget',
       'platters',
       'profile',
+      'notifications',
     ].contains(_currentScreen);
   }
 
@@ -127,6 +131,7 @@ class _AppShellState extends State<AppShell> {
     switch (_currentScreen) {
       case 'home':
       case 'explore':
+      case 'trending':
         return TreatNavTab.explore;
       case 'food_bar':
       case 'budget':
@@ -210,6 +215,17 @@ class _AppShellState extends State<AppShell> {
           onSelectDeal: (_) => _navigateTo('platters'),
           onNavigateBudgetPlanner: () => _navigateTo('budget'),
           onNavigateProfile: () => _navigateTo('profile'),
+          onNavigateNotifications: () => _navigateTo('notifications'),
+          onNavigateFavorites: () => _navigateTo('favorites'),
+        );
+
+      case 'trending':
+        return ViralTrendingScreen(
+          onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
+          onSelectDeal: (_) => _navigateTo('platters'),
+          onNavigateNotifications: () => _navigateTo('notifications'),
+          onNavigateProfile: () => _navigateTo('profile'),
+          onExploreMore: () => _navigateTo('home'),
         );
 
       case 'food_bar':
@@ -220,6 +236,7 @@ class _AppShellState extends State<AppShell> {
             onBackToLogin: () => _navigateTo('welcome'),
             onSelectPlatter: (_) => _navigateTo('booking_hold'),
             onEditBudget: () => _navigateTo('budget'),
+            onNavigateNotifications: () => _navigateTo('notifications'),
           );
         }
         return ChooseTreatBudgetScreen(
@@ -235,6 +252,7 @@ class _AppShellState extends State<AppShell> {
           onSelectDeal: (_) => _navigateTo('platters'),
           onExploreMore: () => _navigateTo('home'),
           onNavigateProfile: () => _navigateTo('profile'),
+          onNavigateNotifications: () => _navigateTo('notifications'),
         );
 
       case 'groups':
@@ -243,7 +261,8 @@ class _AppShellState extends State<AppShell> {
           onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
           onExploreTreats: () => _navigateTo('home'),
           onNavigateProfile: () => _navigateTo('profile'),
-          initialTab: 0,
+          onNavigateNotifications: () => _navigateTo('notifications'),
+          initialTab: 2,
           showSwitcher: false,
         );
 
@@ -253,7 +272,8 @@ class _AppShellState extends State<AppShell> {
           onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
           onExploreTreats: () => _navigateTo('home'),
           onNavigateProfile: () => _navigateTo('profile'),
-          initialTab: 1,
+          onNavigateNotifications: () => _navigateTo('notifications'),
+          initialTab: 0,
           showSwitcher: true,
         );
 
@@ -271,6 +291,7 @@ class _AppShellState extends State<AppShell> {
           onBackToLogin: () => _navigateTo('welcome'),
           onSelectPlatter: (_) => _navigateTo('booking_hold'),
           onEditBudget: () => _navigateTo('budget'),
+          onNavigateNotifications: () => _navigateTo('notifications'),
         );
 
       case 'booking_hold':
@@ -321,11 +342,24 @@ class _AppShellState extends State<AppShell> {
           onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
           onNavigateHome: () => _navigateTo('home'),
           onNavigateProfile: () => _navigateTo('profile'),
+          onNavigateNotifications: () => _navigateTo('notifications'),
           onPlayLudo: () => _navigateTo('ludo_game'),
           onLogOut: () {
             context.read<DinerState>().setFoodieLoggedIn(false);
             _navigateTo('welcome');
           },
+        );
+
+      case 'notifications':
+        return NotificationsScreen(
+          onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
+          onNavigateExplore: () => _navigateTo('home'),
+          onNavigateProfile: () => _navigateTo('profile'),
+          onNavigateSlip: () => _navigateTo('reservation_slip'),
+          onNavigateLudo: () => _navigateTo('ludo_game'),
+          onNavigatePlatters: () => _navigateTo('platters'),
+          onNavigateReceipt: () => _navigateTo('receipt'),
+          onNavigateSocial: () => _navigateTo('social'),
         );
 
       case 'ludo_game':
@@ -367,6 +401,7 @@ class _AppShellState extends State<AppShell> {
           onSelectDeal: (_) => _navigateTo('platters'),
           onNavigateBudgetPlanner: () => _navigateTo('budget'),
           onNavigateProfile: () => _navigateTo('profile'),
+          onNavigateNotifications: () => _navigateTo('notifications'),
         );
     }
   }

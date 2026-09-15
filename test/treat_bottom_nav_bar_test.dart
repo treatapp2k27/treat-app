@@ -34,11 +34,11 @@ void main() {
 
     await tester.pump();
 
-    // 1. Verify all 5 labels are rendered
+    // 1. Verify the 4 labels are rendered (Favorites removed from bottom navbar)
     expect(find.text('Explore'), findsOneWidget);
     expect(find.text('Food Bar'), findsOneWidget);
-    expect(find.text('Favorites'), findsOneWidget);
-    expect(find.text('Social'), findsOneWidget);
+    expect(find.text('Favorites'), findsNothing);
+    expect(find.text('Feed'), findsOneWidget);
     expect(find.text('Profile'), findsOneWidget);
 
     // 2. Initial active tab is Explore
@@ -50,24 +50,19 @@ void main() {
     expect(selectedTab, equals(TreatNavTab.foodBar));
     expect(find.text('Active: foodBar'), findsOneWidget);
 
-    // 4. Tap 'Favorites' tab
-    await tester.tap(find.text('Favorites'));
+    // 4. Tap 'Feed' tab
+    await tester.tap(find.text('Feed'));
     await tester.pumpAndSettle();
-    expect(selectedTab, equals(TreatNavTab.favorites));
-
-    // 5. Tap 'Social' tab
-    await tester.tap(find.text('Social'));
-    await tester.pumpAndSettle();
-    expect(selectedTab, equals(TreatNavTab.social));
+    expect(selectedTab, equals(TreatNavTab.feed));
     expect(find.text('Active: social'), findsOneWidget);
 
-    // 6. Tap 'Profile' tab
+    // 5. Tap 'Profile' tab
     await tester.tap(find.text('Profile'));
     await tester.pumpAndSettle();
     expect(selectedTab, equals(TreatNavTab.profile));
     expect(find.text('Active: profile'), findsOneWidget);
 
-    // 7. Tap 'Explore' tab
+    // 6. Tap 'Explore' tab
     await tester.tap(find.text('Explore'));
     await tester.pumpAndSettle();
     expect(selectedTab, equals(TreatNavTab.explore));

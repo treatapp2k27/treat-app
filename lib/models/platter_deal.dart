@@ -117,14 +117,14 @@ class PlatterDeal {
       '4 Milkshakes',
       'Dipping Sauces'
     ],
-    badgeText: 'Best Match for ৳120 Budget (Saves ৳75 on Squad)',
-    imageUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80',
+    badgeText: 'Best Match for \$120 Budget',
+    imageUrl: 'assets/images/fiesta_platter.jpg',
     isHighDemand: true,
     walkTime: '0.8 mi • 15 mins walk',
     rating: 4.8,
     reviewsCount: 310,
-    saveText: 'Save ৳20 • Pass',
-    perPersonText: '৳15/person',
+    saveText: 'Save \$20 OFF',
+    perPersonText: '(\$15.00 / person)',
   );
 
   static const PlatterDeal megaFeastPlatter = PlatterDeal(
@@ -134,8 +134,8 @@ class PlatterDeal {
     restaurantCode: 'TK-8402',
     title: 'Mega Feast Platter Tier B',
     subtitle: 'Smoky BBQ Wings x8, Loaded Nachos Bowl, 3x Craft Sodas',
-    price: 138.0,
-    originalPrice: 164.0,
+    price: 38.0,
+    originalPrice: 54.0,
     servesCountMin: 2,
     servesCountMax: 3,
     inclusions: [
@@ -145,13 +145,40 @@ class PlatterDeal {
       'Garlic Toast Triangles'
     ],
     badgeText: 'High In-Demand Tonight',
-    imageUrl: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?auto=format&fit=crop&w=800&q=80',
     isHighDemand: false,
     walkTime: '1.1 mi • 22 mins walk',
     rating: 4.7,
     reviewsCount: 198,
-    saveText: 'Save ৳26 • Pass',
-    perPersonText: '৳46/person',
+    saveText: 'Save \$16 OFF',
+    perPersonText: '(\$19.00 / person)',
+  );
+
+  static const PlatterDeal supremeSeafoodPlatter = PlatterDeal(
+    id: 'platter-3',
+    restaurantId: 'res-ocean-catch',
+    restaurantName: 'Ocean Catch Lounge',
+    restaurantCode: 'OC-3601',
+    title: 'Supreme Seafood Snack Bucket',
+    subtitle: 'Crispy Calamari, Jumbo Prawns, Dipping Sauces & Seasoned Wedges',
+    price: 64.0,
+    originalPrice: 64.0,
+    servesCountMin: 3,
+    servesCountMax: 4,
+    inclusions: [
+      'Golden Calamari Rings',
+      'Crispy Jumbo Prawns',
+      'Tartar & Cocktail Sauces',
+      'Seasoned Potato Wedges'
+    ],
+    badgeText: 'Chef Specialty Platter',
+    imageUrl: 'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80',
+    isHighDemand: true,
+    walkTime: '0.5 mi • 10 mins walk',
+    rating: 4.95,
+    reviewsCount: 1200,
+    saveText: 'Chef Selected',
+    perPersonText: '(\$16.00 / person)',
   );
 
   static const PlatterDeal sunsetSlidersPlatter = PlatterDeal(
@@ -234,6 +261,9 @@ class PlatterDeal {
   );
 
   static const List<PlatterDeal> wireframePlatters = [
+    fiestaPlatter,
+    megaFeastPlatter,
+    supremeSeafoodPlatter,
     sunsetSlidersPlatter,
     oceanCalamariPlatter,
     fiestaNachosPlatter,
@@ -243,6 +273,6 @@ class PlatterDeal {
     sugarBloomPlatter,
     sugarBloomFeastPlatter,
     fiestaPlatter,
-    megaFeastPlatter,
+    supremeSeafoodPlatter,
   ];
 }

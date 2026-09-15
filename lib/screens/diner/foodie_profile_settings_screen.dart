@@ -13,6 +13,7 @@ class FoodieProfileSettingsScreen extends StatefulWidget {
   final VoidCallback? onNavigateProfile;
   final VoidCallback? onPlayLudo;
   final VoidCallback? onLogOut;
+  final VoidCallback? onNavigateNotifications;
 
   const FoodieProfileSettingsScreen({
     super.key,
@@ -21,6 +22,7 @@ class FoodieProfileSettingsScreen extends StatefulWidget {
     this.onNavigateProfile,
     this.onPlayLudo,
     this.onLogOut,
+    this.onNavigateNotifications,
   });
 
   @override
@@ -1525,7 +1527,7 @@ class _FoodieProfileSettingsScreenState
       scrolledUnderElevation: 1.5,
       automaticallyImplyLeading: false,
       titleSpacing: 16,
-      toolbarHeight: 62,
+      toolbarHeight: 58,
       title: Row(
         children: [
           // Left Sidebar Drawer Hamburger Button
@@ -1603,13 +1605,17 @@ class _FoodieProfileSettingsScreenState
           // Notification Bell Icon Button
           IconButton(
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('No new alerts! You are all caught up. 🎉'),
-                  duration: Duration(seconds: 1),
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
+              if (widget.onNavigateNotifications != null) {
+                widget.onNavigateNotifications!();
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('No new alerts! You are all caught up. 🎉'),
+                    duration: Duration(seconds: 1),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
             },
             icon: const Icon(
               Icons.notifications_none_rounded,

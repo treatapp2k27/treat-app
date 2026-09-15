@@ -374,13 +374,13 @@ class DinerDrawer extends StatelessWidget {
 
                   // Trending Platters
                   _buildNavItem(
-                    route: 'explore',
+                    route: 'trending',
                     title: 'Trending',
                     subtitle: 'Viral TikTok Flavors',
                     icon: Icons.local_fire_department_rounded,
                     iconColor: const Color(0xFFFF5252),
                     iconBg: const Color(0xFFFFEBEE),
-                    isActive: activeRoute == 'explore',
+                    isActive: activeRoute == 'trending' || activeRoute == 'explore',
                     trailingBadge: 'HOT',
                   ),
                   const SizedBox(height: 6),
@@ -430,6 +430,19 @@ class DinerDrawer extends StatelessWidget {
                     iconColor: TreatColors.secondary,
                     iconBg: const Color(0xFFF2E8F2),
                     isActive: activeRoute == 'food_bar',
+                  ),
+                  const SizedBox(height: 6),
+
+                  // Notifications
+                  _buildNavItem(
+                    route: 'notifications',
+                    title: 'Notifications',
+                    subtitle: 'Feast Alerts & Drops',
+                    icon: Icons.notifications_rounded,
+                    iconColor: const Color(0xFFD6228A),
+                    iconBg: const Color(0xFFFCEAF5),
+                    isActive: activeRoute == 'notifications',
+                    trailingBadge: '3 NEW',
                   ),
 
                   const SizedBox(height: 16),

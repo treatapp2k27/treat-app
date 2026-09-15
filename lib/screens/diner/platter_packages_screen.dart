@@ -12,6 +12,7 @@ class PlatterPackagesScreen extends StatefulWidget {
   final Function(PlatterDeal platter) onSelectPlatter;
   final VoidCallback onEditBudget;
   final VoidCallback? onBackToLogin;
+  final VoidCallback? onNavigateNotifications;
 
   const PlatterPackagesScreen({
     super.key,
@@ -19,6 +20,7 @@ class PlatterPackagesScreen extends StatefulWidget {
     required this.onSelectPlatter,
     required this.onEditBudget,
     this.onBackToLogin,
+    this.onNavigateNotifications,
   });
 
   @override
@@ -27,8 +29,9 @@ class PlatterPackagesScreen extends StatefulWidget {
 
 class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
   final TextEditingController _searchController =
-      TextEditingController(text: 'food platters & packs');
-  String _searchQuery = 'food platters & packs';
+      TextEditingController(text: 'food platters & packz');
+  String _searchQuery = 'food platters & packz';
+  bool _initializedController = false;
   int _selectedSort = 0; // 0: Recommended for You, 1: Lowest Price First
   String _selectedCategory = 'All';
 
@@ -107,7 +110,7 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
             ),
             const SizedBox(height: 18),
             Text(
-              'Squad link for ${deal.restaurantName} is ready! Split the feast bill: ৳${deal.price.toStringAsFixed(2)} total (${deal.perPersonText ?? "৳8/person"}).',
+              'Squad link for ${deal.restaurantName} is ready! Split the feast bill: \$${deal.price.toStringAsFixed(2)} total (${deal.perPersonText ?? "\$15/person"}).',
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 13,
                 color: TreatColors.onSurfaceVariant,
@@ -214,37 +217,42 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.tune_rounded,
-                            color: Color(0xFF7C52AA), size: 22),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Filters & Sort',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w800,
-                            color: const Color(0xFF2B1A3A),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF9D174D),
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          child: const Text(
-                            '2 Active',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
+                    Expanded(
+                      child: Row(
+                        children: [
+                          const Icon(Icons.tune_rounded,
+                              color: Color(0xFF7C52AA), size: 22),
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              'Filters & Sort',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                                color: const Color(0xFF2B1A3A),
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF9D174D),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: const Text(
+                              '2 Active',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     IconButton(
                       icon: const Icon(Icons.close, color: Colors.grey),
@@ -373,8 +381,25 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
     final dinerState = context.watch<DinerState>();
     final isFoodieLoggedIn = dinerState.isFoodieLoggedIn;
 
+    if (!_initializedController) {
+      _initializedController = true;
+      final defaultQuery = isFoodieLoggedIn ? 'food platters & packz' : 'food platters & packs';
+      _searchController.text = defaultQuery;
+      _searchQuery = defaultQuery;
+    }
+
     // Build the list of platters to display
-    List<PlatterDeal> platters = List.from(PlatterDeal.wireframePlatters);
+    List<PlatterDeal> platters = isFoodieLoggedIn
+        ? [
+            PlatterDeal.fiestaPlatter,
+            PlatterDeal.megaFeastPlatter,
+            PlatterDeal.supremeSeafoodPlatter,
+          ]
+        : [
+            PlatterDeal.sunsetSlidersPlatter,
+            PlatterDeal.oceanCalamariPlatter,
+            PlatterDeal.fiestaNachosPlatter,
+          ];
 
     // Apply category filter if active
     if (_selectedCategory != 'All') {
@@ -386,7 +411,7 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
           case 'sliders':
             return title.contains('slider') || sub.contains('slider') || inc.contains('slider');
           case 'seafood':
-            return title.contains('calamari') || sub.contains('calamari') || inc.contains('calamari');
+            return title.contains('calamari') || title.contains('seafood') || sub.contains('calamari') || inc.contains('calamari') || inc.contains('prawn');
           case 'nachos':
             return title.contains('nacho') || sub.contains('nacho') || inc.contains('nacho');
           case 'feast':
@@ -406,11 +431,13 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
 
     // Apply sorting
     if (_selectedSort == 1) {
-      platters.sort((a, b) => a.price.compareTo(b.price));
+      platters.sort((a, b) =>
+          a.perPersonCost(a.servesCountMin).compareTo(b.perPersonCost(b.servesCountMin)));
     }
 
-    // Apply search filter if active and not default
+    // Apply search filter if active and not default mockup query
     if (_searchQuery.isNotEmpty &&
+        _searchQuery.toLowerCase() != 'food platters & packz' &&
         _searchQuery.toLowerCase() != 'food platters & packs') {
       final q = _searchQuery.toLowerCase();
       platters = platters.where((p) {
@@ -423,11 +450,11 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
     return Scaffold(
       backgroundColor: TreatColors.background,
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60),
+        preferredSize: const Size.fromHeight(58),
         child: SafeArea(
           bottom: false,
           child: Container(
-            height: 56,
+            height: 58,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
               color: TreatColors.surfaceContainerLowest,
@@ -470,11 +497,12 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                           color: TreatColors.onSurface, size: 22),
                       onPressed: () {},
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.notifications_none_rounded,
-                          color: TreatColors.onSurfaceVariant, size: 22),
-                      onPressed: () {},
-                    ),
+                    if (isFoodieLoggedIn)
+                      IconButton(
+                        icon: const Icon(Icons.notifications_none_rounded,
+                            color: TreatColors.onSurfaceVariant, size: 22),
+                        onPressed: () => widget.onNavigateNotifications?.call(),
+                      ),
                     if (isFoodieLoggedIn) ...[
                       Container(
                         width: 32,
@@ -497,7 +525,7 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
       body: ListView(
         padding: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 36),
         children: [
-          // Search & Filter Bar Row matching mockup
+          // 1. Search & Filter Bar Row matching mockup
           Row(
             children: [
               Expanded(
@@ -505,14 +533,14 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                   height: 44,
                   padding: const EdgeInsets.symmetric(horizontal: 14),
                   decoration: BoxDecoration(
-                    color: TreatColors.surfaceContainerLowest,
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(999),
                     border: Border.all(
-                      color: TreatColors.outlineVariant.withValues(alpha: 0.6),
+                      color: const Color(0xFFECE4F2),
                     ),
                     boxShadow: const [
                       BoxShadow(
-                        color: Color.fromRGBO(124, 82, 170, 0.06),
+                        color: Color.fromRGBO(124, 82, 170, 0.05),
                         blurRadius: 10,
                         offset: Offset(0, 2),
                       ),
@@ -521,7 +549,7 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                   child: Row(
                     children: [
                       const Icon(Icons.search,
-                          size: 18, color: TreatColors.secondary),
+                          size: 18, color: Color(0xFF4A3E54)),
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
@@ -529,10 +557,10 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: TreatColors.onSurface,
+                            color: const Color(0xFF2B1A3A),
                           ),
                           decoration: InputDecoration(
-                            hintText: 'Search platters & packs',
+                            hintText: 'Search platters & packages...',
                             hintStyle: TextStyle(
                               color: TreatColors.onSurfaceVariant.withValues(alpha: 0.6),
                               fontSize: 13,
@@ -551,14 +579,14 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                             _searchController.clear();
                             setState(() => _searchQuery = '');
                           },
-                          child: const Icon(Icons.close,
-                              size: 16, color: TreatColors.onSurfaceVariant),
+                          child: const Icon(Icons.clear,
+                              size: 16, color: Color(0xFF71717A)),
                         ),
                     ],
                   ),
                 ),
               ),
-              // Filter Button with Badge '2' (visible for logged-in Foodie, hidden in Explore Without Sign In)
+              // Filter Button with Badge '2'
               if (isFoodieLoggedIn) ...[
                 const SizedBox(width: 10),
                 InkWell(
@@ -619,191 +647,242 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
           ),
           const SizedBox(height: 12),
 
-          // Sort Pills & Food Bar Categories (Horizontally Slidable)
-          SizedBox(
-            height: 42,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
-              child: Row(
-                children: _categories.map((cat) {
-                  final isSort = cat['type'] == 'sort';
-                  final isSelected = isSort
-                      ? (_selectedSort.toString() == cat['val'] && _selectedCategory == 'All')
-                      : (_selectedCategory == cat['val']);
-
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: InkWell(
-                      onTap: () {
-                        setState(() {
-                          if (isSort) {
-                            _selectedSort = int.parse(cat['val']!);
-                            _selectedCategory = 'All';
-                          } else {
-                            _selectedCategory = isSelected ? 'All' : cat['val']!;
-                          }
-                        });
-                      },
-                      borderRadius: BorderRadius.circular(999),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? TreatColors.secondary
-                              : TreatColors.surfaceContainerLowest,
-                          borderRadius: BorderRadius.circular(999),
-                          border: Border.all(
-                            color: isSelected
-                                ? Colors.transparent
-                                : TreatColors.outlineVariant.withValues(alpha: 0.6),
-                          ),
-                          boxShadow: isSelected
-                              ? const [
-                                  BoxShadow(
-                                    color: Color.fromRGBO(124, 82, 170, 0.28),
-                                    blurRadius: 8,
-                                    offset: Offset(0, 2),
-                                  )
-                                ]
-                              : null,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(cat['icon']!, style: const TextStyle(fontSize: 13)),
-                            const SizedBox(width: 6),
-                            Text(
-                              cat['label']!,
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: isSelected
-                                    ? Colors.white
-                                    : TreatColors.onSurfaceVariant,
-                              ),
-                            ),
-                            if (isSelected && isSort && cat['val'] == '1') ...[
-                              const SizedBox(width: 4),
-                              const Icon(
-                                Icons.check,
-                                size: 14,
-                                color: Colors.white,
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // Smart Recommendations Callout Card
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: TreatColors.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: TreatColors.outlineVariant.withValues(alpha: 0.5),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: TreatColors.secondary.withValues(alpha: 0.03),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [TreatColors.secondary, TreatColors.primary],
-                    ),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.auto_awesome,
-                      color: Colors.white, size: 16),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text.rich(
-                    TextSpan(
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 12,
-                        color: TreatColors.onSurfaceVariant,
-                        height: 1.35,
-                      ),
-                      children: [
-                        TextSpan(
-                          text: 'Smart Recommendations: ',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontWeight: FontWeight.w800,
-                            color: TreatColors.secondaryDark,
-                          ),
-                        ),
-                        const TextSpan(
-                          text:
-                              'Curated strictly by lowest cost per foodie & highest culinary reviews.',
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          // 2. Budget Summary Card
+          _buildBudgetSummaryCard(),
           const SizedBox(height: 16),
 
-          // Cards Feed
+          // 3. Discovered Platter Packages Header
+          _buildDiscoveredHeader(),
+          const SizedBox(height: 14),
+
+          // 4. Squad Allocation Card
+          _buildSquadAllocationCard(),
+          const SizedBox(height: 18),
+
+          // 5. Platter Cards Feed
           ...platters.map((deal) => _buildPlatterCard(deal)),
 
-          // Footer Loading Section
+          // 6. Treat Booking Guarantee Container
+          _buildBookingGuarantee(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBudgetSummaryCard() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFAF2FC),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFF0E5F8)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color.fromRGBO(124, 82, 170, 0.04),
+            blurRadius: 10,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-            alignment: Alignment.center,
+            width: 36,
+            height: 36,
+            decoration: const BoxDecoration(
+              color: Color(0xFFEADBF5),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.tune_rounded,
+                color: Color(0xFF7C52AA), size: 18),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: const BoxDecoration(
-                    color: TreatColors.secondaryFixed,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.thumb_up_alt_rounded,
-                      color: TreatColors.secondary, size: 22),
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(
+                      'Budget: \$120',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFF2B1A3A),
+                      ),
+                    ),
+                    Text(
+                      ' • 3 Guests •',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12,
+                        color: const Color(0xFF71717A),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 2),
                 Text(
-                  'More Delicious Deals Loading...',
+                  'Casual Dining',
                   style: GoogleFonts.plusJakartaSans(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                    color: TreatColors.onSurface,
+                    fontSize: 11.5,
+                    color: const Color(0xFF71717A),
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 2),
                 Text(
-                  'We scan menus 24/7 to guarantee you and your squad the biggest bites for the lowest bucks.',
-                  textAlign: TextAlign.center,
+                  'Tax Included & Service Matched',
                   style: GoogleFonts.plusJakartaSans(
-                    fontSize: 12,
-                    color: TreatColors.onSurfaceVariant,
-                    height: 1.4,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFFD6228A),
                   ),
                 ),
               ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          InkWell(
+            onTap: widget.onEditBudget,
+            borderRadius: BorderRadius.circular(999),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF1E5F6),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: const Color(0xFFE4D2EE)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Edit',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xFF7C52AA),
+                    ),
+                  ),
+                  const SizedBox(width: 3),
+                  const Icon(Icons.edit_outlined,
+                      size: 12, color: Color(0xFF7C52AA)),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDiscoveredHeader() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Discovered Platter Packages',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 18.5,
+                  fontWeight: FontWeight.w900,
+                  color: const Color(0xFF2B1A3A),
+                  letterSpacing: -0.2,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Select your group feast package to request booking with the kitchen',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 12,
+                  color: const Color(0xFF71717A),
+                  height: 1.35,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 8),
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: const Color(0xFFFDF2F8),
+            shape: BoxShape.circle,
+            border: Border.all(color: const Color(0xFFFCE7F3)),
+          ),
+          child: const Icon(Icons.celebration_rounded,
+              color: Color(0xFFD6228A), size: 18),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSquadAllocationCard() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFDF4FB),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFFCE7F3)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 30,
+            height: 30,
+            decoration: const BoxDecoration(
+              color: Color(0xFFFCE7F3),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.savings_outlined,
+                color: Color(0xFFD6228A), size: 17),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Squad Allocation: \$120.00',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF2B1A3A),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'All platters leave ample budget for cocktails & dessert!',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 11,
+                    color: const Color(0xFF71717A),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              border: Border.all(color: const Color(0xFFE5E7EB)),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              '3+',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 10.5,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFF4B5563),
+              ),
             ),
           ),
         ],
@@ -815,240 +894,203 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
     final dinerState = context.watch<DinerState>();
     final isLoved = dinerState.isFavorite(deal.id);
 
-    final reviewText = deal.reviewsCount >= 1000
-        ? '${(deal.reviewsCount / 1000).toStringAsFixed(1)}k'
-        : '${deal.reviewsCount}';
-
-    String portionBadge = 'Feeds ${deal.servesCountMax} portion';
-    if (deal.id == 'deal-fiesta-nachos') {
-      portionBadge = '#2 Feeds 4-5 portion';
-    } else if (deal.id == 'deal-sunset-sliders') {
-      portionBadge = '#1 Feeds 4 portion';
-    } else if (deal.id == 'deal-ocean-calamari') {
-      portionBadge = '#3 Feeds 4 portion';
-    }
-
     return Container(
-      margin: const EdgeInsets.only(bottom: 20),
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: const Color(0xFFF0EBF5),
           width: 1.2,
         ),
         boxShadow: const [
           BoxShadow(
-            color: Color.fromRGBO(124, 82, 170, 0.08),
-            blurRadius: 18,
+            color: Color.fromRGBO(124, 82, 170, 0.05),
+            blurRadius: 16,
             offset: Offset(0, 4),
           ),
         ],
       ),
-      clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Image with Overlays matching mockup
-          Stack(
+          // Header Row with Heart / Favorite Toggle
+          Row(
             children: [
-              Image.network(
-                deal.imageUrl,
-                height: 195,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
-                  height: 195,
-                  color: TreatColors.secondaryFixed,
-                  alignment: Alignment.center,
-                  child: const Icon(Icons.fastfood,
-                      size: 48, color: TreatColors.secondary),
-                ),
-              ),
-
-              // Top-Left Badge (Budget Steal / Lowest Price Guarantee with Per-portion cost)
-              Positioned(
-                top: 10,
-                left: 10,
+              const Spacer(),
+              InkWell(
+                key: ValueKey('fav_btn_${deal.id}'),
+                onTap: () => _toggleLoved(deal),
+                borderRadius: BorderRadius.circular(999),
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  width: 30,
+                  height: 30,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.94),
-                    borderRadius: BorderRadius.circular(999),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 4,
-                        offset: Offset(0, 1),
-                      ),
-                    ],
+                    color: isLoved
+                        ? const Color(0xFFFCE7F3)
+                        : const Color(0xFFFAF7FC),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isLoved
+                          ? const Color(0xFFFBCFE8)
+                          : const Color(0xFFECE4F2),
+                    ),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.sell_outlined,
-                          size: 13, color: Color(0xFF7C52AA)),
-                      const SizedBox(width: 5),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            deal.badgeText,
-                            style: GoogleFonts.plusJakartaSans(
-                              color: const Color(0xFF2B1A3A),
-                              fontSize: 10.5,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                          if (deal.perPersonText != null)
-                            Text(
-                              deal.perPersonText!,
-                              style: GoogleFonts.plusJakartaSans(
-                                color: const Color(0xFF655B6E),
-                                fontSize: 9.5,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Top-Right Badge (Rating & Reviews)
-              Positioned(
-                top: 10,
-                right: 10,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.94),
-                    borderRadius: BorderRadius.circular(999),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 4,
-                        offset: Offset(0, 1),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.star,
-                          size: 13, color: Color(0xFFF59E0B)),
-                      const SizedBox(width: 3),
-                      Text(
-                        '${deal.rating.toStringAsFixed(deal.rating == 4.9 ? 1 : 2)} ($reviewText+)',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                          color: const Color(0xFF2B1A3A),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Bottom-Left Badge (Feeds X Portion)
-              Positioned(
-                bottom: 10,
-                left: 10,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.94),
-                    borderRadius: BorderRadius.circular(999),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 4,
-                        offset: Offset(0, 1),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.groups_rounded,
-                          size: 13, color: Color(0xFF7C52AA)),
-                      const SizedBox(width: 4),
-                      Text(
-                        portionBadge,
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.w800,
-                          color: const Color(0xFF7C52AA),
-                        ),
-                      ),
-                    ],
+                  child: Icon(
+                    isLoved ? Icons.favorite : Icons.favorite_border,
+                    color: isLoved
+                        ? const Color(0xFFD6228A)
+                        : const Color(0xFF7C52AA),
+                    size: 16,
                   ),
                 ),
               ),
             ],
           ),
+          const SizedBox(height: 6),
 
-          // Details Content Body
-          Padding(
-            padding: const EdgeInsets.all(15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Title
-                Text(
+          // Inset Food Image
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: deal.imageUrl.startsWith('assets/')
+                ? Image.asset(
+                    deal.imageUrl,
+                    height: 165,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => _buildImageFallback(),
+                  )
+                : Image.network(
+                    deal.imageUrl,
+                    height: 165,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => _buildImageFallback(),
+                  ),
+          ),
+          const SizedBox(height: 14),
+
+          // Title & Price Row
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Expanded(
+                child: Text(
                   deal.title,
                   style: GoogleFonts.plusJakartaSans(
-                    fontSize: 16.5,
+                    fontSize: 15.5,
                     fontWeight: FontWeight.w800,
                     color: const Color(0xFF2B1A3A),
                   ),
                 ),
-                const SizedBox(height: 4),
+              ),
+              const SizedBox(width: 8),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  if (deal.originalPrice > deal.price) ...[
+                    Text(
+                      '\$${deal.originalPrice.toStringAsFixed(2)}',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12.5,
+                        color: const Color(0xFF9CA3AF),
+                        decoration: TextDecoration.lineThrough,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                  ],
+                  Text(
+                    '\$${deal.price.toStringAsFixed(2)}',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 18.5,
+                      fontWeight: FontWeight.w900,
+                      color: const Color(0xFF5B2375),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
 
-                // Venue Subtitle
+          // Servings line
+          Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 6,
+            runSpacing: 2,
+            children: [
+              Text(
+                'Serves ${deal.servesCountMin}-${deal.servesCountMax} Foodies',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xFFD6228A),
+                ),
+              ),
+              Text(
+                deal.perPersonText ??
+                    '(\$${(deal.price / deal.servesCountMin).toStringAsFixed(2)} / person)',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11.5,
+                  color: const Color(0xFF71717A),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Package Inclusions Container
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            constraints: const BoxConstraints(minHeight: 56),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF9F4FC),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: const Color(0xFFF0EBF5)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Row(
                   children: [
-                    const Icon(Icons.storefront_outlined,
-                        size: 14, color: Color(0xFF655B6E)),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: Text(
-                        deal.restaurantName,
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 12,
-                          color: const Color(0xFF655B6E),
-                          fontWeight: FontWeight.w500,
-                        ),
-                        overflow: TextOverflow.ellipsis,
+                    const Icon(Icons.inventory_2_outlined,
+                        size: 14, color: Color(0xFF7C52AA)),
+                    const SizedBox(width: 6),
+                    Text(
+                      'PACKAGE INCLUSIONS',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFF6B7280),
+                        letterSpacing: 0.6,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
-
-                // Inclusions Chips
+                const SizedBox(height: 8),
                 Wrap(
                   spacing: 6,
                   runSpacing: 6,
-                  children: deal.inclusions.map((chip) {
+                  children: deal.inclusions.map((inc) {
                     return Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                          horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF7F4FA),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: const Color(0xFFECE4F2)),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: const Color(0xFFE9DFF2)),
                       ),
                       child: Text(
-                        chip,
+                        inc,
                         style: GoogleFonts.plusJakartaSans(
-                          fontSize: 11,
+                          fontSize: 10.5,
                           fontWeight: FontWeight.w600,
                           color: const Color(0xFF4A3E54),
                         ),
@@ -1056,154 +1098,131 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
                     );
                   }).toList(),
                 ),
-                const SizedBox(height: 12),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
 
-                // Price & Discount Row
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // Solid Purple CTA Button
+          ElevatedButton(
+            onPressed: () => widget.onSelectPlatter(deal),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF5E358A),
+              foregroundColor: Colors.white,
+              minimumSize: const Size(double.infinity, 46),
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Select This Platter',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 13.5,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                const Icon(Icons.arrow_forward_rounded, size: 16),
+              ],
+            ),
+          ),
+          if (!dinerState.isFoodieLoggedIn) ...[
+            const SizedBox(height: 8),
+            InkWell(
+              onTap: () => _shareWithSquad(deal),
+              borderRadius: BorderRadius.circular(999),
+              child: Container(
+                height: 40,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEDE8FC),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: const Color(0xFFDDD6FE)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Flexible(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.baseline,
-                        textBaseline: TextBaseline.alphabetic,
-                        children: [
-                          Text(
-                            '৳${deal.price.toStringAsFixed(2)}',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w900,
-                              color: const Color(0xFF2B1A3A),
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Flexible(
-                            child: Text(
-                              '৳${deal.originalPrice.toStringAsFixed(2)}',
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 13,
-                                color: const Color(0xFF9E92A6),
-                                decoration: TextDecoration.lineThrough,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFCE7F3),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        deal.saveText ??
-                            'Save ${deal.discountPercent}% OFF',
-                        style: GoogleFonts.plusJakartaSans(
-                          color: const Color(0xFFD6228A),
-                          fontWeight: FontWeight.w800,
-                          fontSize: 11,
-                        ),
+                    const Icon(Icons.group_add_rounded,
+                        color: Color(0xFF7C52AA), size: 16),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Share with Squad',
+                      style: GoogleFonts.plusJakartaSans(
+                        color: const Color(0xFF7C52AA),
+                        fontWeight: FontWeight.w800,
+                        fontSize: 12.5,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 14),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
 
-                // Action Buttons Row (Loved It & Share with Squad)
-                Row(
-                  children: [
-                    // Loved It Button (Only available for logged-in Foodies; NOT available for Explore Without Sign In)
-                    if (dinerState.isFoodieLoggedIn) ...[
-                      Expanded(
-                        child: InkWell(
-                          onTap: () => _toggleLoved(deal),
-                          borderRadius: BorderRadius.circular(999),
-                          child: Container(
-                            height: 42,
-                            decoration: BoxDecoration(
-                              color: isLoved
-                                  ? const Color(0xFFFCE7F3)
-                                  : const Color(0xFFFFF0F7),
-                              borderRadius: BorderRadius.circular(999),
-                              border: Border.all(
-                                color: const Color(0xFFFBCFE8),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  isLoved
-                                      ? Icons.favorite
-                                      : Icons.favorite_border,
-                                  color: const Color(0xFFD6228A),
-                                  size: 16,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  'Loved It',
-                                  style: GoogleFonts.plusJakartaSans(
-                                    color: const Color(0xFFD6228A),
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 12.5,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                    ],
-
-                    // Share with Squad Button
-                    Expanded(
-                      child: InkWell(
-                        onTap: () => _shareWithSquad(deal),
-                        borderRadius: BorderRadius.circular(999),
-                        child: Container(
-                          height: 42,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFEDE8FC),
-                            borderRadius: BorderRadius.circular(999),
-                            border: Border.all(
-                              color: const Color(0xFFDDD6FE),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.group_add_rounded,
-                                  color: Color(0xFF7C52AA), size: 16),
-                              const SizedBox(width: 6),
-                              Flexible(
-                                child: Text(
-                                  'Share with Squad',
-                                  style: GoogleFonts.plusJakartaSans(
-                                    color: const Color(0xFF7C52AA),
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 12.5,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+  Widget _buildBookingGuarantee() {
+    return Container(
+      margin: const EdgeInsets.only(top: 4, bottom: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF3ECF8),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: const BoxDecoration(
+              color: Color(0xFFBE185D),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.verified_user_rounded,
+                color: Colors.white, size: 16),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Treat Booking Guarantee',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF2B1A3A),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Kitchen holds the table and locks platter pricing for 20 minutes once selected.',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 10.5,
+                    color: const Color(0xFF655B6E),
+                    height: 1.3,
+                  ),
                 ),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildImageFallback() {
+    return Container(
+      height: 185,
+      color: const Color(0xFFF0E5F8),
+      alignment: Alignment.center,
+      child: const Icon(Icons.fastfood_rounded,
+          size: 40, color: Color(0xFF7C52AA)),
     );
   }
 }

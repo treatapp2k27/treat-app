@@ -13,6 +13,8 @@ class HomePromotionsScreen extends StatefulWidget {
   final Function(PlatterDeal deal) onSelectDeal;
   final VoidCallback onNavigateBudgetPlanner;
   final VoidCallback? onNavigateProfile;
+  final VoidCallback? onNavigateNotifications;
+  final VoidCallback? onNavigateFavorites;
   final VoidCallback? onBackToLogin;
   final VoidCallback? onNavigateLogin;
 
@@ -22,6 +24,8 @@ class HomePromotionsScreen extends StatefulWidget {
     required this.onSelectDeal,
     required this.onNavigateBudgetPlanner,
     this.onNavigateProfile,
+    this.onNavigateNotifications,
+    this.onNavigateFavorites,
     this.onBackToLogin,
     this.onNavigateLogin,
   });
@@ -719,9 +723,70 @@ class _HomePromotionsScreenState extends State<HomePromotionsScreen> {
           ),
 
 
-          // Profile Avatar Icon Button (Shown ONLY for Foodie login, NOT in Explore without Sign In)
+          // Favorites, Notifications & Profile Avatar Icon Buttons (Shown ONLY for Foodie login, NOT in Explore without Sign In)
           if (context.watch<DinerState>().isFoodieLoggedIn) ...[
             const SizedBox(width: 4),
+            // Favorites Icon Button
+            InkWell(
+              onTap: widget.onNavigateFavorites,
+              borderRadius: BorderRadius.circular(999),
+              child: Container(
+                width: 38,
+                height: 38,
+                alignment: Alignment.center,
+                child: const Icon(
+                  Icons.favorite_border_rounded,
+                  color: TreatColors.onSurface,
+                  size: 24,
+                ),
+              ),
+            ),
+            const SizedBox(width: 4),
+            InkWell(
+              onTap: widget.onNavigateNotifications,
+              borderRadius: BorderRadius.circular(999),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    width: 38,
+                    height: 38,
+                    alignment: Alignment.center,
+                    child: const Icon(
+                      Icons.notifications_none_rounded,
+                      color: TreatColors.onSurface,
+                      size: 24,
+                    ),
+                  ),
+                  Positioned(
+                    top: 5,
+                    right: 5,
+                    child: Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFD6228A),
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 15,
+                        minHeight: 15,
+                      ),
+                      alignment: Alignment.center,
+                      child: const Text(
+                        '3',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w800,
+                          height: 1,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 6),
             InkWell(
               onTap: widget.onNavigateProfile,
               borderRadius: BorderRadius.circular(999),

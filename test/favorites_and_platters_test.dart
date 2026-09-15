@@ -81,82 +81,90 @@ void main() {
     // VERIFICATION 1: Successfully redirected to PlatterPackagesScreen
     expect(find.byType(PlatterPackagesScreen), findsOneWidget);
 
-    // VERIFICATION 2: Check Search, Filter button, and Sorting elements
-    expect(find.text('food platters & packs'), findsOneWidget);
+    // VERIFICATION 2: Check Search and Filter button
+    expect(find.text('food platters & packz'), findsOneWidget);
     expect(find.text('Filter'), findsOneWidget);
     expect(find.text('2'), findsOneWidget);
+
+    // VERIFICATION 3: Budget Summary Card
+    expect(find.text('Budget: \$120'), findsOneWidget);
+    expect(find.text('Casual Dining'), findsOneWidget);
+    expect(find.text('Tax Included & Service Matched'), findsOneWidget);
+    expect(find.text('Edit'), findsOneWidget);
+
+    // VERIFICATION 4: Discovered Platter Packages Header
+    expect(find.text('Discovered Platter Packages'), findsOneWidget);
+    expect(find.textContaining('Select your group feast package'), findsOneWidget);
+
+    // VERIFICATION 5: Squad Allocation Card
+    expect(find.text('Squad Allocation: \$120.00'), findsOneWidget);
+    expect(find.textContaining('All platters leave ample budget'), findsOneWidget);
+    expect(find.text('3+'), findsOneWidget);
+
+    // VERIFICATION 6: Exact Platter Deals from the mockup
+    expect(find.text('The Fiesta Treat Platter'), findsOneWidget);
+    expect(find.text('\$45.00'), findsOneWidget);
+    expect(find.text('\$65.00'), findsOneWidget);
+    expect(find.text('(\$15.00 / person)'), findsOneWidget);
+    expect(find.text('PACKAGE INCLUSIONS'), findsWidgets);
+    expect(find.text('Select This Platter'), findsWidgets);
+
+    // VERIFICATION 7: Favorites adding and deleting logic on Platter Card
+    final initialFavoritesCount = dinerState.favorites.length;
+    final fiestaFavBtn = find.byKey(const ValueKey('fav_btn_platter-1'));
+    expect(fiestaFavBtn, findsOneWidget);
+
+    // Tap heart to add to favorites
+    await tester.tap(fiestaFavBtn);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 350));
+
+    expect(dinerState.isFavorite('platter-1'), isTrue);
+    expect(dinerState.favorites.length, equals(initialFavoritesCount + 1));
+
+    // Tap heart again to remove from favorites
+    await tester.tap(fiestaFavBtn);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 350));
+
+    expect(dinerState.isFavorite('platter-1'), isFalse);
+    expect(dinerState.favorites.length, equals(initialFavoritesCount));
+
+    // VERIFICATION 8: Filter & Sort Modal
+    final filterBtn = find.text('Filter');
+    await tester.tap(filterBtn);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 350));
+
+    expect(find.text('Filters & Sort'), findsOneWidget);
     expect(find.text('Recommended for You'), findsOneWidget);
     expect(find.text('Lowest Price First'), findsOneWidget);
 
-    // VERIFICATION 3: Smart Recommendations Callout Banner
-    expect(find.textContaining('Smart Recommendations:'), findsOneWidget);
-    expect(find.textContaining('Curated strictly by lowest cost per foodie'), findsOneWidget);
-
-    // VERIFICATION 4: Exact Platter Deals from the wireframe
-    expect(find.text('The Sunset Sliders & Fries Feast'), findsOneWidget);
-    expect(find.text('৳32.00'), findsOneWidget);
-    expect(find.text('৳58.00'), findsOneWidget);
-    expect(find.text('Save 45% OFF'), findsOneWidget);
-    expect(find.text('🍔 12 Crispy Sliders'), findsOneWidget);
-    expect(find.text('🍟 Loaded Truffle Fries'), findsOneWidget);
-    expect(find.text('🥤 4 Milkshakes'), findsOneWidget);
-
-    // VERIFICATION 5: Favorites adding and deleting logic
-    final initialFavoritesCount = dinerState.favorites.length;
-    expect(dinerState.isFavorite('deal-sunset-sliders'), isTrue);
-
-    // Tap Loved It on Sunset Sliders (currently in favorites) to remove it
-    final lovedButtons = find.text('Loved It');
-    expect(lovedButtons, findsWidgets);
-    await tester.tap(lovedButtons.first);
+    // Tap Lowest Price First
+    await tester.tap(find.text('Lowest Price First'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 350));
-
-    expect(dinerState.isFavorite('deal-sunset-sliders'), isFalse);
-    expect(dinerState.favorites.length, equals(initialFavoritesCount - 1));
-
-    // Tap Loved It on Sunset Sliders again to re-add it
-    await tester.tap(lovedButtons.first);
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 350));
-
-    expect(dinerState.isFavorite('deal-sunset-sliders'), isTrue);
-    expect(dinerState.favorites.length, equals(initialFavoritesCount));
-
-    // VERIFICATION 6: Test Share with Squad Modal
-    final shareButtons = find.text('Share with Squad');
-    expect(shareButtons, findsWidgets);
-    await tester.tap(shareButtons.first);
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 350));
-    expect(find.text('Copy Squad Invite Link'), findsOneWidget);
 
     // Close modal
-    await tester.tap(find.text('Copy Squad Invite Link'));
+    await tester.tap(find.byIcon(Icons.close));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 350));
 
-    // VERIFICATION 7: Sort by Lowest Price First
-    final lowestPriceChip = find.text('Lowest Price First');
-    await tester.ensureVisible(lowestPriceChip);
-    await tester.tap(lowestPriceChip);
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 350));
-
-    // Scroll down to reveal all cards and footer
+    // Scroll down to reveal subsequent cards and booking guarantee
     await tester.drag(find.byType(ListView), const Offset(0, -600));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 350));
 
-    expect(find.text('Fiesta Loaded Nachos & BBQ Wings'), findsOneWidget);
-    expect(find.text('৳28.00'), findsOneWidget);
-    expect(find.text('Save 42% OFF'), findsOneWidget);
+    expect(find.text('Mega Feast Platter Tier B'), findsOneWidget);
+    expect(find.text('\$38.00'), findsOneWidget);
 
     await tester.drag(find.byType(ListView), const Offset(0, -600));
     await tester.pumpAndSettle();
 
-    expect(find.text('More Delicious Deals Loading...'), findsOneWidget);
-    expect(find.textContaining('We scan menus 24/7'), findsOneWidget);
+    expect(find.text('Supreme Seafood Snack Bucket'), findsOneWidget);
+    expect(find.text('\$64.00'), findsOneWidget);
+    expect(find.text('Treat Booking Guarantee'), findsOneWidget);
+    expect(find.textContaining('Kitchen holds the table'), findsOneWidget);
 
     // VERIFICATION 10: Check Favorites screen directly
     await tester.pumpWidget(

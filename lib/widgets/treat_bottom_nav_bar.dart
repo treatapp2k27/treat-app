@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../core/theme/treat_colors.dart';
+import 'feed_nav_icon.dart';
 
 enum TreatNavTab {
   explore,
   foodBar,
   favorites,
   social,
-  profile,
+  profile;
+
+  static TreatNavTab get feed => TreatNavTab.social;
 }
 
 class TreatBottomNavBar extends StatelessWidget {
@@ -76,16 +79,13 @@ class TreatBottomNavBar extends StatelessWidget {
                       activeIcon: Icons.lunch_dining,
                     ),
                     _buildNavItem(
-                      tab: TreatNavTab.favorites,
-                      label: 'Favorites',
-                      icon: Icons.favorite_border_rounded,
-                      activeIcon: Icons.favorite_rounded,
-                    ),
-                    _buildNavItem(
                       tab: TreatNavTab.social,
-                      label: 'Social',
-                      icon: Icons.forum_outlined,
-                      activeIcon: Icons.forum,
+                      label: 'Feed',
+                      customIconBuilder: (color, isActive) => FeedNavIcon(
+                        color: color,
+                        size: 23,
+                        isActive: isActive,
+                      ),
                     ),
                     _buildNavItem(
                       tab: TreatNavTab.profile,
@@ -103,8 +103,9 @@ class TreatBottomNavBar extends StatelessWidget {
   Widget _buildNavItem({
     required TreatNavTab tab,
     required String label,
-    required IconData icon,
-    required IconData activeIcon,
+    IconData? icon,
+    IconData? activeIcon,
+    Widget Function(Color color, bool isActive)? customIconBuilder,
   }) {
     final isActive = currentTab == tab;
     const activeColor = TreatColors.primary; // #7C52AA
@@ -136,13 +137,16 @@ class TreatBottomNavBar extends StatelessWidget {
                 ),
                 child: SizedBox(
                   height: 26,
-                  child: Center(
-                    child: Icon(
-                      isActive ? activeIcon : icon,
-                      size: 22,
-                      color: isActive ? activeColor : inactiveColor,
-                    ),
-                  ),
+                    child: customIconBuilder != null
+                        ? customIconBuilder(
+                            isActive ? activeColor : inactiveColor,
+                            isActive,
+                          )
+                        : Icon(
+                            (isActive ? activeIcon : icon) ?? Icons.circle,
+                            size: 22,
+                            color: isActive ? activeColor : inactiveColor,
+                          ),
                 ),
               ),
               const SizedBox(height: 3),

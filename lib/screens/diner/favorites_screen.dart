@@ -38,6 +38,7 @@ class FavoritesScreen extends StatefulWidget {
   final Function(PlatterDeal deal)? onSelectDeal;
   final VoidCallback? onExploreMore;
   final VoidCallback? onNavigateProfile;
+  final VoidCallback? onNavigateNotifications;
 
   const FavoritesScreen({
     super.key,
@@ -45,6 +46,7 @@ class FavoritesScreen extends StatefulWidget {
     this.onSelectDeal,
     this.onExploreMore,
     this.onNavigateProfile,
+    this.onNavigateNotifications,
   });
 
   @override
@@ -211,10 +213,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAF7FC),
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60),
-        child: _buildTopAppBar(),
-      ),
+      appBar: _buildTopAppBar(),
       body: ListView(
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
@@ -377,16 +376,15 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   }
 
   // --- Top App Bar ---
-  Widget _buildTopAppBar() {
-    return Container(
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 4,
-        left: 16,
-        right: 16,
-        bottom: 8,
-      ),
-      color: Colors.white,
-      child: Row(
+  PreferredSizeWidget _buildTopAppBar() {
+    return AppBar(
+      backgroundColor: Colors.white,
+      elevation: 0,
+      scrolledUnderElevation: 2,
+      automaticallyImplyLeading: false,
+      titleSpacing: 16,
+      toolbarHeight: 58,
+      title: Row(
         children: [
           // 3-Line Hamburger Menu Icon
           InkWell(
@@ -426,7 +424,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             icon: const Icon(Icons.notifications_none_rounded, color: Color(0xFF1F1528), size: 22),
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
-            onPressed: () {},
+            onPressed: widget.onNavigateNotifications,
           ),
           const SizedBox(width: 12),
           // Circular Profile Avatar (#5B2375) - Redirects to Profile Settings

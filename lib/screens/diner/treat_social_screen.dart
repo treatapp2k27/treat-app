@@ -10,6 +10,7 @@ class TreatSocialScreen extends StatefulWidget {
   final VoidCallback onOpenDrawer;
   final VoidCallback? onExploreTreats;
   final VoidCallback? onNavigateProfile;
+  final VoidCallback? onNavigateNotifications;
   final int initialTab;
   final bool showSwitcher;
 
@@ -18,7 +19,8 @@ class TreatSocialScreen extends StatefulWidget {
     required this.onOpenDrawer,
     this.onExploreTreats,
     this.onNavigateProfile,
-    this.initialTab = 1,
+    this.onNavigateNotifications,
+    this.initialTab = 0,
     this.showSwitcher = true,
   });
 
@@ -35,6 +37,48 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
     super.initState();
     _activeTab = widget.initialTab;
   }
+
+  // --- Community Feed State ---
+  int _promoCarouselIndex = 0;
+  final PageController _promoPageController = PageController(viewportFraction: 0.90);
+  final TextEditingController _feedPostInputController = TextEditingController();
+  final TextEditingController _comment1Controller = TextEditingController();
+  final TextEditingController _comment2Controller = TextEditingController();
+
+  // Post 1 (@TacoFiend) State
+  int _p1DroolingCount = 84;
+  bool _p1HasDrooled = false;
+  int _p1FireDealCount = 42;
+  bool _p1HasFireDeal = false;
+  int _p1DownToSplitCount = 16;
+  bool _p1HasDownToSplit = false;
+  int _p1HeartCount = 31;
+  bool _p1HasHeart = false;
+  int _p1CommentsCount = 28;
+  int _p1SharesCount = 9;
+  bool _p1IsSaved = false;
+  bool _p1VoucherClaimed = false;
+  final List<Map<String, dynamic>> _p1Comments = [
+    {
+      'author': '@SweetTooth_99',
+      'avatar': '🧁',
+      'text': 'Does the guacamole refill apply too? Looking for dinner squad tonight! 🥑',
+      'time': '8m',
+      'likes': 3,
+      'isLiked': false,
+    },
+  ];
+
+  // Post 2 (Bistro Bella) State
+  int _p2ClaimedCount = 42;
+  bool _p2HasClaimed = false;
+  int _p2OnMyWayCount = 11;
+  bool _p2HasOnMyWay = false;
+  int _p2HeartCount = 36;
+  bool _p2HasHeart = false;
+  int _p2CommentsCount = 14;
+  int _p2SharesCount = 22;
+  bool _p2VoucherClaimed = false;
 
   final TextEditingController _chatController = TextEditingController();
   final ScrollController _chatScrollController = ScrollController();
@@ -138,6 +182,10 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
   void dispose() {
     _chatController.dispose();
     _chatScrollController.dispose();
+    _promoPageController.dispose();
+    _feedPostInputController.dispose();
+    _comment1Controller.dispose();
+    _comment2Controller.dispose();
     super.dispose();
   }
 
@@ -274,6 +322,7 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFBF8FD),
+      floatingActionButton: _activeTab == 0 ? _buildNewPostFab() : null,
       body: SafeArea(
         child: Column(
           children: [
@@ -296,7 +345,8 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
   // --- 1. Top App Bar ---
   Widget _buildTopAppBar() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      height: 58,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       color: Colors.white,
       child: Row(
         children: [
@@ -326,22 +376,54 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
             icon: const Icon(Icons.search, color: Color(0xFF1F1528), size: 22),
             onPressed: widget.onExploreTreats,
           ),
-          // Circular Profile Avatar (#5B2375) - Redirects to Profile Settings
+          // Food Bar Chat icon with unread badge '3'
           InkWell(
-            onTap: widget.onNavigateProfile,
+            onTap: () => setState(() => _activeTab = 1),
             borderRadius: BorderRadius.circular(999),
-            child: Tooltip(
-              message: 'Profile Settings',
-              child: Container(
-                width: 34,
-                height: 34,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(0xFF5B2375),
-                ),
-                child: const Icon(Icons.person, color: Colors.white, size: 20),
+            child: Padding(
+              padding: const EdgeInsets.all(6),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  const Icon(
+                    Icons.chat_bubble_outline_rounded,
+                    color: Color(0xFF1F1528),
+                    size: 22,
+                  ),
+                  Positioned(
+                    top: -4,
+                    right: -6,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF633990),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                      alignment: Alignment.center,
+                      child: const Text(
+                        '3',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
+          ),
+          const SizedBox(width: 4),
+          // Notification Bell
+          IconButton(
+            icon: const Icon(
+              Icons.notifications_none_rounded,
+              color: Color(0xFF1F1528),
+              size: 24,
+            ),
+            onPressed: widget.onNavigateNotifications,
           ),
         ],
       ),
@@ -360,7 +442,7 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
       ),
       child: Row(
         children: [
-          // Community Feed / Foodie Groups
+          // Community Feed
           Expanded(
             child: InkWell(
               onTap: () => setState(() => _activeTab = 0),
@@ -369,7 +451,7 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
                 decoration: BoxDecoration(
-                  color: _activeTab == 0 ? const Color(0xFF5B2375) : Colors.transparent,
+                  color: _activeTab == 0 ? const Color(0xFF633990) : Colors.transparent,
                   borderRadius: BorderRadius.circular(999),
                 ),
                 alignment: Alignment.center,
@@ -396,7 +478,7 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
                 decoration: BoxDecoration(
-                  color: _activeTab == 1 ? const Color(0xFF5B2375) : Colors.transparent,
+                  color: _activeTab == 1 ? const Color(0xFF633990) : Colors.transparent,
                   borderRadius: BorderRadius.circular(999),
                 ),
                 alignment: Alignment.center,
@@ -444,14 +526,2013 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
   Widget _buildActiveTabContent() {
     switch (_activeTab) {
       case 0:
-        return _buildCommunityGroupsView();
+        return _buildCommunityFeedView();
       case 1:
         return _buildFoodBarChatView();
       case 2:
+        return _buildCommunityGroupsView();
+      case 3:
         return _buildSavingsWallView();
       default:
-        return _buildCommunityGroupsView();
+        return _buildCommunityFeedView();
     }
+  }
+
+  // ==========================================
+  // VIEW 0: COMMUNITY FEED (Matches provided UI)
+  // ==========================================
+  Widget _buildCommunityFeedView() {
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 96),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 1. Promo Carousel Card
+          _buildPromoCarousel(),
+
+          const SizedBox(height: 14),
+
+          // 2. Post Creator Card
+          _buildPostCreatorCard(),
+
+          const SizedBox(height: 18),
+
+          // 3. Craving Stories Section
+          _buildCravingStoriesSection(),
+
+          const SizedBox(height: 18),
+
+          // 4. Feed Post 1: @TacoFiend
+          _buildTacoBodegaFeedPost(),
+
+          const SizedBox(height: 20),
+
+          // 5. Feed Post 2: Bistro Bella (Partner Drop)
+          _buildBistroBellaFeedPost(),
+        ],
+      ),
+    );
+  }
+
+  // --- 1. Promo Carousel ---
+  Widget _buildPromoCarousel() {
+    return Column(
+      children: [
+        SizedBox(
+          height: 154,
+          child: PageView(
+            controller: _promoPageController,
+            onPageChanged: (idx) => setState(() => _promoCarouselIndex = idx),
+            children: [
+              // Card 1: 40% OFF GROUP FEASTS
+              Container(
+                margin: const EdgeInsets.only(right: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFF532475),
+                      Color(0xFF7E3294),
+                      Color(0xFFA13589),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF633990).withValues(alpha: 0.25),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Top tag row
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.18),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            'LIMITED TIME',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.18),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            'TREAT40',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                        const Spacer(),
+                        Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
+                          ),
+                          child: const Center(
+                            child: Icon(Icons.stars_rounded, color: Colors.white, size: 14),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    // Title
+                    Text(
+                      '🔥 40% OFF GROUP FEASTS',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Split any platter with 2+ friends in Midtown',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 11,
+                        color: Colors.white.withValues(alpha: 0.9),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const Spacer(),
+                    // Bottom row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Save up to \$32 total',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white.withValues(alpha: 0.9),
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('🎉 TREAT40 Group Feast Pass added to your wallet!'),
+                                duration: Duration(seconds: 2),
+                                backgroundColor: Color(0xFF633990),
+                              ),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(999),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(999),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'CLAIM PASS',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w900,
+                                    color: const Color(0xFF633990),
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                const Icon(
+                                  Icons.arrow_forward_rounded,
+                                  size: 12,
+                                  color: Color(0xFF633990),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              // Card 2: Free Boba Special
+              Container(
+                margin: const EdgeInsets.only(left: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFBE185D),
+                      Color(0xFFD946EF),
+                      Color(0xFF8B5CF6),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            'TODAY ONLY',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            'BOBAFEAST',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '🧋 FREE BOBA PLATTER ADD-ON',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Claim free brown sugar pearls with any savory feast',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 11,
+                        color: Colors.white.withValues(alpha: 0.9),
+                      ),
+                    ),
+                    const Spacer(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Save \$14.00 total',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            'CLAIM PASS ➔',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                              color: const Color(0xFFBE185D),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 8),
+
+        // Carousel Pagination Dots
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: _promoCarouselIndex == 0 ? 16 : 5,
+              height: 5,
+              decoration: BoxDecoration(
+                color: _promoCarouselIndex == 0 ? const Color(0xFF633990) : const Color(0xFFE5D5EE),
+                borderRadius: BorderRadius.circular(999),
+              ),
+            ),
+            const SizedBox(width: 4),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: _promoCarouselIndex == 1 ? 16 : 5,
+              height: 5,
+              decoration: BoxDecoration(
+                color: _promoCarouselIndex == 1 ? const Color(0xFF633990) : const Color(0xFFE5D5EE),
+                borderRadius: BorderRadius.circular(999),
+              ),
+            ),
+            const SizedBox(width: 4),
+            Container(
+              width: 5,
+              height: 5,
+              decoration: const BoxDecoration(
+                color: Color(0xFFE5D5EE),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  // --- 2. Post Creator Card ---
+  Widget _buildPostCreatorCard() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFF1E9F6), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF7C52AA).withValues(alpha: 0.05),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Top Input Row with Avatar
+          Row(
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: const Color(0xFFF3EDF7),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: const Color(0xFFD946EF), width: 1.5),
+                      ),
+                      child: const Center(
+                        child: Text('🥟', style: TextStyle(fontSize: 18)),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      width: 9,
+                      height: 9,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF633990),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 1.5),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF6F2F8),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _feedPostInputController,
+                          decoration: InputDecoration(
+                            hintText: "What's on your plate, MidnightDumpling?",
+                            hintStyle: GoogleFonts.plusJakartaSans(
+                              fontSize: 12,
+                              color: const Color(0xFF8A7E94),
+                              fontWeight: FontWeight.w500,
+                            ),
+                            border: InputBorder.none,
+                            isDense: true,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                          onSubmitted: (text) {
+                            if (text.trim().isNotEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Post published: "${text.trim()}"'),
+                                  backgroundColor: const Color(0xFF633990),
+                                ),
+                              );
+                              _feedPostInputController.clear();
+                            }
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      const Icon(
+                        Icons.crop_original_outlined,
+                        size: 18,
+                        color: Color(0xFF8A7E94),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 12),
+
+          // Quick Action Pills (Photo, Craving, Spot, Split)
+          Row(
+            children: [
+              _buildCreatorActionPill(
+                label: 'Photo',
+                iconEmoji: '📷',
+                bgColor: const Color(0xFFFDF2F8),
+                textColor: const Color(0xFFBE185D),
+                borderColor: const Color(0xFFFCE7F3),
+                onTap: () => _showCreatorToast('Add Food Photo'),
+              ),
+              const SizedBox(width: 6),
+              _buildCreatorActionPill(
+                label: 'Craving',
+                iconEmoji: '😋',
+                bgColor: const Color(0xFFF5EEFB),
+                textColor: const Color(0xFF7C3AED),
+                borderColor: const Color(0xFFEDE2F7),
+                onTap: () => _showCreatorToast('Select Food Craving'),
+              ),
+              const SizedBox(width: 6),
+              _buildCreatorActionPill(
+                label: 'Spot',
+                iconEmoji: '📍',
+                bgColor: const Color(0xFFEFF6FF),
+                textColor: const Color(0xFF0284C7),
+                borderColor: const Color(0xFFDBEAFE),
+                onTap: () => _showCreatorToast('Tag Restaurant Spot'),
+              ),
+              const SizedBox(width: 6),
+              _buildCreatorActionPill(
+                label: 'Split',
+                iconEmoji: '🎟',
+                bgColor: const Color(0xFFFDF2F8),
+                textColor: const Color(0xFFDB2777),
+                borderColor: const Color(0xFFFCE7F3),
+                onTap: () => _showCreatorToast('Add Bill Split Deal'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCreatorActionPill({
+    required String label,
+    required String iconEmoji,
+    required Color bgColor,
+    required Color textColor,
+    required Color borderColor,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(999),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: borderColor),
+          ),
+          alignment: Alignment.center,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(iconEmoji, style: const TextStyle(fontSize: 11)),
+              const SizedBox(width: 4),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  label,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: textColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showCreatorToast(String feature) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$feature tapped!'),
+        duration: const Duration(seconds: 1),
+        backgroundColor: const Color(0xFF633990),
+      ),
+    );
+  }
+
+  // --- 3. Craving Stories Section ---
+  Widget _buildCravingStoriesSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Header
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                const Icon(
+                  Icons.auto_awesome,
+                  size: 16,
+                  color: Color(0xFFBE185D),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  'CRAVING STORIES',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.5,
+                    color: const Color(0xFF4A3E56),
+                  ),
+                ),
+              ],
+            ),
+            InkWell(
+              onTap: () {},
+              child: Text(
+                'See all',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xFF633990),
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 10),
+
+        // Horizontal Stories List
+        SizedBox(
+          height: 136,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            children: [
+              // 0. Add Craving Story Card
+              InkWell(
+                onTap: () => _showCreateFeedPostSheet(),
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  width: 98,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFDF4F8),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFFCE7F3)),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFDB2777),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.add, color: Colors.white, size: 26),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Add Craving\nStory',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFF3B2F44),
+                          height: 1.2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(width: 10),
+
+              // 1. Taco Bodega Story
+              _buildCravingStoryCard(
+                imagePath: AssetConstants.tacoBodega,
+                title: 'Taco Bodega 🌮',
+                timeAgo: '12m ago',
+                avatarEmoji: '🌮',
+                avatarColor: const Color(0xFFBE185D),
+              ),
+
+              const SizedBox(width: 10),
+
+              // 2. Sugar Bloom Story
+              _buildCravingStoryCard(
+                imagePath: AssetConstants.churroSundae,
+                title: 'Sugar Bloom 🍨',
+                timeAgo: '35m ago',
+                avatarEmoji: '🍦',
+                avatarColor: const Color(0xFF7C3AED),
+              ),
+
+              const SizedBox(width: 10),
+
+              // 3. Bistro Bella Story
+              _buildCravingStoryCard(
+                imagePath: AssetConstants.bistroBella,
+                title: 'Bistro Bella 🍕',
+                timeAgo: '1h ago',
+                avatarEmoji: '🍕',
+                avatarColor: const Color(0xFFDB2777),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCravingStoryCard({
+    required String imagePath,
+    required String title,
+    required String timeAgo,
+    required String avatarEmoji,
+    required Color avatarColor,
+  }) {
+    return Container(
+      width: 175,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Background Image
+          Image.asset(
+            imagePath,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => Container(
+              color: const Color(0xFF633990),
+              child: Center(
+                child: Text(avatarEmoji, style: const TextStyle(fontSize: 36)),
+              ),
+            ),
+          ),
+
+          // Gradient Overlay
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.black.withValues(alpha: 0.15),
+                  Colors.transparent,
+                  Colors.black.withValues(alpha: 0.75),
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                stops: const [0.0, 0.45, 1.0],
+              ),
+            ),
+          ),
+
+          // User Avatar top left
+          Positioned(
+            top: 8,
+            left: 8,
+            child: Container(
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: avatarColor, width: 2),
+                color: Colors.white,
+              ),
+              child: Text(avatarEmoji, style: const TextStyle(fontSize: 13)),
+            ),
+          ),
+
+          // Bottom title & time
+          Positioned(
+            bottom: 8,
+            left: 10,
+            right: 8,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  timeAgo,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white.withValues(alpha: 0.8),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- 4. Feed Post 1: @TacoFiend ---
+  Widget _buildTacoBodegaFeedPost() {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFF1E9F6)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF7C52AA).withValues(alpha: 0.05),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Author Header
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Taco Avatar with verified badge
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: const Color(0xFFFDF2F8),
+                    child: const Text('🌮', style: TextStyle(fontSize: 20)),
+                  ),
+                  Positioned(
+                    bottom: -2,
+                    right: -2,
+                    child: Container(
+                      padding: const EdgeInsets.all(1.5),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF633990),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.check, color: Colors.white, size: 10),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    RichText(
+                      text: TextSpan(
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 13,
+                          color: const Color(0xFF1F1528),
+                        ),
+                        children: [
+                          const TextSpan(
+                            text: '@TacoFiend',
+                            style: TextStyle(fontWeight: FontWeight.w800),
+                          ),
+                          const TextSpan(
+                            text: ' is feeling ',
+                            style: TextStyle(color: Color(0xFF6B5E74)),
+                          ),
+                          const TextSpan(
+                            text: '🤤 stuffed',
+                            style: TextStyle(
+                              color: Color(0xFFBE185D),
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const TextSpan(
+                            text: ' with ',
+                            style: TextStyle(color: Color(0xFF6B5E74)),
+                          ),
+                          const TextSpan(
+                            text: '@BobaBandit',
+                            style: TextStyle(fontWeight: FontWeight.w800),
+                          ),
+                          const TextSpan(
+                            text: ' at ',
+                            style: TextStyle(color: Color(0xFF6B5E74)),
+                          ),
+                          const TextSpan(
+                            text: 'Taco Bodega',
+                            style: TextStyle(
+                              color: Color(0xFF633990),
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Text(
+                          '15m ago • ',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            color: const Color(0xFF8A7E94),
+                          ),
+                        ),
+                        const Icon(
+                          Icons.public,
+                          size: 11,
+                          color: Color(0xFF8A7E94),
+                        ),
+                        Text(
+                          ' Public • ',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            color: const Color(0xFF8A7E94),
+                          ),
+                        ),
+                        Text(
+                          'Midtown',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFFBE185D),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.more_horiz, color: Color(0xFF8A7E94), size: 20),
+            ],
+          ),
+
+          const SizedBox(height: 10),
+
+          // Caption
+          Text(
+            'Unbelievable 4-combo platter split! Treat code stacked with student deal and saved us \$32 total. Who\'s hitting Midtown next? 🌮🔥',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 13,
+              height: 1.4,
+              color: const Color(0xFF2A2033),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // Feast Image with Floating Voucher Banner
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Stack(
+              children: [
+                Image.asset(
+                  AssetConstants.tacoBodega,
+                  width: double.infinity,
+                  height: 220,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
+                    height: 220,
+                    color: const Color(0xFFF3EDF7),
+                    child: const Center(
+                      child: Text('🌮 Taco Bodega Feast Platter', style: TextStyle(fontSize: 16)),
+                    ),
+                  ),
+                ),
+
+                // Floating Voucher Strip across bottom of image
+                Positioned(
+                  left: 10,
+                  right: 10,
+                  bottom: 10,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.96),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.12),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Taco Bodega Grand Feast',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                  color: const Color(0xFF1F1528),
+                                ),
+                              ),
+                              Text(
+                                '4 Platters • Saved 40%',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 10,
+                                  color: const Color(0xFF6B5E74),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              _p1VoucherClaimed = !_p1VoucherClaimed;
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(_p1VoucherClaimed
+                                    ? '🎟 Taco Bodega Grand Feast Voucher claimed!'
+                                    : 'Voucher unpinned.'),
+                                backgroundColor: const Color(0xFF633990),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(999),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                            decoration: BoxDecoration(
+                              color: _p1VoucherClaimed
+                                  ? const Color(0xFF10B981)
+                                  : const Color(0xFF633990),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: Text(
+                              _p1VoucherClaimed ? 'CLAIMED ✓' : 'CLAIM VOUCHER',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // Reaction Badges Row
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: Row(
+              children: [
+                _buildReactionBadge(
+                  label: '🤤 Drooling ($_p1DroolingCount)',
+                  isSelected: _p1HasDrooled,
+                  bgColor: const Color(0xFFFEF3C7),
+                  textColor: const Color(0xFF92400E),
+                  onTap: () {
+                    setState(() {
+                      _p1HasDrooled = !_p1HasDrooled;
+                      _p1DroolingCount += _p1HasDrooled ? 1 : -1;
+                    });
+                  },
+                ),
+                const SizedBox(width: 6),
+                _buildReactionBadge(
+                  label: '🔥 Fire Deal ($_p1FireDealCount)',
+                  isSelected: _p1HasFireDeal,
+                  bgColor: const Color(0xFFFEF3C7),
+                  textColor: const Color(0xFF92400E),
+                  onTap: () {
+                    setState(() {
+                      _p1HasFireDeal = !_p1HasFireDeal;
+                      _p1FireDealCount += _p1HasFireDeal ? 1 : -1;
+                    });
+                  },
+                ),
+                const SizedBox(width: 6),
+                _buildReactionBadge(
+                  label: '⚡ Down to Split! ($_p1DownToSplitCount)',
+                  isSelected: _p1HasDownToSplit,
+                  bgColor: const Color(0xFFFDF2F8),
+                  textColor: const Color(0xFFDB2777),
+                  onTap: () {
+                    setState(() {
+                      _p1HasDownToSplit = !_p1HasDownToSplit;
+                      _p1DownToSplitCount += _p1HasDownToSplit ? 1 : -1;
+                    });
+                  },
+                ),
+                const SizedBox(width: 6),
+                _buildReactionBadge(
+                  label: '❤️ $_p1HeartCount',
+                  isSelected: _p1HasHeart,
+                  bgColor: const Color(0xFFFDF2F8),
+                  textColor: const Color(0xFFBE185D),
+                  onTap: () {
+                    setState(() {
+                      _p1HasHeart = !_p1HasHeart;
+                      _p1HeartCount += _p1HasHeart ? 1 : -1;
+                    });
+                  },
+                ),
+                const SizedBox(width: 6),
+                InkWell(
+                  onTap: () {},
+                  borderRadius: BorderRadius.circular(999),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF3EDF7),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: const Icon(
+                      Icons.add_reaction_outlined,
+                      size: 14,
+                      color: Color(0xFF633990),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          // Quick Emoji Reaction Bar (😆 🍕 🥳 🌮 🍔 ❤️)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: ['😆', '🍕', '🥳', '🌮', '🍔', '❤️'].map((emoji) {
+              return InkWell(
+                onTap: () {
+                  setState(() {
+                    _p1DroolingCount++;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Reacted with $emoji!'),
+                      duration: const Duration(milliseconds: 700),
+                      backgroundColor: const Color(0xFF633990),
+                    ),
+                  );
+                },
+                borderRadius: BorderRadius.circular(999),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  child: Text(emoji, style: const TextStyle(fontSize: 16)),
+                ),
+              );
+            }).toList(),
+          ),
+
+          const SizedBox(height: 10),
+
+          // Actions Row (Comments, Shares, Save)
+          Row(
+            children: [
+              Expanded(
+                child: _buildPostActionButton(
+                  label: '💬 $_p1CommentsCount Comments',
+                  bgColor: const Color(0xFFF6F2F8),
+                  textColor: const Color(0xFF4A3E56),
+                  onTap: () {},
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildPostActionButton(
+                  label: '🔗 $_p1SharesCount Shares',
+                  bgColor: const Color(0xFFF6F2F8),
+                  textColor: const Color(0xFF4A3E56),
+                  onTap: () {
+                    setState(() => _p1SharesCount++);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Post link copied to clipboard!'),
+                        duration: Duration(seconds: 1),
+                        backgroundColor: Color(0xFF633990),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(width: 8),
+              InkWell(
+                onTap: () {
+                  setState(() => _p1IsSaved = !_p1IsSaved);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(_p1IsSaved ? 'Post saved to favorites!' : 'Post unsaved.'),
+                      duration: const Duration(seconds: 1),
+                      backgroundColor: const Color(0xFFBE185D),
+                    ),
+                  );
+                },
+                borderRadius: BorderRadius.circular(999),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: _p1IsSaved ? const Color(0xFFFCE7F3) : const Color(0xFFFDF2F8),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(
+                      color: _p1IsSaved ? const Color(0xFFDB2777) : const Color(0xFFFCE7F3),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        _p1IsSaved ? Icons.bookmark : Icons.bookmark_border_rounded,
+                        size: 14,
+                        color: const Color(0xFFDB2777),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Save',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFFDB2777),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 12),
+
+          // Comment Snippet (@SweetTooth_99)
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFAF7FC),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (final comment in _p1Comments)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CircleAvatar(
+                          radius: 12,
+                          backgroundColor: const Color(0xFFEDE8FC),
+                          child: Text(
+                            comment['avatar'] as String,
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                comment['author'] as String,
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                  color: const Color(0xFF1F1528),
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                comment['text'] as String,
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 11,
+                                  color: const Color(0xFF3D3247),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  Text(
+                                    'Like',
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w700,
+                                      color: const Color(0xFF8A7E94),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    'Reply',
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w700,
+                                      color: const Color(0xFF8A7E94),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    comment['time'] as String,
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 10,
+                                      color: const Color(0xFF8A7E94),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          // Inline Comment Field
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 14,
+                backgroundColor: const Color(0xFFF3EDF7),
+                child: const Text('🥟', style: TextStyle(fontSize: 12)),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F0F8),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _comment1Controller,
+                          style: GoogleFonts.plusJakartaSans(fontSize: 11),
+                          decoration: InputDecoration(
+                            hintText: 'Write a comment or send a bite...',
+                            hintStyle: GoogleFonts.plusJakartaSans(
+                              fontSize: 11,
+                              color: const Color(0xFF8A7E94),
+                            ),
+                            border: InputBorder.none,
+                            isDense: true,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                          onSubmitted: (text) {
+                            if (text.trim().isNotEmpty) {
+                              setState(() {
+                                _p1Comments.add({
+                                  'author': '@MidnightDumpling',
+                                  'avatar': '🥟',
+                                  'text': text.trim(),
+                                  'time': 'Just now',
+                                  'likes': 0,
+                                  'isLiked': false,
+                                });
+                                _p1CommentsCount++;
+                                _comment1Controller.clear();
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      const Icon(
+                        Icons.sentiment_satisfied_alt_outlined,
+                        size: 16,
+                        color: Color(0xFF8A7E94),
+                      ),
+                      const SizedBox(width: 6),
+                      const Icon(
+                        Icons.camera_alt_outlined,
+                        size: 16,
+                        color: Color(0xFF8A7E94),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- 5. Feed Post 2: Bistro Bella (Partner Drop) ---
+  Widget _buildBistroBellaFeedPost() {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFF1E9F6)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF7C52AA).withValues(alpha: 0.05),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Author Header
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Pizza Avatar with verified badge
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: const Color(0xFFEDE8FC),
+                    child: const Text('🍕', style: TextStyle(fontSize: 20)),
+                  ),
+                  Positioned(
+                    bottom: -2,
+                    right: -2,
+                    child: Container(
+                      padding: const EdgeInsets.all(1.5),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF0284C7),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.check, color: Colors.white, size: 10),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 4,
+                      runSpacing: 2,
+                      children: [
+                        Text(
+                          'Bistro Bella',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF1F1528),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFBE185D),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Text(
+                            'PARTNER',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 8,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          'is feeling ',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 12,
+                            color: const Color(0xFF6B5E74),
+                          ),
+                        ),
+                        Text(
+                          '🥂 excited',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF633990),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Text(
+                          '1h ago • ',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            color: const Color(0xFF8A7E94),
+                          ),
+                        ),
+                        const Icon(
+                          Icons.campaign_outlined,
+                          size: 12,
+                          color: Color(0xFF8A7E94),
+                        ),
+                        Text(
+                          ' Promoted Treat Drop',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            color: const Color(0xFF8A7E94),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.more_horiz, color: Color(0xFF8A7E94), size: 20),
+            ],
+          ),
+
+          const SizedBox(height: 10),
+
+          // Caption
+          Text(
+            '⚡ Flash 30% voucher drop for the next 5 tables! Claim voucher slip directly below and show at host stand. Fresh artisanal truffle crusts just landed! 🍕✨',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 13,
+              height: 1.4,
+              color: const Color(0xFF2A2033),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // Voucher Banner Card
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFAF0FA),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFF3D9F2)),
+            ),
+            child: Row(
+              children: [
+                // 30% circular badge
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      '30%',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                        color: const Color(0xFF633990),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Artisan Truffle Slice Voucher',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFF1F1528),
+                        ),
+                      ),
+                      Text(
+                        'Valid until 9:00 PM today',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 10,
+                          color: const Color(0xFF6B5E74),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      _p2VoucherClaimed = !_p2VoucherClaimed;
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(_p2VoucherClaimed
+                            ? '🎉 30% Truffle Slice Voucher Claimed!'
+                            : 'Voucher unpinned.'),
+                        backgroundColor: const Color(0xFF633990),
+                      ),
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(999),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                    decoration: BoxDecoration(
+                      color: _p2VoucherClaimed
+                          ? const Color(0xFF10B981)
+                          : const Color(0xFF633990),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      _p2VoucherClaimed ? 'CLAIMED ✓' : 'CLAIM NOW',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // Media Box (Bistro Bella image)
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.asset(
+              AssetConstants.bistroBella,
+              width: double.infinity,
+              height: 220,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => Container(
+                height: 220,
+                color: const Color(0xFFF3EDF7),
+                child: const Center(
+                  child: Text('🍕 Bistro Bella Outdoor Patio', style: TextStyle(fontSize: 16)),
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // Reaction Badges Row
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: Row(
+              children: [
+                _buildReactionBadge(
+                  label: '🍕 Claimed! ($_p2ClaimedCount)',
+                  isSelected: _p2HasClaimed,
+                  bgColor: const Color(0xFFFDF2F8),
+                  textColor: const Color(0xFFBE185D),
+                  onTap: () {
+                    setState(() {
+                      _p2HasClaimed = !_p2HasClaimed;
+                      _p2ClaimedCount += _p2HasClaimed ? 1 : -1;
+                    });
+                  },
+                ),
+                const SizedBox(width: 6),
+                _buildReactionBadge(
+                  label: '🏃 On my way ($_p2OnMyWayCount)',
+                  isSelected: _p2HasOnMyWay,
+                  bgColor: const Color(0xFFFEF3C7),
+                  textColor: const Color(0xFF92400E),
+                  onTap: () {
+                    setState(() {
+                      _p2HasOnMyWay = !_p2HasOnMyWay;
+                      _p2OnMyWayCount += _p2HasOnMyWay ? 1 : -1;
+                    });
+                  },
+                ),
+                const SizedBox(width: 6),
+                _buildReactionBadge(
+                  label: '❤️ $_p2HeartCount',
+                  isSelected: _p2HasHeart,
+                  bgColor: const Color(0xFFFDF2F8),
+                  textColor: const Color(0xFFBE185D),
+                  onTap: () {
+                    setState(() {
+                      _p2HasHeart = !_p2HasHeart;
+                      _p2HeartCount += _p2HasHeart ? 1 : -1;
+                    });
+                  },
+                ),
+                const SizedBox(width: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF3EDF7),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: const Icon(
+                    Icons.add_reaction_outlined,
+                    size: 14,
+                    color: Color(0xFF633990),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          // Quick Emojis Bar (😍 🍕 🥳 🌮 🍔 ❤️)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: ['😍', '🍕', '🥳', '🌮', '🍔', '❤️'].map((emoji) {
+              return InkWell(
+                onTap: () {
+                  setState(() => _p2ClaimedCount++);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Reacted with $emoji!'),
+                      duration: const Duration(milliseconds: 700),
+                      backgroundColor: const Color(0xFF633990),
+                    ),
+                  );
+                },
+                borderRadius: BorderRadius.circular(999),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  child: Text(emoji, style: const TextStyle(fontSize: 16)),
+                ),
+              );
+            }).toList(),
+          ),
+
+          const SizedBox(height: 10),
+
+          // Actions Row (Comments, Shares, Claim Voucher)
+          Row(
+            children: [
+              Expanded(
+                child: _buildPostActionButton(
+                  label: '💬 $_p2CommentsCount Comments',
+                  bgColor: const Color(0xFFF6F2F8),
+                  textColor: const Color(0xFF4A3E56),
+                  onTap: () {},
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildPostActionButton(
+                  label: '🔗 $_p2SharesCount Shares',
+                  bgColor: const Color(0xFFF6F2F8),
+                  textColor: const Color(0xFF4A3E56),
+                  onTap: () {
+                    setState(() => _p2SharesCount++);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Bistro Bella post shared!'),
+                        duration: Duration(seconds: 1),
+                        backgroundColor: Color(0xFF633990),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(width: 8),
+              InkWell(
+                onTap: () {
+                  setState(() => _p2VoucherClaimed = true);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('🎟 Claim slip generated!'),
+                      duration: Duration(seconds: 2),
+                      backgroundColor: Color(0xFFDB2777),
+                    ),
+                  );
+                },
+                borderRadius: BorderRadius.circular(999),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFDF2F8),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: const Color(0xFFFCE7F3)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.card_giftcard,
+                        size: 14,
+                        color: Color(0xFFDB2777),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Claim Voucher',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFFDB2777),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- Helper: Reaction Badge Pill ---
+  Widget _buildReactionBadge({
+    required String label,
+    required bool isSelected,
+    required Color bgColor,
+    required Color textColor,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(999),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: isSelected ? textColor.withValues(alpha: 0.15) : bgColor,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(
+            color: isSelected ? textColor : Colors.transparent,
+            width: 1,
+          ),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            color: textColor,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // --- Helper: Post Action Button ---
+  Widget _buildPostActionButton({
+    required String label,
+    required Color bgColor,
+    required Color textColor,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(999),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(999),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          label,
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            color: textColor,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // --- 6. Floating Action Button: NEW POST ---
+  Widget _buildNewPostFab() {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => _showCreateFeedPostSheet(),
+        borderRadius: BorderRadius.circular(999),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            color: const Color(0xFF633990),
+            borderRadius: BorderRadius.circular(999),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF633990).withValues(alpha: 0.35),
+                blurRadius: 14,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.edit, color: Colors.white, size: 16),
+              const SizedBox(width: 6),
+              Text(
+                'NEW POST',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.5,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showCreateFeedPostSheet() {
+    final textController = TextEditingController();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Container(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
+            top: 20,
+            left: 16,
+            right: 16,
+          ),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Create Community Post',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xFF1F1528),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(ctx),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: textController,
+                maxLines: 3,
+                decoration: InputDecoration(
+                  hintText: 'Share a feast, foodie tip, or split invitation...',
+                  filled: true,
+                  fillColor: const Color(0xFFF9F6FC),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(color: Color(0xFFEADBEE)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF633990),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  onPressed: () {
+                    final postText = textController.text.trim();
+                    Navigator.pop(ctx);
+                    if (postText.isNotEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('🎉 Post published: "$postText"'),
+                          backgroundColor: const Color(0xFF633990),
+                        ),
+                      );
+                    }
+                  },
+                  child: Text(
+                    'Publish Post',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   // ==========================================
