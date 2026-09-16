@@ -7,6 +7,7 @@ class DinerPersona {
   final int vipLevel;
   final int treatsClaimed;
   final double totalSaved;
+  final int points;
   final List<String> dietTags;
   final int preferredSquadSize;
   final double budgetTarget;
@@ -20,16 +21,19 @@ class DinerPersona {
   final bool instantDropAlerts;
   final bool tableHoldReminders;
   final bool dealRadarAlerts;
+  final String? backgroundImageUrl;
 
   const DinerPersona({
     required this.id,
     required this.handle,
     required this.avatarEmoji,
     this.avatarUrl = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+    this.backgroundImageUrl,
     this.isVip = true,
     this.vipLevel = 2,
     this.treatsClaimed = 34,
     this.totalSaved = 185.0,
+    this.points = 2450,
     this.dietTags = const [
       'Spicy Lover',
       'Halal',
@@ -57,10 +61,13 @@ class DinerPersona {
     String? handle,
     String? avatarEmoji,
     String? avatarUrl,
+    String? backgroundImageUrl,
+    bool clearBackgroundImage = false,
     bool? isVip,
     int? vipLevel,
     int? treatsClaimed,
     double? totalSaved,
+    int? points,
     List<String>? dietTags,
     int? preferredSquadSize,
     double? budgetTarget,
@@ -80,10 +87,14 @@ class DinerPersona {
       handle: handle ?? this.handle,
       avatarEmoji: avatarEmoji ?? this.avatarEmoji,
       avatarUrl: avatarUrl ?? this.avatarUrl,
+      backgroundImageUrl: clearBackgroundImage
+          ? null
+          : (backgroundImageUrl ?? this.backgroundImageUrl),
       isVip: isVip ?? this.isVip,
       vipLevel: vipLevel ?? this.vipLevel,
       treatsClaimed: treatsClaimed ?? this.treatsClaimed,
       totalSaved: totalSaved ?? this.totalSaved,
+      points: points ?? this.points,
       dietTags: dietTags ?? this.dietTags,
       preferredSquadSize: preferredSquadSize ?? this.preferredSquadSize,
       budgetTarget: budgetTarget ?? this.budgetTarget,

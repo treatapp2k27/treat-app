@@ -21,6 +21,7 @@ import 'diner/notifications_screen.dart';
 import 'diner/treat_ludo_game_screen.dart';
 import 'diner/treat_ludo_leaderboard_screen.dart';
 import 'diner/viral_trending_screen.dart';
+import '../models/ludo_match_result.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
@@ -32,6 +33,8 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String _currentScreen = 'opening';
+  List<LudoPlayerStanding>? _lastLudoStandings;
+  LudoMatchResult? _lastLudoMatchResult;
 
   void _navigateTo(String screen) {
     setState(() {
@@ -366,13 +369,35 @@ class _AppShellState extends State<AppShell> {
         return TreatLudoGameScreen(
           onBack: () => _navigateTo('profile'),
           onShowLeaderboard: () => _navigateTo('ludo_leaderboard'),
+          onMatchResultFinished: (result) {
+            setState(() {
+              _lastLudoMatchResult = result;
+              _lastLudoStandings = result.standings;
+            });
+            _navigateTo('ludo_leaderboard');
+          },
+          onMatchFinished: (standings) {
+            setState(() {
+              _lastLudoStandings = standings;
+            });
+            _navigateTo('ludo_leaderboard');
+          },
           onOpenProfile: () => _navigateTo('profile'),
         );
 
       case 'ludo_leaderboard':
         return TreatLudoLeaderboardScreen(
+          matchResult: _lastLudoMatchResult,
+          standings: _lastLudoStandings,
+          roundsPlayed: 4,
           onBack: () => _navigateTo('ludo_game'),
-          onRematch: () => _navigateTo('ludo_game'),
+          onRematch: () {
+            setState(() {
+              _lastLudoMatchResult = null;
+              _lastLudoStandings = null;
+            });
+            _navigateTo('ludo_game');
+          },
           onBackToProfile: () => _navigateTo('profile'),
           onNavigateTab: (tab) {
             switch (tab) {
@@ -406,3 +431,4 @@ class _AppShellState extends State<AppShell> {
     }
   }
 }
+

@@ -4007,32 +4007,42 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
     final totalVotes = _ramenVotes + _wafflesVotes;
     final ramenPct = totalVotes > 0 ? ((_ramenVotes / totalVotes) * 100).round() : 50;
     final wafflesPct = 100 - ramenPct;
+    final isRamenLeading = _ramenVotes >= _wafflesVotes;
 
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFF0E5F8)),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: const Color(0xFFF0E5F8), width: 1.2),
         boxShadow: const [
           BoxShadow(
-            color: Color.fromRGBO(0, 0, 0, 0.04),
-            blurRadius: 12,
-            offset: Offset(0, 3),
+            color: Color.fromRGBO(91, 35, 117, 0.06),
+            blurRadius: 16,
+            offset: Offset(0, 4),
           ),
         ],
       ),
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Author Header
           Row(
             children: [
               Container(
-                width: 36,
-                height: 36,
-                decoration: const BoxDecoration(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Color(0xFFCCFBF1),
+                  color: const Color(0xFFE6FAF6),
+                  border: Border.all(color: const Color(0xFF99F6E4), width: 1.5),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color.fromRGBO(15, 118, 110, 0.12),
+                      blurRadius: 6,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
                 ),
                 alignment: Alignment.center,
                 child: const Text(
@@ -4053,55 +4063,70 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
                       children: [
                         Flexible(
                           child: Text(
-                            '@MidnightDumpl...',
+                            '@MidnightDumpling',
                             style: GoogleFonts.plusJakartaSans(
-                              fontWeight: FontWeight.w900,
+                              fontWeight: FontWeight.w800,
                               fontSize: 14,
                               color: const Color(0xFF1F1528),
+                              letterSpacing: -0.2,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         const SizedBox(width: 6),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFCE7F3),
+                            color: const Color(0xFFFDE8F3),
                             borderRadius: BorderRadius.circular(999),
+                            border: Border.all(color: const Color(0xFFFBCFE8), width: 0.8),
                           ),
                           child: const Text(
                             'Poll Maker',
                             style: TextStyle(
-                              color: Color(0xFF9D174D),
-                              fontSize: 9,
+                              color: Color(0xFFD6228A),
+                              fontSize: 9.5,
                               fontWeight: FontWeight.w800,
                             ),
                           ),
                         ),
                       ],
                     ),
-                    const Text('22m ago • Food Poll', style: TextStyle(fontSize: 11, color: Color(0xFF7C6D85))),
+                    const SizedBox(height: 2),
+                    const Text(
+                      '22m ago • Food Poll',
+                      style: TextStyle(fontSize: 11, color: Color(0xFF7C6D85), fontWeight: FontWeight.w500),
+                    ),
                   ],
                 ),
               ),
               const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEDE8FC),
+                  color: const Color(0xFFF3E8FC),
                   borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: const Color(0xFFE2D1F5), width: 1),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.circle, size: 7, color: Color(0xFF7C52AA)),
-                    SizedBox(width: 4),
-                    Text(
+                    Container(
+                      width: 6,
+                      height: 6,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF7C52AA),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                    const Text(
                       'LIVE POLL',
                       style: TextStyle(
                         color: Color(0xFF7C52AA),
-                        fontSize: 9,
+                        fontSize: 9.5,
                         fontWeight: FontWeight.w900,
+                        letterSpacing: 0.3,
                       ),
                     ),
                   ],
@@ -4109,65 +4134,124 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
+
+          // Poll Question
           Text(
             'Dinner dilemma: Boba Lounge sweet waffles OR Spicy Miso Ramen? Vote below! 🍜 🧇',
             style: GoogleFonts.plusJakartaSans(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF33253B),
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFF281C30),
               height: 1.35,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
 
           // Poll Option 1 (Spicy Miso Ramen)
           _buildPollOptionBar(
             title: '🍜 Spicy Miso Ramen',
+            votes: _ramenVotes,
             percent: ramenPct,
             isSelected: _userVotedOption == 0,
-            fillColor: const Color(0xFFEDE8FC),
+            isLeading: isRamenLeading,
+            accentColor: const Color(0xFF7C52AA),
+            fillGradient: const LinearGradient(
+              colors: [Color(0xFFF1E7FB), Color(0xFFE4D3F7)],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
             onTap: () {
-              if (_userVotedOption == null) {
-                setState(() {
+              setState(() {
+                if (_userVotedOption == null) {
                   _userVotedOption = 0;
                   _ramenVotes++;
-                });
-              }
-            },
-          ),
-          const SizedBox(height: 8),
-
-          // Poll Option 2 (Sweet Boba Waffles)
-          _buildPollOptionBar(
-            title: '🧇 Sweet Boba Waffles',
-            percent: wafflesPct,
-            isSelected: _userVotedOption == 1,
-            fillColor: const Color(0xFFFCE7F3),
-            onTap: () {
-              if (_userVotedOption == null) {
-                setState(() {
-                  _userVotedOption = 1;
-                  _wafflesVotes++;
-                });
-              }
+                } else if (_userVotedOption == 1) {
+                  _userVotedOption = 0;
+                  _wafflesVotes--;
+                  _ramenVotes++;
+                }
+              });
             },
           ),
           const SizedBox(height: 10),
 
+          // Poll Option 2 (Sweet Boba Waffles)
+          _buildPollOptionBar(
+            title: '🧇 Sweet Boba Waffles',
+            votes: _wafflesVotes,
+            percent: wafflesPct,
+            isSelected: _userVotedOption == 1,
+            isLeading: !isRamenLeading,
+            accentColor: const Color(0xFFD6228A),
+            fillGradient: const LinearGradient(
+              colors: [Color(0xFFFDE8F3), Color(0xFFF9D2E8)],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+            onTap: () {
+              setState(() {
+                if (_userVotedOption == null) {
+                  _userVotedOption = 1;
+                  _wafflesVotes++;
+                } else if (_userVotedOption == 0) {
+                  _userVotedOption = 1;
+                  _ramenVotes--;
+                  _wafflesVotes++;
+                }
+              });
+            },
+          ),
+          const SizedBox(height: 12),
+
           // Poll Stats Footer
           Row(
             children: [
-              Text('🍜 $_ramenVotes votes', style: const TextStyle(fontSize: 11, color: Color(0xFF7C6D85))),
-              const SizedBox(width: 10),
-              Text('🧇 $_wafflesVotes votes', style: const TextStyle(fontSize: 11, color: Color(0xFF7C6D85))),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF7F2FA),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: const Color(0xFFEADBEE), width: 0.8),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.how_to_vote_rounded, size: 12.5, color: Color(0xFF7C6D85)),
+                    const SizedBox(width: 4),
+                    Text(
+                      '$totalVotes votes${_userVotedOption != null ? ' • You voted' : ''}',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF5A4866),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               const Spacer(),
-              const Row(
-                children: [
-                  Icon(Icons.timer_outlined, size: 12, color: Color(0xFF7C6D85)),
-                  SizedBox(width: 3),
-                  Text('12 mins left', style: TextStyle(fontSize: 11, color: Color(0xFF7C6D85))),
-                ],
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF0F6),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.timer_outlined, size: 12, color: Color(0xFFD6228A)),
+                    SizedBox(width: 4),
+                    Text(
+                      '12 mins left',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFFD6228A),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -4178,62 +4262,178 @@ class _TreatSocialScreenState extends State<TreatSocialScreen> {
 
   Widget _buildPollOptionBar({
     required String title,
+    required int votes,
     required int percent,
     required bool isSelected,
-    required Color fillColor,
+    required bool isLeading,
+    required Color accentColor,
+    required LinearGradient fillGradient,
     required VoidCallback onTap,
   }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        height: 42,
-        decoration: BoxDecoration(
-          color: const Color(0xFFFBF8FD),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? const Color(0xFF7C52AA) : const Color(0xFFEADBEE),
-            width: isSelected ? 2 : 1,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          height: 52,
+          decoration: BoxDecoration(
+            color: const Color(0xFFFCFBFD),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: isSelected
+                  ? accentColor
+                  : (isLeading ? const Color(0xFFDDD2E8) : const Color(0xFFEDE3F2)),
+              width: isSelected ? 2 : 1.2,
+            ),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: accentColor.withValues(alpha: 0.18),
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
+                    ),
+                  ]
+                : const [
+                    BoxShadow(
+                      color: Color.fromRGBO(0, 0, 0, 0.02),
+                      blurRadius: 4,
+                      offset: Offset(0, 1),
+                    ),
+                  ],
           ),
-        ),
-        child: Stack(
-          children: [
-            // Fill Progress
-            FractionallySizedBox(
-              widthFactor: percent / 100.0,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: fillColor,
-                  borderRadius: BorderRadius.circular(11),
+          clipBehavior: Clip.antiAlias,
+          child: Stack(
+            children: [
+              // Animated Fill Progress Bar
+              TweenAnimationBuilder<double>(
+                tween: Tween<double>(begin: 0, end: (percent / 100.0).clamp(0.0, 1.0)),
+                duration: const Duration(milliseconds: 600),
+                curve: Curves.easeOutCubic,
+                builder: (context, fillFactor, _) {
+                  return FractionallySizedBox(
+                    alignment: Alignment.centerLeft,
+                    widthFactor: fillFactor,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: fillGradient,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  );
+                },
+              ),
+
+              // Content Layer: Radio Icon, Option Title, Badges, Percentage & Votes
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                child: Row(
+                  children: [
+                    // Radio Button / Checked Indicator
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      width: 22,
+                      height: 22,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isSelected ? accentColor : Colors.white.withValues(alpha: 0.85),
+                        border: Border.all(
+                          color: isSelected ? accentColor : const Color(0xFFC7B8D6),
+                          width: isSelected ? 2 : 1.6,
+                        ),
+                        boxShadow: isSelected
+                            ? [
+                                BoxShadow(
+                                  color: accentColor.withValues(alpha: 0.3),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ]
+                            : null,
+                      ),
+                      child: isSelected
+                          ? const Center(
+                              child: Icon(
+                                Icons.check_rounded,
+                                color: Colors.white,
+                                size: 14,
+                              ),
+                            )
+                          : null,
+                    ),
+                    const SizedBox(width: 10),
+
+                    // Option Title & Leading Chip
+                    Expanded(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              title,
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 13.5,
+                                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w700,
+                                color: const Color(0xFF1F1528),
+                                letterSpacing: -0.2,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (isLeading) ...[
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: accentColor.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                'Leading',
+                                style: TextStyle(
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.w800,
+                                  color: accentColor,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(width: 8),
+
+                    // Percentage & Votes Count
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '$percent%',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w900,
+                            color: isSelected ? accentColor : const Color(0xFF2E1C38),
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                        Text(
+                          '$votes votes',
+                          style: GoogleFonts.dmSans(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF8A7A94),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            ),
-            // Text Row
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF1F1528),
-                    ),
-                  ),
-                  Text(
-                    '$percent%',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF5B2375),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

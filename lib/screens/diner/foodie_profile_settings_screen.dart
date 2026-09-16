@@ -45,6 +45,45 @@ class _FoodieProfileSettingsScreenState
     {'name': 'Boba Lover', 'icon': Icons.local_cafe_rounded},
   ];
 
+  static const List<Map<String, String>> backgroundPresets = [
+    {
+      'title': 'Bistro & Candlelight',
+      'category': 'Cozy Dining',
+      'url':
+          'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      'title': 'Tokyo Ramen Bar',
+      'category': 'Late Night',
+      'url':
+          'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      'title': 'Artisan Bakery Cafe',
+      'category': 'Pastries & Brews',
+      'url':
+          'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      'title': 'Sunset Rooftop Lounge',
+      'category': 'Vibrant Drinks',
+      'url':
+          'https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      'title': 'Pastel Gelato Corner',
+      'category': 'Sweet Treats',
+      'url':
+          'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      'title': 'Midnight Dumplings Feast',
+      'category': 'Asian Flavors',
+      'url':
+          'https://images.unsplash.com/photo-1496116218417-1a781b1c416c?auto=format&fit=crop&w=800&q=80',
+    },
+  ];
+
   double _budgetSliderVal = 8000.0;
   late final ScrollController _scrollController;
 
@@ -58,6 +97,309 @@ class _FoodieProfileSettingsScreenState
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _showChangeBackgroundImageDialog(BuildContext context) {
+    final dinerState = context.read<DinerState>();
+    final urlController = TextEditingController(
+      text: dinerState.currentPersona.backgroundImageUrl ?? '',
+    );
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (dialogCtx, setDialogState) {
+          final currentUrl = dinerState.currentPersona.backgroundImageUrl;
+
+          return AlertDialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            backgroundColor: Colors.white,
+            contentPadding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+            title: Row(
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFDE8F3),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.add_photo_alternate_rounded,
+                    color: Color(0xFFD6228A),
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Background Image',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 18,
+                      color: const Color(0xFF201A24),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            content: SizedBox(
+              width: 440,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Customize the background image for your sidebar and profile header. Choose from curated styles or paste a custom image URL:',
+                      style: GoogleFonts.dmSans(
+                        fontSize: 13,
+                        color: const Color(0xFF706776),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+
+                    // Curated Presets
+                    Text(
+                      'CURATED PRESETS',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFF9E8EAA),
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: backgroundPresets.map((preset) {
+                        final isSelected = currentUrl == preset['url'];
+                        return InkWell(
+                          onTap: () {
+                            dinerState.setBackgroundImageUrl(preset['url']);
+                            setDialogState(() {
+                              urlController.text = preset['url']!;
+                            });
+                          },
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            width: 130,
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? const Color(0xFFFDE8F3)
+                                  : const Color(0xFFF8F5FA),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isSelected
+                                    ? const Color(0xFFD6228A)
+                                    : const Color(0xFFEADBEE),
+                                width: isSelected ? 2 : 1,
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Stack(
+                                    children: [
+                                      Image.network(
+                                        preset['url']!,
+                                        height: 62,
+                                        width: double.infinity,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => Container(
+                                          height: 62,
+                                          color: const Color(0xFFEADBEE),
+                                          child: const Icon(
+                                            Icons.image_not_supported_rounded,
+                                            size: 20,
+                                            color: Color(0xFF9E8EAA),
+                                          ),
+                                        ),
+                                      ),
+                                      if (isSelected)
+                                        Positioned(
+                                          top: 4,
+                                          right: 4,
+                                          child: Container(
+                                            padding: const EdgeInsets.all(2),
+                                            decoration: const BoxDecoration(
+                                              color: Color(0xFFD6228A),
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: const Icon(
+                                              Icons.check_rounded,
+                                              size: 12,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  preset['title']!,
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: isSelected
+                                        ? const Color(0xFFD6228A)
+                                        : const Color(0xFF201A24),
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                Text(
+                                  preset['category']!,
+                                  style: GoogleFonts.dmSans(
+                                    fontSize: 9.5,
+                                    color: const Color(0xFF8A7F93),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Custom URL Section
+                    Text(
+                      'CUSTOM IMAGE URL',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFF9E8EAA),
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: urlController,
+                            style: GoogleFonts.dmSans(
+                              fontSize: 13,
+                              color: const Color(0xFF201A24),
+                            ),
+                            decoration: InputDecoration(
+                              hintText: 'https://images.unsplash.com/...',
+                              hintStyle: GoogleFonts.dmSans(
+                                fontSize: 12,
+                                color: const Color(0xFFA098A5),
+                              ),
+                              filled: true,
+                              fillColor: const Color(0xFFFBF6FD),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 11,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide:
+                                    const BorderSide(color: Color(0xFFE2D6EE)),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide:
+                                    const BorderSide(color: Color(0xFFE2D6EE)),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide:
+                                    const BorderSide(color: Color(0xFFD6228A)),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: () {
+                            final input = urlController.text.trim();
+                            if (input.isNotEmpty) {
+                              dinerState.setBackgroundImageUrl(input);
+                              setDialogState(() {});
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Custom background image applied!'),
+                                  duration: Duration(seconds: 2),
+                                  backgroundColor: Color(0xFFD6228A),
+                                ),
+                              );
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFD6228A),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          child: Text(
+                            'Apply',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 12.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Reset to default pastel gradient
+                    Center(
+                      child: TextButton.icon(
+                        onPressed: () {
+                          dinerState.setBackgroundImageUrl(null);
+                          urlController.clear();
+                          setDialogState(() {});
+                        },
+                        icon: const Icon(Icons.restart_alt_rounded, size: 16),
+                        label: const Text('Revert to Default Pastel Gradient'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: const Color(0xFF8A7F93),
+                          textStyle: GoogleFonts.plusJakartaSans(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: Text(
+                  'Done',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF7C52AA),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
   }
 
   void _showEditPersonaDialog(BuildContext context) {
@@ -1245,51 +1587,43 @@ class _FoodieProfileSettingsScreenState
                 ),
                 onTap: () => _showDietaryPreferencesDialog(context),
               ),
-            ],
-          ),
-          const SizedBox(height: 22),
-
-          // ==========================================
-          // Section: ACCOUNT & CREDENTIALS
-          // ==========================================
-          _buildSectionHeader('ACCOUNT & CREDENTIALS'),
-          const SizedBox(height: 8),
-          _buildCardContainer(
-            children: [
-              _buildSettingRow(
-                icon: Icons.lock_reset_rounded,
-                title: 'Change Password',
-                subtitle: '•••••••••••• (Tap to update)',
-                trailing: const Icon(
-                  Icons.chevron_right_rounded,
-                  color: Color(0xFFA098A5),
-                  size: 20,
-                ),
-                onTap: () => _showChangePasswordDialog(context),
-              ),
               _buildDivider(),
               _buildSettingRow(
-                icon: Icons.alternate_email_rounded,
-                title: 'Change Email',
-                subtitle: persona.email,
-                trailing: const Icon(
-                  Icons.chevron_right_rounded,
-                  color: Color(0xFFA098A5),
-                  size: 20,
+                icon: Icons.wallpaper_rounded,
+                title: 'Sidebar & Profile Background',
+                subtitle: (persona.backgroundImageUrl != null &&
+                        persona.backgroundImageUrl!.isNotEmpty)
+                    ? 'Custom cover applied • Tap to change'
+                    : 'Default pastel gradient • Tap to add image',
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (persona.backgroundImageUrl != null &&
+                        persona.backgroundImageUrl!.isNotEmpty)
+                      Container(
+                        width: 32,
+                        height: 22,
+                        margin: const EdgeInsets.only(right: 6),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(
+                            color: const Color(0xFFE2D6EE),
+                            width: 1,
+                          ),
+                          image: DecorationImage(
+                            image: NetworkImage(persona.backgroundImageUrl!),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    const Icon(
+                      Icons.chevron_right_rounded,
+                      color: Color(0xFFA098A5),
+                      size: 20,
+                    ),
+                  ],
                 ),
-                onTap: () => _showChangeEmailDialog(context, persona.email),
-              ),
-              _buildDivider(),
-              _buildSettingRow(
-                icon: Icons.phone_iphone_rounded,
-                title: 'Contact Number',
-                subtitle: persona.contactNumber,
-                trailing: const Icon(
-                  Icons.chevron_right_rounded,
-                  color: Color(0xFFA098A5),
-                  size: 20,
-                ),
-                onTap: () => _showChangeContactNumberDialog(context, persona.contactNumber),
+                onTap: () => _showChangeBackgroundImageDialog(context),
               ),
             ],
           ),
@@ -1372,6 +1706,52 @@ class _FoodieProfileSettingsScreenState
           ),
           const SizedBox(height: 8),
           _buildSquadLudoCard(context),
+          const SizedBox(height: 22),
+
+          // ==========================================
+          // Section: ACCOUNT & CREDENTIALS
+          // ==========================================
+          _buildSectionHeader('ACCOUNT & CREDENTIALS'),
+          const SizedBox(height: 8),
+          _buildCardContainer(
+            children: [
+              _buildSettingRow(
+                icon: Icons.lock_reset_rounded,
+                title: 'Change Password',
+                subtitle: '•••••••••••• (Tap to update)',
+                trailing: const Icon(
+                  Icons.chevron_right_rounded,
+                  color: Color(0xFFA098A5),
+                  size: 20,
+                ),
+                onTap: () => _showChangePasswordDialog(context),
+              ),
+              _buildDivider(),
+              _buildSettingRow(
+                icon: Icons.alternate_email_rounded,
+                title: 'Change Email',
+                subtitle: persona.email,
+                trailing: const Icon(
+                  Icons.chevron_right_rounded,
+                  color: Color(0xFFA098A5),
+                  size: 20,
+                ),
+                onTap: () => _showChangeEmailDialog(context, persona.email),
+              ),
+              _buildDivider(),
+              _buildSettingRow(
+                icon: Icons.phone_iphone_rounded,
+                title: 'Contact Number',
+                subtitle: persona.contactNumber,
+                trailing: const Icon(
+                  Icons.chevron_right_rounded,
+                  color: Color(0xFFA098A5),
+                  size: 20,
+                ),
+                onTap: () => _showChangeContactNumberDialog(context, persona.contactNumber),
+              ),
+            ],
+          ),
           const SizedBox(height: 22),
 
           // ==========================================
@@ -1633,7 +2013,7 @@ class _FoodieProfileSettingsScreenState
               }
               if (_scrollController.hasClients) {
                 _scrollController.animateTo(
-                  _scrollController.offset > 50 ? 0.0 : 250.0,
+                  _scrollController.offset > 50 ? 0.0 : 420.0,
                   duration: const Duration(milliseconds: 350),
                   curve: Curves.easeOutCubic,
                 );
@@ -1683,236 +2063,360 @@ class _FoodieProfileSettingsScreenState
           ),
         ],
       ),
-      padding: const EdgeInsets.all(16),
+      clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Avatar with Verified Checkmark Badge
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Container(
-                    width: 66,
-                    height: 66,
+          // Background cover banner
+          Container(
+            height: 52,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              image: (persona.backgroundImageUrl != null &&
+                      persona.backgroundImageUrl!.isNotEmpty)
+                  ? DecorationImage(
+                      image: NetworkImage(persona.backgroundImageUrl!),
+                      fit: BoxFit.cover,
+                    )
+                  : null,
+              gradient: (persona.backgroundImageUrl != null &&
+                      persona.backgroundImageUrl!.isNotEmpty)
+                  ? null
+                  : const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFFFFEBF6),
+                        Color(0xFFFBF2FB),
+                        Color(0xFFEEDCFF),
+                      ],
+                    ),
+            ),
+            child: Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: InkWell(
+                  onTap: () => _showChangeBackgroundImageDialog(context),
+                  borderRadius: BorderRadius.circular(999),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
                     decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: const Color(0xFF7C52AA),
-                        width: 2.2,
-                      ),
+                      color: Colors.white.withValues(alpha: 0.92),
+                      borderRadius: BorderRadius.circular(999),
                       boxShadow: const [
                         BoxShadow(
-                          color: Color.fromRGBO(224, 64, 160, 0.20),
-                          blurRadius: 10,
-                          offset: Offset(0, 3),
+                          color: Colors.black12,
+                          blurRadius: 4,
+                          offset: Offset(0, 1),
                         ),
                       ],
                     ),
-                    clipBehavior: Clip.antiAlias,
-                    child: Image.network(
-                      persona.avatarUrl,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
-                        color: const Color(0xFFF3E8FC),
-                        alignment: Alignment.center,
-                        child: Text(
-                          persona.avatarEmoji,
-                          style: const TextStyle(fontSize: 30),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: -1,
-                    right: -1,
-                    child: Container(
-                      width: 22,
-                      height: 22,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF7C52AA),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.verified_rounded,
-                        color: Colors.white,
-                        size: 14,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 14),
-
-              // Name, Tag, Handle, and VIP Row
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Flexible(
-                          child: Text(
-                            persona.handle,
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w800,
-                              color: const Color(0xFF201A24),
-                              letterSpacing: -0.3,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                        const Icon(
+                          Icons.add_photo_alternate_rounded,
+                          size: 14,
+                          color: Color(0xFFD6228A),
                         ),
-                        const SizedBox(width: 6),
+                        const SizedBox(width: 4),
                         Text(
-                          '#FD-882',
+                          (persona.backgroundImageUrl != null &&
+                                  persona.backgroundImageUrl!.isNotEmpty)
+                              ? 'Change Background'
+                              : 'Add Background',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF8E8295),
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFFD6228A),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '@treat_nomad',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF706776),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Wrap(
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      spacing: 8,
-                      runSpacing: 4,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Avatar with Verified Checkmark Badge
+                    Stack(
+                      clipBehavior: Clip.none,
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 3),
+                          width: 66,
+                          height: 66,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF5E8FF),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: const Color(0xFF7C52AA),
+                              width: 2.2,
+                            ),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color.fromRGBO(224, 64, 160, 0.20),
+                                blurRadius: 10,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: Image.network(
+                            persona.avatarUrl,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Container(
+                              color: const Color(0xFFF3E8FC),
+                              alignment: Alignment.center,
+                              child: Text(
+                                persona.avatarEmoji,
+                                style: const TextStyle(fontSize: 30),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: -1,
+                          right: -1,
+                          child: Container(
+                            width: 22,
+                            height: 22,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF7C52AA),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.verified_rounded,
+                              color: Colors.white,
+                              size: 14,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(width: 14),
+
+                    // Name, Tag, Handle, and VIP Row
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  persona.handle,
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w800,
+                                    color: const Color(0xFF201A24),
+                                    letterSpacing: -0.3,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                '#FD-882',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: const Color(0xFF8E8295),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '@treat_nomad',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF706776),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 8,
+                            runSpacing: 4,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF5E8FF),
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.card_giftcard_rounded,
+                                      size: 12,
+                                      color: Color(0xFF7C52AA),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'VIP Level 2',
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 10.5,
+                                        fontWeight: FontWeight.w800,
+                                        color: const Color(0xFF7C52AA),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Text(
+                                '34 Treats Claimed',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xFF706776),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+
+                // Bottom Action Buttons: Switch Persona & Edit & Background Cover
+                Row(
+                  children: [
+                    // Button 1: Switch Persona
+                    Expanded(
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () => _showSwitchPersonaDialog(context),
+                          borderRadius: BorderRadius.circular(999),
+                          child: Ink(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE0F4FC),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.switch_account_outlined,
+                                  size: 16,
+                                  color: Color(0xFF0284C7),
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'Switch Persona',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w800,
+                                    color: const Color(0xFF0284C7),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+
+                    // Button 2: Edit
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () => _showEditPersonaDialog(context),
+                        borderRadius: BorderRadius.circular(999),
+                        child: Ink(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF8EEFC),
                             borderRadius: BorderRadius.circular(999),
                           ),
                           child: Row(
-                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Icon(
-                                Icons.card_giftcard_rounded,
-                                size: 12,
-                                color: Color(0xFF7C52AA),
+                                Icons.edit_outlined,
+                                size: 15,
+                                color: Color(0xFF6A1B9A),
                               ),
-                              const SizedBox(width: 4),
+                              const SizedBox(width: 5),
                               Text(
-                                'VIP Level 2',
+                                'Edit',
                                 style: GoogleFonts.plusJakartaSans(
-                                  fontSize: 10.5,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.w800,
-                                  color: const Color(0xFF7C52AA),
+                                  color: const Color(0xFF6A1B9A),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        Text(
-                          '34 Treats Claimed',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF706776),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+
+                    // Button 3: Background Cover
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () => _showChangeBackgroundImageDialog(context),
+                        borderRadius: BorderRadius.circular(999),
+                        child: Ink(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFDE8F3),
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(
+                              color: const Color(0xFFF9C8E5),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.wallpaper_rounded,
+                                size: 15,
+                                color: Color(0xFFD6228A),
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                'Cover',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                  color: const Color(0xFFD6228A),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-
-          // Bottom Action Buttons: Switch Persona & Edit
-          Row(
-            children: [
-              // Button 1: Switch Persona
-              Expanded(
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () => _showSwitchPersonaDialog(context),
-                    borderRadius: BorderRadius.circular(999),
-                    child: Ink(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE0F4FC),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.switch_account_outlined,
-                            size: 16,
-                            color: Color(0xFF0284C7),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Switch Persona',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                              color: const Color(0xFF0284C7),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-
-              // Button 2: Edit
-              Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () => _showEditPersonaDialog(context),
-                  borderRadius: BorderRadius.circular(999),
-                  child: Ink(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 18, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF8EEFC),
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.edit_outlined,
-                          size: 15,
-                          color: Color(0xFF6A1B9A),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          'Edit',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w800,
-                            color: const Color(0xFF6A1B9A),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

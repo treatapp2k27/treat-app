@@ -39,19 +39,33 @@ class DinerDrawer extends StatelessWidget {
             // 1. Profile Header Area (Profile image on left, info on right in same div)
             Container(
               padding: const EdgeInsets.fromLTRB(14, 12, 12, 16),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFFFFEBF6),
-                    Color(0xFFFBF2FB),
-                    Color(0xFFEEDCFF),
-                  ],
-                ),
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
                   bottomRight: Radius.circular(28),
                 ),
+                image: (persona.backgroundImageUrl != null &&
+                        persona.backgroundImageUrl!.isNotEmpty)
+                    ? DecorationImage(
+                        image: NetworkImage(persona.backgroundImageUrl!),
+                        fit: BoxFit.cover,
+                        colorFilter: ColorFilter.mode(
+                          const Color(0xFFFEF7FF).withValues(alpha: 0.65),
+                          BlendMode.srcOver,
+                        ),
+                      )
+                    : null,
+                gradient: (persona.backgroundImageUrl != null &&
+                        persona.backgroundImageUrl!.isNotEmpty)
+                    ? null
+                    : const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color(0xFFFFEBF6),
+                          Color(0xFFFBF2FB),
+                          Color(0xFFEEDCFF),
+                        ],
+                      ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,7 +100,7 @@ class DinerDrawer extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
 
-                  // Main Profile Div: Image on left, Name/Categories/Level/Treats on right
+                  // Main Profile Div: Image on left, Name on top & View Profile under it on right
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -162,86 +176,93 @@ class DinerDrawer extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 12),
 
-                      // RIGHT SIDE: Name, View Profile, Categories, Level, Treats Claimed
+                      // RIGHT SIDE: Name on TOP, View Profile button UNDER name, Badges below
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Row with Name + Pink Verified Icon and View Profile > button
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Flexible(
-                                  child: InkWell(
-                                    onTap: () {
-                                      Navigator.of(context).pop();
-                                      onNavigate('profile');
-                                    },
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Flexible(
-                                          child: Text(
-                                            persona.handle,
-                                            style: GoogleFonts.plusJakartaSans(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w800,
-                                              color: const Color(0xFF1F1626),
-                                              letterSpacing: -0.3,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 4),
-                                        const Icon(
-                                          Icons.verified,
-                                          color: Color(0xFFD6228A),
-                                          size: 16,
-                                        ),
-                                      ],
+                            // 1. Name on TOP with Pink Verified Icon
+                            InkWell(
+                              onTap: () {
+                                Navigator.of(context).pop();
+                                onNavigate('profile');
+                              },
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      persona.handle,
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w800,
+                                        color: const Color(0xFF1F1626),
+                                        letterSpacing: -0.3,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
+                                  const SizedBox(width: 4),
+                                  const Icon(
+                                    Icons.verified,
+                                    color: Color(0xFFD6228A),
+                                    size: 16,
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            const SizedBox(height: 5),
+
+                            // 2. View Profile Button UNDER the Name
+                            InkWell(
+                              onTap: () {
+                                Navigator.of(context).pop();
+                                onNavigate('profile');
+                              },
+                              borderRadius: BorderRadius.circular(999),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 9,
+                                  vertical: 4,
                                 ),
-                                const SizedBox(width: 4),
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.of(context).pop();
-                                    onNavigate('profile');
-                                  },
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFDE8F3),
                                   borderRadius: BorderRadius.circular(999),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 3.5,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFFDE8F3),
-                                      borderRadius: BorderRadius.circular(999),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          'View Profile',
-                                          style: GoogleFonts.plusJakartaSans(
-                                            fontSize: 9.5,
-                                            fontWeight: FontWeight.w700,
-                                            color: const Color(0xFFD6228A),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 1),
-                                        const Icon(
-                                          Icons.chevron_right_rounded,
-                                          size: 12,
-                                          color: Color(0xFFD6228A),
-                                        ),
-                                      ],
-                                    ),
+                                  border: Border.all(
+                                    color: const Color(0xFFF7BDDE),
+                                    width: 1,
                                   ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(0xFFD6228A).withValues(alpha: 0.08),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 1),
+                                    ),
+                                  ],
                                 ),
-                              ],
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      'View Profile',
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w700,
+                                        color: const Color(0xFFD6228A),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 2),
+                                    const Icon(
+                                      Icons.chevron_right_rounded,
+                                      size: 13,
+                                      color: Color(0xFFD6228A),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
 
                             const SizedBox(height: 7),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/diner_persona.dart';
 import '../models/favorite_item.dart';
+import '../models/ludo_match_result.dart';
 import '../models/voucher.dart';
 
 class DinerState extends ChangeNotifier {
@@ -82,6 +83,16 @@ class DinerState extends ChangeNotifier {
 
   void setAvatarEmoji(String emoji) {
     _currentPersona = _currentPersona.copyWith(avatarEmoji: emoji);
+    notifyListeners();
+  }
+
+  void setBackgroundImageUrl(String? url) {
+    final trimmed = url?.trim();
+    final isEmpty = trimmed == null || trimmed.isEmpty;
+    _currentPersona = _currentPersona.copyWith(
+      backgroundImageUrl: isEmpty ? null : trimmed,
+      clearBackgroundImage: isEmpty,
+    );
     notifyListeners();
   }
 
@@ -183,6 +194,31 @@ class DinerState extends ChangeNotifier {
 
   void setContactNumber(String contactNumber) {
     _currentPersona = _currentPersona.copyWith(contactNumber: contactNumber);
+    notifyListeners();
+  }
+
+  void setPoints(int points) {
+    _currentPersona = _currentPersona.copyWith(points: points);
+    notifyListeners();
+  }
+
+  void addPoints(int delta) {
+    _currentPersona = _currentPersona.copyWith(
+      points: _currentPersona.points + delta,
+    );
+    notifyListeners();
+  }
+
+  LudoMatchResult? _cachedLudoMatchResult;
+  LudoMatchResult? get cachedLudoMatchResult => _cachedLudoMatchResult;
+
+  void cacheLudoMatchResult(LudoMatchResult result) {
+    _cachedLudoMatchResult = result;
+    notifyListeners();
+  }
+
+  void clearLudoMatchResult() {
+    _cachedLudoMatchResult = null;
     notifyListeners();
   }
 }
