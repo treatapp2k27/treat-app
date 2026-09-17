@@ -22,13 +22,16 @@ void main() {
         value: dinerState,
         child: MaterialApp(
           home: Scaffold(
-            drawer: DinerDrawer(
-              onNavigate: (route) {
-                navigatedRoute = route;
-              },
-              onLogOut: () {
-                loggedOut = true;
-              },
+            drawer: Builder(
+              builder: (ctx) => DinerDrawer(
+                onNavigate: (route) {
+                  navigatedRoute = route;
+                  Navigator.of(ctx).pop();
+                },
+                onLogOut: () {
+                  loggedOut = true;
+                },
+              ),
             ),
             body: Builder(
               builder: (ctx) => TextButton(
@@ -61,6 +64,17 @@ void main() {
     expect(find.text('Treat'), findsOneWidget);
     expect(find.text('Social'), findsOneWidget);
     expect(find.text('Groups'), findsOneWidget);
+    expect(find.text('Reviews'), findsOneWidget);
+
+    // Test Reviews navigation
+    await tester.tap(find.text('Reviews'));
+    await tester.pumpAndSettle();
+    expect(navigatedRoute, equals('reviews'));
+
+    // Re-open drawer
+    await tester.tap(find.text('Open Drawer'));
+    await tester.pumpAndSettle();
+
     // 3. Test View Profile Tap
     await tester.tap(find.text('View Profile'));
     await tester.pumpAndSettle();

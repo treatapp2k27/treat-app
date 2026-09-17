@@ -3,8 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/asset_constants.dart';
 import '../../core/theme/treat_colors.dart';
+import '../../models/bangladesh_locations.dart';
 import '../../models/platter_deal.dart';
 import '../../state/diner_state.dart';
+import '../../widgets/bangladesh_location_picker_dialog.dart';
 
 class ViralTrendingScreen extends StatefulWidget {
   final VoidCallback onOpenDrawer;
@@ -390,46 +392,270 @@ class _ViralTrendingScreenState extends State<ViralTrendingScreen> {
   }
 
   void _showChangeLocationModal(BuildContext context) {
-    final quickOptions = [
-      'Soho Quarter, London',
-      'Covent Garden, London',
-      'Shoreditch, London',
-      'Camden Town, London',
-      'Kensington, London',
-    ];
+    final dinerState = context.read<DinerState>();
+    final preferredOptions = BangladeshLocations.feniSadarRoads
+        .map((road) => '$road, Feni Sadar')
+        .toList();
+
+    // Default dropdown selection to current user location or first preferred road
+    String selectedArea = preferredOptions.contains(dinerState.userLocation)
+        ? dinerState.userLocation
+        : preferredOptions.firstWhere(
+            (opt) => dinerState.userLocation.contains(opt.split(',').first),
+            orElse: () => preferredOptions.first,
+          );
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(
-          'Select Trending Area',
-          style: GoogleFonts.plusJakartaSans(
-            fontWeight: FontWeight.w800,
-            fontSize: 17,
-          ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: quickOptions.map((area) {
-            return ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.place_rounded, color: Color(0xFFD6228A)),
-              title: Text(
-                area,
-                style: GoogleFonts.plusJakartaSans(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 13.5,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) {
+          return AlertDialog(
+            backgroundColor: Colors.white,
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            contentPadding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+            title: Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFDE8F4),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.location_on_rounded,
+                    color: Color(0xFFA6056D),
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Select Trending Area',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 17,
+                          color: const Color(0xFF201A24),
+                        ),
+                      ),
+                      Text(
+                        'Preferred locations from homepage:',
+                        style: GoogleFonts.dmSans(
+                          fontSize: 11.5,
+                          color: const Color(0xFF706776),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            content: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Preferred Road / Location (Feni Sadar)',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF5A4D64),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Dropdown of preferred locations from homepage
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFBF6FD),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: const Color(0xFFE2D6EE), width: 1.2),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButtonFormField<String>(
+                          value: selectedArea,
+                          isExpanded: true,
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            isDense: true,
+                            contentPadding: EdgeInsets.symmetric(vertical: 8),
+                          ),
+                          icon: const Icon(Icons.keyboard_arrow_down_rounded,
+                              color: Color(0xFFA6056D)),
+                          items: preferredOptions.map((area) {
+                            return DropdownMenuItem<String>(
+                              value: area,
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.place_rounded,
+                                      size: 15, color: Color(0xFFA6056D)),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      area,
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w700,
+                                        color: const Color(0xFF201A24),
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            if (val != null) {
+                              setModalState(() {
+                                selectedArea = val;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Quick Tap Popular Roads
+                    Text(
+                      'Quick Select Road:',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF706776),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: [
+                        'Mizan Road',
+                        'SSK Road',
+                        'Hospital Road',
+                        'Doctorpara Road',
+                        'Mohipal Road',
+                        'Trunk Road',
+                      ].map((road) {
+                        final formatted = '$road, Feni Sadar';
+                        final isChosen = selectedArea == formatted;
+                        return ActionChip(
+                          visualDensity: VisualDensity.compact,
+                          label: Text(
+                            road,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 11,
+                              fontWeight: isChosen ? FontWeight.w800 : FontWeight.w600,
+                              color: isChosen ? Colors.white : const Color(0xFF201A24),
+                            ),
+                          ),
+                          backgroundColor: isChosen
+                              ? const Color(0xFFA6056D)
+                              : const Color(0xFFF7F0FA),
+                          shape: StadiumBorder(
+                            side: BorderSide(
+                              color: isChosen
+                                  ? const Color(0xFFA6056D)
+                                  : const Color(0xFFE2D6EE),
+                            ),
+                          ),
+                          onPressed: () {
+                            setModalState(() {
+                              selectedArea = formatted;
+                            });
+                          },
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 14),
+
+                    // Button to open full Bangladesh 64-district modal
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(ctx).pop();
+                        showDialog(
+                          context: context,
+                          builder: (c) => BangladeshLocationPickerDialog(
+                            currentLocation: dinerState.userLocation,
+                            onLocationSelected: (newLoc) {
+                              context.read<DinerState>().setUserLocation(newLoc);
+                            },
+                          ),
+                        );
+                      },
+                      borderRadius: BorderRadius.circular(10),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.travel_explore_rounded,
+                                  size: 16, color: Color(0xFF653993)),
+                              const SizedBox(width: 6),
+                              Text(
+                                '+ Explore All 64 BD Districts',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                  color: const Color(0xFF653993),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              onTap: () {
-                context.read<DinerState>().setUserLocation(area);
-                Navigator.of(ctx).pop();
-              },
-            );
-          }).toList(),
-        ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: Text(
+                  'Cancel',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF706776),
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFA6056D),
+                  foregroundColor: Colors.white,
+                  shape: const StadiumBorder(),
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                  elevation: 0,
+                ),
+                onPressed: () {
+                  context.read<DinerState>().setUserLocation(selectedArea);
+                  Navigator.of(ctx).pop();
+                },
+                child: Text(
+                  'Apply Location',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

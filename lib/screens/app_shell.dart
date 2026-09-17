@@ -21,6 +21,7 @@ import 'diner/notifications_screen.dart';
 import 'diner/treat_ludo_game_screen.dart';
 import 'diner/treat_ludo_leaderboard_screen.dart';
 import 'diner/viral_trending_screen.dart';
+import 'diner/top_reviewed_feasts_screen.dart';
 import '../models/ludo_match_result.dart';
 
 class AppShell extends StatefulWidget {
@@ -229,6 +230,14 @@ class _AppShellState extends State<AppShell> {
           onNavigateNotifications: () => _navigateTo('notifications'),
           onNavigateProfile: () => _navigateTo('profile'),
           onExploreMore: () => _navigateTo('home'),
+        );
+
+      case 'reviews':
+        return TopReviewedFeastsScreen(
+          onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
+          onSelectDeal: (_) => _navigateTo('platters'),
+          onNavigateProfile: () => _navigateTo('profile'),
+          onNavigateNotifications: () => _navigateTo('notifications'),
         );
 
       case 'food_bar':

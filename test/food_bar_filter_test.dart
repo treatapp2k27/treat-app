@@ -121,6 +121,6 @@ void main() {
 
     // Should now be on Platters screen (redesigned mockup)
     expect(find.byType(PlatterPackagesScreen), findsOneWidget);
-    expect(find.text('The Sunset Sliders & Fries Feast'), findsOneWidget);
+    expect(find.text('The Fiesta Treat Platter'), findsOneWidget);
   });
 }

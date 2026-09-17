@@ -219,7 +219,6 @@ class DinerDrawer extends StatelessWidget {
                             // 2. View Profile Button UNDER the Name
                             InkWell(
                               onTap: () {
-                                Navigator.of(context).pop();
                                 onNavigate('profile');
                               },
                               borderRadius: BorderRadius.circular(999),
@@ -444,13 +443,13 @@ class DinerDrawer extends StatelessWidget {
 
                   // Reviews
                   _buildNavItem(
-                    route: 'food_bar',
+                    route: 'reviews',
                     title: 'Reviews',
                     subtitle: 'Honest Bite Takes',
                     icon: Icons.rate_review_rounded,
                     iconColor: TreatColors.secondary,
                     iconBg: const Color(0xFFF2E8F2),
-                    isActive: activeRoute == 'food_bar',
+                    isActive: activeRoute == 'reviews',
                   ),
                   const SizedBox(height: 6),
 

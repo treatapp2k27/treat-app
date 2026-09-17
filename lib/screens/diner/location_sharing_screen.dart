@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/asset_constants.dart';
+import '../../widgets/bangladesh_location_picker_dialog.dart';
 import '../../widgets/radar_pulse_widget.dart';
 
 class LocationSharingScreen extends StatefulWidget {
@@ -22,114 +23,17 @@ class LocationSharingScreen extends StatefulWidget {
 
 class _LocationSharingScreenState extends State<LocationSharingScreen> {
   void _showCityZipDialog() {
-    final controller = TextEditingController();
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: Row(
-          children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: const BoxDecoration(
-                color: Color(0xFFF2E8FC),
-                shape: BoxShape.circle,
-              ),
-              child: const Center(
-                child: Text('📍', style: TextStyle(fontSize: 18)),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              'Set Your Location',
-              style: GoogleFonts.plusJakartaSans(
-                fontWeight: FontWeight.w800,
-                fontSize: 18,
-                color: const Color(0xFF201A24),
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Enter your city name or postal zip code to find foodie platters nearby:',
-              style: GoogleFonts.dmSans(
-                fontSize: 13,
-                color: const Color(0xFF706776),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: controller,
-              autofocus: true,
-              style: GoogleFonts.plusJakartaSans(
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF201A24),
-              ),
-              decoration: InputDecoration(
-                hintText: 'e.g. Brooklyn, NY or 11201',
-                hintStyle: GoogleFonts.dmSans(color: const Color(0xFFA098A5), fontSize: 13),
-                filled: true,
-                fillColor: const Color(0xFFFBF6FD),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: Color(0xFFE2D6EE)),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: Color(0xFFE2D6EE)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: Color(0xFF7C52AA), width: 1.5),
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(
-              'Cancel',
-              style: GoogleFonts.plusJakartaSans(
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF706776),
-              ),
-            ),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF7C52AA),
-              foregroundColor: Colors.white,
-              shape: const StadiumBorder(),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              elevation: 0,
-            ),
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              final input = controller.text.trim();
-              if (widget.onLocationSelected != null && input.isNotEmpty) {
-                widget.onLocationSelected!(input);
-              } else {
-                widget.onSkip();
-              }
-            },
-            child: Text(
-              'Save & Continue',
-              style: GoogleFonts.plusJakartaSans(
-                fontWeight: FontWeight.w800,
-                fontSize: 13,
-              ),
-            ),
-          ),
-        ],
+      builder: (ctx) => BangladeshLocationPickerDialog(
+        currentLocation: 'Feni Sadar',
+        onLocationSelected: (loc) {
+          if (widget.onLocationSelected != null && loc.isNotEmpty) {
+            widget.onLocationSelected!(loc);
+          } else {
+            widget.onSkip();
+          }
+        },
       ),
     );
   }

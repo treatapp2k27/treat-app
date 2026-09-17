@@ -163,6 +163,10 @@ void main() {
 
     expect(find.text('Supreme Seafood Snack Bucket'), findsOneWidget);
     expect(find.text('\$64.00'), findsOneWidget);
+
+    await tester.drag(find.byType(ListView), const Offset(0, -400));
+    await tester.pumpAndSettle();
+
     expect(find.text('Treat Booking Guarantee'), findsOneWidget);
     expect(find.textContaining('Kitchen holds the table'), findsOneWidget);
 

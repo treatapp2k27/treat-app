@@ -45,6 +45,28 @@ void main() {
     expect(find.text('Location & Radius'), findsOneWidget);
     expect(find.text('Change'), findsOneWidget);
 
+    // Tap Change to open Select Trending Area modal
+    await tester.tap(find.text('Change'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Select Trending Area'), findsOneWidget);
+    expect(find.text('Preferred Road / Location (Feni Sadar)'), findsOneWidget);
+    expect(find.text('+ Explore All 64 BD Districts'), findsOneWidget);
+    expect(find.text('SSK Road'), findsOneWidget);
+    expect(find.text('Mohipal Road'), findsOneWidget);
+
+    // Tap a road chip (e.g. Mohipal Road)
+    await tester.tap(find.text('Mohipal Road'));
+    await tester.pumpAndSettle();
+
+    // Tap Apply Location
+    await tester.tap(find.text('Apply Location'));
+    await tester.pumpAndSettle();
+
+    // Verify modal dismissed and location updated
+    expect(find.text('Select Trending Area'), findsNothing);
+    expect(dinerState.userLocation, equals('Mohipal Road, Feni Sadar'));
+
     // 3. Verify Announcement Banner
     expect(find.textContaining('24 Viral Dishes'), findsOneWidget);
     expect(find.textContaining('trending near you right now'), findsOneWidget);

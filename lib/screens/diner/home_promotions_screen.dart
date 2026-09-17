@@ -4,9 +4,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/asset_constants.dart';
 import '../../core/theme/treat_colors.dart';
+import '../../models/bangladesh_locations.dart';
 import '../../models/platter_deal.dart';
 import '../../state/budget_planner_state.dart';
 import '../../state/diner_state.dart';
+import '../../widgets/bangladesh_location_picker_dialog.dart';
 
 class HomePromotionsScreen extends StatefulWidget {
   final VoidCallback onOpenDrawer;
@@ -243,7 +245,7 @@ class _HomePromotionsScreenState extends State<HomePromotionsScreen> {
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.only(top: 8, bottom: 48),
         children: [
-          // 0. Location Pill Bar (Shown ONLY for Foodie login, NOT for Explore without Login)
+          // 0. Location Pill Bar with Feni Sadar Quick Roads (Shown ONLY for Foodie login, NOT for Explore without Login)
           if (dinerState.isFoodieLoggedIn) ...[
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
@@ -287,297 +289,324 @@ class _HomePromotionsScreenState extends State<HomePromotionsScreen> {
   }
 
   // -------------------------------------------------------------
-  // Location Pill Bar (Shown only after TopBar for Foodie login)
+  // Optimized Topbar Map & Quick Location Bar
   // -------------------------------------------------------------
   Widget _buildLocationBar(BuildContext context) {
     final dinerState = context.watch<DinerState>();
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(
-          color: const Color(0xFFEADBEE),
-          width: 1.2,
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color.fromRGBO(124, 82, 170, 0.08),
-            blurRadius: 14,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
-      child: Row(
-        children: [
-          // Magenta circle with white location pin icon
-          Container(
-            width: 34,
-            height: 34,
-            decoration: const BoxDecoration(
-              color: Color(0xFFA6056D),
-              shape: BoxShape.circle,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Main Location & Map Pill Bar
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color: const Color(0xFFEADBEE),
+              width: 1.2,
             ),
-            child: const Center(
-              child: Icon(
-                Icons.location_on,
-                color: Colors.white,
-                size: 19,
+            boxShadow: const [
+              BoxShadow(
+                color: Color.fromRGBO(124, 82, 170, 0.09),
+                blurRadius: 16,
+                offset: Offset(0, 4),
               ),
-            ),
+            ],
           ),
-          const SizedBox(width: 8),
-
-          // User's location title
-          Expanded(
-            child: Text(
-              dinerState.userLocation,
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 14,
-                fontWeight: FontWeight.w800,
-                color: const Color(0xFF1E1624),
-                letterSpacing: -0.2,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          const SizedBox(width: 6),
-
-          // Magenta CHANGE button
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => _showChangeLocationModal(context),
-              borderRadius: BorderRadius.circular(999),
-              child: Ink(
-                padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5.5),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFA6056D),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+          child: Row(
+            children: [
+              // Dual Map Radar Pin Icon Button
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => _showChangeLocationModal(context),
                   borderRadius: BorderRadius.circular(999),
-                ),
-                child: Text(
-                  'CHANGE',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.white,
-                    letterSpacing: 0.4,
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFA6056D), Color(0xFF7C52AA)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFA6056D).withOpacity(0.25),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.location_on,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
+              const SizedBox(width: 8),
 
-          // Separator dot
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6),
-            child: Container(
-              width: 6.5,
-              height: 6.5,
-              decoration: const BoxDecoration(
-                color: Color(0xFFA6056D),
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-
-          // Purple radius dropdown pill
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => _showRadiusModal(context),
-              borderRadius: BorderRadius.circular(999),
-              child: Ink(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF653993),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      dinerState.locationRadius,
+              // User's location title
+              Expanded(
+                child: InkWell(
+                  onTap: () => _showChangeLocationModal(context),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 2),
+                    child: Text(
+                      dinerState.userLocation,
                       style: GoogleFonts.plusJakartaSans(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFF1E1624),
+                        letterSpacing: -0.2,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(width: 3),
-                    const Icon(
-                      Icons.keyboard_arrow_down_rounded,
-                      color: Colors.white,
-                      size: 16,
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            ),
+              const SizedBox(width: 6),
+
+              // Magenta CHANGE button (Preserves test expectation)
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => _showChangeLocationModal(context),
+                  borderRadius: BorderRadius.circular(999),
+                  child: Ink(
+                    padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFA6056D), Color(0xFFBF1180)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(999),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFA6056D).withOpacity(0.25),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.swap_horiz_rounded,
+                          color: Colors.white,
+                          size: 13,
+                        ),
+                        const SizedBox(width: 3),
+                        Text(
+                          'CHANGE',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                            letterSpacing: 0.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              // Separator dot
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                child: Container(
+                  width: 5,
+                  height: 5,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFE0D3E5),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+
+              // Purple radius dropdown pill (Preserves test expectation)
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => _showRadiusModal(context),
+                  borderRadius: BorderRadius.circular(999),
+                  child: Ink(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6.5),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF653993),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          dinerState.locationRadius,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(width: 3),
+                        const Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: Colors.white,
+                          size: 15,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
+
+        // Quick Road Selection Row under Feni Sadar (Multiple buttons right on Homepage)
+        const SizedBox(height: 7),
+        _buildFeniSadarQuickRoadsRow(context),
+      ],
+    );
+  }
+
+  // -------------------------------------------------------------
+  // Quick Road Buttons Row under Feni Sadar on Homepage
+  // -------------------------------------------------------------
+  Widget _buildFeniSadarQuickRoadsRow(BuildContext context) {
+    final dinerState = context.watch<DinerState>();
+    final roads = BangladeshLocations.feniSadarRoads;
+
+    return SizedBox(
+      height: 30,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        itemCount: roads.length + 2,
+        separatorBuilder: (_, __) => const SizedBox(width: 6),
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            // Label indicator
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF3EAF8),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: const Color(0xFFE2D4EA)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.explore_rounded,
+                      size: 13, color: Color(0xFFA6056D)),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Feni Sadar Roads:',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xFFA6056D),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          if (index == roads.length + 1) {
+            // "+ More BD Districts" button
+            return ActionChip(
+              visualDensity: VisualDensity.compact,
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+              backgroundColor: const Color(0xFFFBF6FD),
+              shape: const StadiumBorder(
+                side: BorderSide(color: Color(0xFFE5D7EB)),
+              ),
+              avatar: const Icon(
+                Icons.add_location_alt_rounded,
+                size: 12,
+                color: Color(0xFF653993),
+              ),
+              label: Text(
+                '+ All BD Districts',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w800,
+                  color: const Color(0xFF653993),
+                ),
+              ),
+              onPressed: () => _showChangeLocationModal(context),
+            );
+          }
+
+          final road = roads[index - 1];
+          final isSelected = dinerState.userLocation.contains(road);
+
+          return ActionChip(
+            visualDensity: VisualDensity.compact,
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+            backgroundColor: isSelected ? const Color(0xFFA6056D) : Colors.white,
+            shape: StadiumBorder(
+              side: BorderSide(
+                color: isSelected
+                    ? const Color(0xFFA6056D)
+                    : const Color(0xFFE5D7EB),
+                width: isSelected ? 1.4 : 1.0,
+              ),
+            ),
+            avatar: Icon(
+              isSelected ? Icons.check : Icons.near_me_rounded,
+              size: 12,
+              color: isSelected ? Colors.white : const Color(0xFFA6056D),
+            ),
+            label: Text(
+              road,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 10.5,
+                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w700,
+                color: isSelected ? Colors.white : const Color(0xFF2C2235),
+              ),
+            ),
+            onPressed: () {
+              context.read<DinerState>().setUserLocation('$road, Feni Sadar');
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Location updated to $road, Feni Sadar'),
+                  duration: const Duration(milliseconds: 1500),
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                  backgroundColor: const Color(0xFFA6056D),
+                ),
+              );
+            },
+          );
+        },
       ),
     );
   }
 
   void _showChangeLocationModal(BuildContext context) {
-    final textController = TextEditingController();
-    final quickOptions = [
-      'Soho Quarter',
-      'East Village',
-      'Williamsburg',
-      'Chelsea',
-      'Downtown',
-      'Brooklyn',
-    ];
-
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: Row(
-          children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: const BoxDecoration(
-                color: Color(0xFFFDE8F4),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.location_on,
-                color: Color(0xFFA6056D),
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              'Change Location',
-              style: GoogleFonts.plusJakartaSans(
-                fontWeight: FontWeight.w800,
-                fontSize: 18,
-                color: const Color(0xFF201A24),
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Quick neighborhood select:',
-              style: GoogleFonts.dmSans(
-                fontSize: 12.5,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF706776),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: quickOptions.map((opt) {
-                return ActionChip(
-                  label: Text(
-                    opt,
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 11.5,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF201A24),
-                    ),
-                  ),
-                  backgroundColor: const Color(0xFFF8F2FC),
-                  shape: const StadiumBorder(
-                    side: BorderSide(color: Color(0xFFE2D6EE)),
-                  ),
-                  onPressed: () {
-                    context.read<DinerState>().setUserLocation(opt);
-                    Navigator.of(ctx).pop();
-                  },
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Or enter a custom city or zip code:',
-              style: GoogleFonts.dmSans(
-                fontSize: 12.5,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF706776),
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: textController,
-              autofocus: false,
-              style: GoogleFonts.plusJakartaSans(
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF201A24),
-              ),
-              decoration: InputDecoration(
-                hintText: 'e.g. Soho Quarter or 10012',
-                hintStyle: GoogleFonts.dmSans(
-                  color: const Color(0xFFA098A5),
-                  fontSize: 13,
-                ),
-                filled: true,
-                fillColor: const Color(0xFFFBF6FD),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: Color(0xFFE2D6EE)),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: Color(0xFFE2D6EE)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: Color(0xFFA6056D), width: 1.5),
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(
-              'Cancel',
-              style: GoogleFonts.plusJakartaSans(
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF706776),
-              ),
-            ),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFA6056D),
-              foregroundColor: Colors.white,
-              shape: const StadiumBorder(),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              elevation: 0,
-            ),
-            onPressed: () {
-              final val = textController.text.trim();
-              if (val.isNotEmpty) {
-                context.read<DinerState>().setUserLocation(val);
-              }
-              Navigator.of(ctx).pop();
-            },
-            child: Text(
-              'Update Location',
-              style: GoogleFonts.plusJakartaSans(
-                fontWeight: FontWeight.w800,
-                fontSize: 13,
-              ),
-            ),
-          ),
-        ],
+      builder: (ctx) => BangladeshLocationPickerDialog(
+        currentLocation: context.read<DinerState>().userLocation,
+        onLocationSelected: (newLocation) {
+          context.read<DinerState>().setUserLocation(newLocation);
+        },
       ),
     );
   }

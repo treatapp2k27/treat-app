@@ -6,6 +6,7 @@ import 'package:treat/models/platter_deal.dart';
 import 'package:treat/screens/diner/home_promotions_screen.dart';
 import 'package:treat/state/budget_planner_state.dart';
 import 'package:treat/state/diner_state.dart';
+import 'package:treat/widgets/bangladesh_location_picker_dialog.dart';
 
 void main() {
   testWidgets('HomePromotionsScreen renders wireframe mockup layout and verifies workable carousel functionalities',
@@ -162,14 +163,17 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Change Location'), findsOneWidget);
-    expect(find.text('Williamsburg'), findsOneWidget);
+    expect(find.text('SSK Road'), findsWidgets);
 
-    // Select Williamsburg
-    await tester.tap(find.text('Williamsburg'));
+    // Select preferable road SSK Road from Quick Neighborhood selection
+    await tester.tap(find.descendant(
+      of: find.byType(BangladeshLocationPickerDialog),
+      matching: find.text('SSK Road'),
+    ));
     await tester.pumpAndSettle();
 
-    expect(dinerState.userLocation, equals('Williamsburg'));
-    expect(find.text('Williamsburg'), findsOneWidget);
+    expect(dinerState.userLocation, equals('SSK Road, Feni Sadar'));
+    expect(find.text('SSK Road, Feni Sadar'), findsWidgets);
 
     // Test tapping Radius
     await tester.tap(find.text('Within 2 mi'));
