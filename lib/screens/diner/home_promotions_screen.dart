@@ -19,6 +19,7 @@ class HomePromotionsScreen extends StatefulWidget {
   final VoidCallback? onNavigateFavorites;
   final VoidCallback? onBackToLogin;
   final VoidCallback? onNavigateLogin;
+  final VoidCallback? onLovedItGuest;
 
   const HomePromotionsScreen({
     super.key,
@@ -30,6 +31,7 @@ class HomePromotionsScreen extends StatefulWidget {
     this.onNavigateFavorites,
     this.onBackToLogin,
     this.onNavigateLogin,
+    this.onLovedItGuest,
   });
 
   @override
@@ -45,38 +47,54 @@ class _HomePromotionsScreenState extends State<HomePromotionsScreen> {
   int _activeCarouselPage = 0;
   final TextEditingController _searchController = TextEditingController();
 
-  final List<Map<String, dynamic>> _filters = [
+  final List<Map<String, dynamic>> _filters = const [
     {
       'label': 'Trending Platters',
       'icon': Icons.local_fire_department,
+      'color': Color(0xFFFF2A55), // Hot Coral Fire Pop
+      'shadow': Color(0x66FF2A55),
     },
     {
       'label': 'Squad Feasts',
       'icon': Icons.groups_rounded,
+      'color': Color(0xFF8B3AEE), // Electric Violet Pop
+      'shadow': Color(0x668B3AEE),
     },
     {
       'label': 'Flash Drops',
       'icon': Icons.bolt_rounded,
+      'color': Color(0xFFFF8800), // Sunburst Citrus Orange Pop
+      'shadow': Color(0x66FF8800),
     },
     {
       'label': 'Dessert Craze',
       'icon': Icons.cake_rounded,
+      'color': Color(0xFFFF2D87), // Bubblegum Candy Pink Pop
+      'shadow': Color(0x66FF2D87),
     },
     {
       'label': 'Taco & Nacho Trays',
       'icon': Icons.fastfood_rounded,
+      'color': Color(0xFF00B862), // Fiesta Lime Emerald Pop
+      'shadow': Color(0x6600B862),
     },
     {
       'label': 'Mega Deep-Dish',
       'icon': Icons.local_pizza_rounded,
+      'color': Color(0xFFFF4820), // Fiery Flame Tangerine Pop
+      'shadow': Color(0x66FF4820),
     },
     {
       'label': 'Slushie Pitchers',
       'icon': Icons.local_drink_rounded,
+      'color': Color(0xFF00A3FF), // Neon Electric Cyan Pop
+      'shadow': Color(0x6600A3FF),
     },
     {
       'label': 'Midnight Munchies',
       'icon': Icons.nightlife_rounded,
+      'color': Color(0xFF6366F1), // Royal Twilight Indigo Pop
+      'shadow': Color(0x666366F1),
     },
   ];
 
@@ -191,7 +209,7 @@ class _HomePromotionsScreenState extends State<HomePromotionsScreen> {
   void _toggleLoved(String id, String itemName) {
     final isFoodie = context.read<DinerState>().isFoodieLoggedIn;
     if (!isFoodie) {
-      (widget.onNavigateLogin ?? widget.onBackToLogin)?.call();
+      (widget.onLovedItGuest ?? widget.onNavigateLogin ?? widget.onBackToLogin)?.call();
       return;
     }
 
@@ -715,32 +733,16 @@ class _HomePromotionsScreenState extends State<HomePromotionsScreen> {
       automaticallyImplyLeading: false,
       titleSpacing: 16,
       toolbarHeight: 58,
-      title: Row(
-        children: [
-          // Hamburger Menu Button (Foodie) OR Back Button (Guest / Explore Without Sign In)
-          InkWell(
-            onTap: isFoodieLoggedIn ? widget.onOpenDrawer : widget.onBackToLogin,
-            borderRadius: BorderRadius.circular(999),
-            child: Container(
-              width: 40,
-              height: 40,
-              alignment: Alignment.center,
-              child: Icon(
-                isFoodieLoggedIn ? Icons.menu : Icons.arrow_back_ios_new_rounded,
-                color: TreatColors.onSurface,
-                size: isFoodieLoggedIn ? 24 : 20,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-
-          // Treat Logo (Treat button only enabled for Foodie login, not available for Explore Without Sign In)
-          Expanded(
-            child: InkWell(
-              onTap: isFoodieLoggedIn ? widget.onNavigateBudgetPlanner : null,
-              borderRadius: BorderRadius.circular(8),
-              child: Align(
-                alignment: Alignment.centerLeft,
+      title: SizedBox(
+        height: 58,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Center Treat Brand Logo (centered in div)
+            Center(
+              child: InkWell(
+                onTap: isFoodieLoggedIn ? widget.onNavigateBudgetPlanner : null,
+                borderRadius: BorderRadius.circular(8),
                 child: Image.asset(
                   AssetConstants.logo,
                   height: 30,
@@ -749,92 +751,133 @@ class _HomePromotionsScreenState extends State<HomePromotionsScreen> {
                 ),
               ),
             ),
-          ),
 
-
-          // Favorites, Notifications & Profile Avatar Icon Buttons (Shown ONLY for Foodie login, NOT in Explore without Sign In)
-          if (context.watch<DinerState>().isFoodieLoggedIn) ...[
-            const SizedBox(width: 4),
-            // Favorites Icon Button
-            InkWell(
-              onTap: widget.onNavigateFavorites,
-              borderRadius: BorderRadius.circular(999),
-              child: Container(
-                width: 38,
-                height: 38,
-                alignment: Alignment.center,
-                child: const Icon(
-                  Icons.favorite_border_rounded,
-                  color: TreatColors.onSurface,
-                  size: 24,
+            // Left: Hamburger Menu Button (Foodie) OR Back Button (Guest / Explore Without Sign In)
+            Positioned(
+              left: 0,
+              child: InkWell(
+                onTap: isFoodieLoggedIn ? widget.onOpenDrawer : widget.onBackToLogin,
+                borderRadius: BorderRadius.circular(999),
+                child: Container(
+                  width: 38,
+                  height: 38,
+                  alignment: Alignment.center,
+                  decoration: isFoodieLoggedIn
+                      ? null
+                      : BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: const Color(0xFFEDE5F2),
+                            width: 1.2,
+                          ),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color.fromRGBO(124, 82, 170, 0.08),
+                              blurRadius: 8,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                  child: Icon(
+                    isFoodieLoggedIn ? Icons.menu : Icons.arrow_back_ios_new_rounded,
+                    color: TreatColors.onSurface,
+                    size: isFoodieLoggedIn ? 24 : 17,
+                  ),
                 ),
               ),
             ),
-            const SizedBox(width: 4),
-            InkWell(
-              onTap: widget.onNavigateNotifications,
-              borderRadius: BorderRadius.circular(999),
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Container(
-                    width: 38,
-                    height: 38,
-                    alignment: Alignment.center,
-                    child: const Icon(
-                      Icons.notifications_none_rounded,
-                      color: TreatColors.onSurface,
-                      size: 24,
-                    ),
-                  ),
-                  Positioned(
-                    top: 5,
-                    right: 5,
-                    child: Container(
-                      padding: const EdgeInsets.all(3),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFD6228A),
-                        shape: BoxShape.circle,
-                      ),
-                      constraints: const BoxConstraints(
-                        minWidth: 15,
-                        minHeight: 15,
-                      ),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        '3',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 9,
-                          fontWeight: FontWeight.w800,
-                          height: 1,
+
+            // Favorites, Notifications & Profile Avatar Icon Buttons (Shown ONLY for Foodie login, NOT in Explore without Sign In)
+            if (isFoodieLoggedIn)
+              Positioned(
+                right: 0,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Favorites Icon Button
+                    InkWell(
+                      onTap: widget.onNavigateFavorites,
+                      borderRadius: BorderRadius.circular(999),
+                      child: Container(
+                        width: 38,
+                        height: 38,
+                        alignment: Alignment.center,
+                        child: const Icon(
+                          Icons.favorite_border_rounded,
+                          color: TreatColors.onSurface,
+                          size: 24,
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 6),
-            InkWell(
-              onTap: widget.onNavigateProfile,
-              borderRadius: BorderRadius.circular(999),
-              child: Container(
-                width: 36,
-                height: 36,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(0xFFD6228A),
+                    const SizedBox(width: 4),
+                    InkWell(
+                      onTap: widget.onNavigateNotifications,
+                      borderRadius: BorderRadius.circular(999),
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Container(
+                            width: 38,
+                            height: 38,
+                            alignment: Alignment.center,
+                            child: const Icon(
+                              Icons.notifications_none_rounded,
+                              color: TreatColors.onSurface,
+                              size: 24,
+                            ),
+                          ),
+                          Positioned(
+                            top: 5,
+                            right: 5,
+                            child: Container(
+                              padding: const EdgeInsets.all(3),
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFD6228A),
+                                shape: BoxShape.circle,
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 15,
+                                minHeight: 15,
+                              ),
+                              alignment: Alignment.center,
+                              child: const Text(
+                                '3',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    InkWell(
+                      onTap: widget.onNavigateProfile,
+                      borderRadius: BorderRadius.circular(999),
+                      child: Container(
+                        width: 36,
+                        height: 36,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color(0xFFD6228A),
+                        ),
+                        child: const Icon(
+                          Icons.person,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                child: const Icon(
-                  Icons.person,
-                  color: Colors.white,
-                  size: 20,
-                ),
               ),
-            ),
           ],
-        ],
+        ),
       ),
     );
   }
@@ -981,10 +1024,12 @@ class _HomePromotionsScreenState extends State<HomePromotionsScreen> {
           children: List.generate(_filters.length, (index) {
             final filter = _filters[index];
             final isSelected = index == _selectedFilterIndex;
+            final popColor = (filter['color'] as Color?) ?? TreatColors.secondary;
+            final popShadow = (filter['shadow'] as Color?) ?? const Color.fromRGBO(124, 82, 170, 0.35);
 
-            final bg = isSelected ? TreatColors.secondary : TreatColors.surfaceContainerLowest;
+            final bg = isSelected ? popColor : TreatColors.surfaceContainerLowest;
             final textFg = isSelected ? Colors.white : TreatColors.onSurface;
-            final iconFg = isSelected ? Colors.white : TreatColors.secondary;
+            final iconFg = isSelected ? Colors.white : popColor;
 
             return Padding(
               padding: EdgeInsets.only(right: index < _filters.length - 1 ? 8 : 0),
@@ -1011,11 +1056,11 @@ class _HomePromotionsScreenState extends State<HomePromotionsScreen> {
                         ? null
                         : Border.all(color: TreatColors.outlineVariant.withValues(alpha: 0.5)),
                     boxShadow: isSelected
-                        ? const [
+                        ? [
                             BoxShadow(
-                              color: Color.fromRGBO(124, 82, 170, 0.35),
-                              blurRadius: 10,
-                              offset: Offset(0, 3),
+                              color: popShadow,
+                              blurRadius: 12,
+                              offset: const Offset(0, 3),
                             )
                           ]
                         : null,

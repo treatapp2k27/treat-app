@@ -69,7 +69,7 @@ void main() {
     expect(find.text('Active: explore'), findsOneWidget);
   });
 
-  testWidgets('TreatBottomNavBar renders only Explore and Food Bar in guest mode',
+  testWidgets('TreatBottomNavBar renders same lower nav bar in guest mode as Sign page',
       (WidgetTester tester) async {
     tester.view.physicalSize = const Size(400, 800);
     tester.view.devicePixelRatio = 1.0;
@@ -99,16 +99,25 @@ void main() {
 
     await tester.pump();
 
-    // In guest mode: only Explore and Food Bar are shown
+    // In guest mode ("Without sign In"): lower navigation bar is same as Sign page
     expect(find.text('Explore'), findsOneWidget);
     expect(find.text('Food Bar'), findsOneWidget);
-    expect(find.text('Favorites'), findsNothing);
-    expect(find.text('Social'), findsNothing);
-    expect(find.text('Profile'), findsNothing);
+    expect(find.text('Feed'), findsOneWidget);
+    expect(find.text('Profile'), findsOneWidget);
 
     // Tap Food Bar
     await tester.tap(find.text('Food Bar'));
     await tester.pumpAndSettle();
     expect(selectedTab, equals(TreatNavTab.foodBar));
+
+    // Tap Feed
+    await tester.tap(find.text('Feed'));
+    await tester.pumpAndSettle();
+    expect(selectedTab, equals(TreatNavTab.social));
+
+    // Tap Profile
+    await tester.tap(find.text('Profile'));
+    await tester.pumpAndSettle();
+    expect(selectedTab, equals(TreatNavTab.profile));
   });
 }

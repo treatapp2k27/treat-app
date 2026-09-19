@@ -15,6 +15,7 @@ class TreatHeader extends StatelessWidget implements PreferredSizeWidget {
   final IconData actionIcon;
   final bool showSearch;
   final ValueChanged<String>? onSearchChanged;
+  final bool isGuest;
 
   const TreatHeader({
     super.key,
@@ -24,6 +25,7 @@ class TreatHeader extends StatelessWidget implements PreferredSizeWidget {
     this.actionIcon = Icons.tune,
     this.showSearch = true,
     this.onSearchChanged,
+    this.isGuest = false,
   });
 
   @override
@@ -96,7 +98,7 @@ class TreatHeader extends StatelessWidget implements PreferredSizeWidget {
                   height: 44,
                   child: Row(
                     children: [
-                      // Menu Drawer Button (Sleek 3-Line Hamburger Bar)
+                      // Menu Drawer Button (Sleek 3-Line Hamburger Bar) or Guest Back Button
                       if (onMenuTap != null)
                         InkWell(
                           onTap: onMenuTap,
@@ -104,9 +106,16 @@ class TreatHeader extends StatelessWidget implements PreferredSizeWidget {
                           child: Container(
                             width: 44,
                             height: 44,
+                            alignment: Alignment.center,
                             decoration: BoxDecoration(
-                              color: TreatColors.surfaceContainerLow,
+                              color: isGuest ? Colors.white : TreatColors.surfaceContainerLow,
                               shape: BoxShape.circle,
+                              border: isGuest
+                                  ? Border.all(
+                                      color: const Color(0xFFEDE5F2),
+                                      width: 1.2,
+                                    )
+                                  : null,
                               boxShadow: const [
                                 BoxShadow(
                                   color: Color.fromRGBO(124, 82, 170, 0.14),
@@ -115,10 +124,10 @@ class TreatHeader extends StatelessWidget implements PreferredSizeWidget {
                                 ),
                               ],
                             ),
-                            child: const Icon(
-                              Icons.menu,
-                              color: TreatColors.secondary,
-                              size: 24,
+                            child: Icon(
+                              isGuest ? Icons.arrow_back_ios_new_rounded : Icons.menu,
+                              color: isGuest ? TreatColors.onSurface : TreatColors.secondary,
+                              size: isGuest ? 18 : 24,
                             ),
                           ),
                         ),

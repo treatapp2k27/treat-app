@@ -51,12 +51,11 @@ void main() {
     // Verify location pill bar is NOT shown in guest mode
     expect(find.text('CHANGE'), findsNothing);
 
-    // Verify guest bottom nav only has Explore and Food Bar
+    // Verify guest bottom nav has the same navigation tabs as Sign page
     expect(find.text('Explore'), findsOneWidget);
     expect(find.text('Food Bar'), findsOneWidget);
-    expect(find.text('Favorites'), findsNothing);
-    expect(find.text('Social'), findsNothing);
-    expect(find.text('Profile'), findsNothing);
+    expect(find.text('Feed'), findsOneWidget);
+    expect(find.text('Profile'), findsOneWidget);
   });
 
   testWidgets('Full flow: Foodie Login -> Login Page -> Location Page -> Homepage with location bar and full nav tabs', (WidgetTester tester) async {

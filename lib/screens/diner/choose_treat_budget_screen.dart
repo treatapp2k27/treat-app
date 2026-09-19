@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../../core/constants/asset_constants.dart';
 import '../../core/theme/treat_colors.dart';
 import '../../core/theme/treat_typography.dart';
 import '../../models/favorite_item.dart';
@@ -8,22 +9,27 @@ import '../../models/platter_deal.dart';
 import '../../state/budget_planner_state.dart';
 import '../../state/diner_state.dart';
 import '../../widgets/treat_card.dart';
-import '../../widgets/treat_header.dart';
 
 class ChooseTreatBudgetScreen extends StatelessWidget {
   final VoidCallback onOpenDrawer;
   final Function(PlatterDeal deal) onSelectDeal;
   final VoidCallback? onBackToFoodBar;
+  final VoidCallback? onBack;
   final VoidCallback? onFindWithinBudget;
   final VoidCallback? onOpenFilters;
+  final VoidCallback? onLovedIt;
+  final ValueChanged<String>? onSearchChanged;
 
   const ChooseTreatBudgetScreen({
     super.key,
     required this.onOpenDrawer,
     required this.onSelectDeal,
     this.onBackToFoodBar,
+    this.onBack,
     this.onFindWithinBudget,
     this.onOpenFilters,
+    this.onLovedIt,
+    this.onSearchChanged,
   });
 
   void _showFilterSheet(BuildContext context, BudgetPlannerState state) {
@@ -204,22 +210,191 @@ class ChooseTreatBudgetScreen extends StatelessWidget {
     );
   }
 
+  PreferredSizeWidget _buildTopAppBar(BuildContext context, bool isFoodie) {
+    return AppBar(
+      backgroundColor: TreatColors.surface.withValues(alpha: 0.95),
+      elevation: 0,
+      scrolledUnderElevation: 2,
+      automaticallyImplyLeading: false,
+      titleSpacing: 16,
+      toolbarHeight: 58,
+      title: SizedBox(
+        height: 58,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Center Treat Brand Logo (centered in div)
+            Center(
+              child: Image.asset(
+                AssetConstants.logo,
+                height: 30,
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+              ),
+            ),
+
+            // Left: Hamburger Menu Button (Foodie) OR Back Button (Guest / Explore Without Sign In)
+            Positioned(
+              left: 0,
+              child: InkWell(
+                onTap: isFoodie ? onOpenDrawer : (onBack ?? onBackToFoodBar),
+                borderRadius: BorderRadius.circular(999),
+                child: Container(
+                  width: 38,
+                  height: 38,
+                  alignment: Alignment.center,
+                  decoration: isFoodie
+                      ? null
+                      : BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: const Color(0xFFEDE5F2),
+                            width: 1.2,
+                          ),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color.fromRGBO(124, 82, 170, 0.08),
+                              blurRadius: 8,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                  child: Icon(
+                    isFoodie ? Icons.menu : Icons.arrow_back_ios_new_rounded,
+                    color: TreatColors.onSurface,
+                    size: isFoodie ? 24 : 17,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSearchAndFiltersRow(BuildContext context, BudgetPlannerState state) {
+    return Row(
+      children: [
+        // Pill Search Input
+        Expanded(
+          child: Container(
+            height: 44,
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(
+                color: const Color(0xFFEADBEE),
+                width: 1.2,
+              ),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color.fromRGBO(124, 82, 170, 0.08),
+                  blurRadius: 12,
+                  offset: Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.search,
+                  size: 20,
+                  color: TreatColors.tertiary,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: TextField(
+                    onChanged: onSearchChanged,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: TreatColors.onSurface,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: 'Search sweets, spots & treats...',
+                      hintStyle: GoogleFonts.plusJakartaSans(
+                        color: TreatColors.onSurfaceVariant.withValues(alpha: 0.6),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      border: InputBorder.none,
+                      isDense: true,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+
+        // Filters Button
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onOpenFilters ?? () => _showFilterSheet(context, state),
+            borderRadius: BorderRadius.circular(999),
+            child: Ink(
+              height: 44,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF7C52AA), Color(0xFF6B3A9B)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(999),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color.fromRGBO(124, 82, 170, 0.30),
+                    blurRadius: 12,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.tune, color: Colors.white, size: 18),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Filters',
+                    style: GoogleFonts.plusJakartaSans(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = context.watch<BudgetPlannerState>();
+    final isFoodie = context.watch<DinerState>().isFoodieLoggedIn;
     final matches = state.matchedPlatters;
 
     return Scaffold(
       backgroundColor: TreatColors.background,
-      appBar: TreatHeader(
-        onMenuTap: onOpenDrawer,
-        actionLabel: 'Filters',
-        actionIcon: Icons.tune,
-        onActionTap: onOpenFilters ?? () => _showFilterSheet(context, state),
-      ),
+      appBar: _buildTopAppBar(context, isFoodie),
       body: ListView(
-        padding: const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 36),
+        padding: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 36),
         children: [
+          // Search & Filters Row (Below Topbar)
+          _buildSearchAndFiltersRow(context, state),
+          const SizedBox(height: 14),
+
           // Smart Matcher Card
           TreatCard(
             padding: const EdgeInsets.all(18),
@@ -927,6 +1102,10 @@ class ChooseTreatBudgetScreen extends StatelessWidget {
                                       final isLoved = context.watch<DinerState>().isFavorite(deal.id);
                                       return InkWell(
                                         onTap: () {
+                                          if (!isFoodie) {
+                                            onLovedIt?.call();
+                                            return;
+                                          }
                                           final added = context.read<DinerState>().toggleFavorite(FavoriteItem.fromPlatterDeal(deal));
                                           ScaffoldMessenger.of(context).hideCurrentSnackBar();
                                           ScaffoldMessenger.of(context).showSnackBar(

@@ -4,6 +4,7 @@ import '../core/theme/treat_colors.dart';
 import '../state/diner_state.dart';
 import '../widgets/diner_drawer.dart';
 import '../widgets/treat_bottom_nav_bar.dart';
+import '../widgets/guest_auth_overlay.dart';
 import 'diner/choose_treat_budget_screen.dart';
 import 'diner/treat_social_screen.dart';
 import 'diner/favorites_screen.dart';
@@ -36,10 +37,28 @@ class _AppShellState extends State<AppShell> {
   String _currentScreen = 'opening';
   List<LudoPlayerStanding>? _lastLudoStandings;
   LudoMatchResult? _lastLudoMatchResult;
+  bool _showGuestActionModal = false;
+  String _guestActionModalType = 'feed';
 
   void _navigateTo(String screen) {
     setState(() {
       _currentScreen = screen;
+      _showGuestActionModal = false;
+    });
+  }
+
+  void _dismissGuestModal() {
+    if (_showGuestActionModal) {
+      setState(() {
+        _showGuestActionModal = false;
+      });
+    }
+  }
+
+  void _showGuestModalFor(String type) {
+    setState(() {
+      _showGuestActionModal = true;
+      _guestActionModalType = type;
     });
   }
 
@@ -49,6 +68,15 @@ class _AppShellState extends State<AppShell> {
       builder: (context, constraints) {
         final isFoodieLoggedIn = context.watch<DinerState>().isFoodieLoggedIn;
         final isDiner = _isDinerScreen();
+        final isScreenRestricted = !isFoodieLoggedIn &&
+            (_currentScreen == 'social' ||
+                _currentScreen == 'groups' ||
+                _currentScreen == 'profile');
+        final showGuestAuthOverlay =
+            isScreenRestricted || (!isFoodieLoggedIn && _showGuestActionModal);
+        final effectivePanelType = isScreenRestricted
+            ? (_currentScreen == 'profile' ? 'profile' : 'feed')
+            : _guestActionModalType;
 
         // Responsive Panel Design:
         // Full width on mobile (<960), centered with generous 960px panel on desktop/tablet
@@ -76,7 +104,26 @@ class _AppShellState extends State<AppShell> {
           body: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 960),
-              child: _buildCurrentScreenWithSwitcher(),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  _buildCurrentScreenWithSwitcher(),
+                  if (showGuestAuthOverlay)
+                    Positioned.fill(
+                      child: GuestAuthOverlay(
+                        panelType: effectivePanelType,
+                        onSignIn: () => _navigateTo('welcome_persona'),
+                        onBackToExplore: () {
+                          if (isScreenRestricted) {
+                            _navigateTo('home');
+                          } else {
+                            _dismissGuestModal();
+                          }
+                        },
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
           bottomNavigationBar: isDiner ? _buildDinerBottomNav() : null,
@@ -216,7 +263,15 @@ class _AppShellState extends State<AppShell> {
           onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
           onBackToLogin: () => _navigateTo('welcome'),
           onNavigateLogin: () => _navigateTo('welcome_persona'),
-          onSelectDeal: (_) => _navigateTo('platters'),
+          onLovedItGuest: () => _showGuestModalFor('favorites'),
+          onSelectDeal: (_) {
+            final isFoodie = context.read<DinerState>().isFoodieLoggedIn;
+            if (!isFoodie) {
+              _showGuestModalFor('view_details');
+            } else {
+              _navigateTo('platters');
+            }
+          },
           onNavigateBudgetPlanner: () => _navigateTo('budget'),
           onNavigateProfile: () => _navigateTo('profile'),
           onNavigateNotifications: () => _navigateTo('notifications'),
@@ -242,20 +297,25 @@ class _AppShellState extends State<AppShell> {
 
       case 'food_bar':
         final isFoodie = context.watch<DinerState>().isFoodieLoggedIn;
-        if (!isFoodie) {
-          return PlatterPackagesScreen(
-            onOpenDrawer: () {},
-            onBackToLogin: () => _navigateTo('welcome'),
-            onSelectPlatter: (_) => _navigateTo('booking_hold'),
-            onEditBudget: () => _navigateTo('budget'),
-            onNavigateNotifications: () => _navigateTo('notifications'),
-          );
-        }
         return ChooseTreatBudgetScreen(
-          onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
-          onSelectDeal: (_) => _navigateTo('platters'),
+          onOpenDrawer: () {
+            if (isFoodie) {
+              _scaffoldKey.currentState?.openDrawer();
+            } else {
+              _navigateTo('welcome');
+            }
+          },
+          onSelectDeal: (_) {
+            if (!isFoodie) {
+              _showGuestModalFor('select_platter');
+            } else {
+              _navigateTo('platters');
+            }
+          },
+          onLovedIt: () => _showGuestModalFor('favorites'),
           onFindWithinBudget: () => _navigateTo('platters'),
-          onBackToFoodBar: () => _navigateTo('home'),
+          onBackToFoodBar: () => _navigateTo(isFoodie ? 'home' : 'welcome'),
+          onBack: () => _navigateTo(isFoodie ? 'home' : 'welcome'),
         );
 
       case 'favorites':
@@ -298,11 +358,18 @@ class _AppShellState extends State<AppShell> {
         );
 
       case 'platters':
+        final isFoodie = context.watch<DinerState>().isFoodieLoggedIn;
         return PlatterPackagesScreen(
           onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
-          onBackToLogin: () => _navigateTo('welcome'),
-          onSelectPlatter: (_) => _navigateTo('booking_hold'),
-          onEditBudget: () => _navigateTo('budget'),
+          onBackToLogin: () => _navigateTo(isFoodie ? 'welcome' : 'food_bar'),
+          onSelectPlatter: (_) {
+            if (!isFoodie) {
+              _showGuestModalFor('select_platter');
+            } else {
+              _navigateTo('booking_hold');
+            }
+          },
+          onEditBudget: () => _navigateTo('food_bar'),
           onNavigateNotifications: () => _navigateTo('notifications'),
         );
 

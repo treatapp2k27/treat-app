@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:treat/core/theme/treat_theme.dart';
 import 'package:treat/screens/app_shell.dart';
+import 'package:treat/screens/diner/choose_treat_budget_screen.dart';
 import 'package:treat/screens/diner/gateway_explore_screen.dart';
 import 'package:treat/screens/diner/home_promotions_screen.dart';
 import 'package:treat/screens/diner/platter_packages_screen.dart';
@@ -118,25 +119,42 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 350));
 
-    // 9. Food Bar should show PlatterPackagesScreen
+    // 9. Food Bar should show ChooseTreatBudgetScreen at first
+    expect(find.byType(ChooseTreatBudgetScreen), findsOneWidget);
+    expect(find.text('SMART MATCHER'), findsOneWidget);
+
+    // 10. Tap 'FIND IT WITHIN BUDGET' to see platters
+    final findBudgetBtn = find.text('FIND IT WITHIN BUDGET');
+    expect(findBudgetBtn, findsOneWidget);
+    await tester.ensureVisible(findBudgetBtn);
+    await tester.pumpAndSettle();
+    await tester.tap(findBudgetBtn);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 350));
+
     expect(find.byType(PlatterPackagesScreen), findsOneWidget);
     expect(find.text('food platters & packs'), findsOneWidget);
     expect(find.text('The Sunset Sliders & Fries Feast'), findsOneWidget);
 
-    // 10. Loved It must NOT be available on this screen in guest mode
+    // 11. Loved It must NOT be available on this screen in guest mode
     expect(find.text('Loved It'), findsNothing);
 
-    // 11. Share with Squad IS available
+    // 12. Share with Squad IS available
     expect(find.text('Share with Squad'), findsWidgets);
 
-    // 12. Inside 'Explore Without Sign In', Treat button at the top shouldn't be visible
-    expect(find.text('Filter'), findsNothing);
-    expect(find.text('TREAT'), findsNothing);
-
-    // 13. Verify back button on PlatterPackagesScreen redirects to gateway
+    // 13. Verify back button on PlatterPackagesScreen redirects to Food Bar panel
     final platterBackBtn = find.byIcon(Icons.arrow_back_ios_new_rounded);
     expect(platterBackBtn, findsOneWidget);
     await tester.tap(platterBackBtn);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 350));
+
+    expect(find.byType(ChooseTreatBudgetScreen), findsOneWidget);
+
+    // 14. Verify back button on ChooseTreatBudgetScreen redirects to Gateway
+    final budgetBackBtn = find.byIcon(Icons.arrow_back_ios_new_rounded);
+    expect(budgetBackBtn, findsOneWidget);
+    await tester.tap(budgetBackBtn);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 350));
 

@@ -11,7 +11,7 @@ import 'package:treat/widgets/bangladesh_location_picker_dialog.dart';
 void main() {
   testWidgets('HomePromotionsScreen renders wireframe mockup layout and verifies workable carousel functionalities',
       (WidgetTester tester) async {
-    tester.view.physicalSize = const Size(500, 3000);
+    tester.view.physicalSize = const Size(960, 3000);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() => tester.view.resetPhysicalSize());
 
@@ -56,14 +56,37 @@ void main() {
     expect(find.text('Search sweets, spots & group pla...'), findsOneWidget);
     expect(find.byIcon(Icons.tune_rounded), findsOneWidget);
 
-    // 4. Verify Filter Chips
+    // 4. Verify Filter Chips with Joyful Pop colors
     expect(find.text('Trending Platters'), findsOneWidget);
     expect(find.text('Squad Feasts'), findsOneWidget);
     expect(find.text('Flash Drops'), findsOneWidget);
 
-    // Test filter selection tap
+    // Initial selected is Trending Platters (Hot Coral: Color(0xFFFF2A55))
+    final trendingChip = tester.widget<AnimatedContainer>(
+      find.ancestor(of: find.text('Trending Platters'), matching: find.byType(AnimatedContainer)).first,
+    );
+    final trendingBox = trendingChip.decoration as BoxDecoration?;
+    expect(trendingBox?.color, equals(const Color(0xFFFF2A55)));
+
+    // Test filter selection tap: Squad Feasts (Electric Violet: Color(0xFF8B3AEE))
     await tester.tap(find.text('Squad Feasts'));
-    await tester.pump(const Duration(milliseconds: 200));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    final squadFeastsChip = tester.widget<AnimatedContainer>(
+      find.ancestor(of: find.text('Squad Feasts'), matching: find.byType(AnimatedContainer)).first,
+    );
+    final squadFeastsBox = squadFeastsChip.decoration as BoxDecoration?;
+    expect(squadFeastsBox?.color, equals(const Color(0xFF8B3AEE)));
+
+    // Test filter selection tap: Trending Platters (Hot Coral: Color(0xFFFF2A55))
+    await tester.tap(find.text('Trending Platters'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    final trendingChipAfter = tester.widget<AnimatedContainer>(
+      find.ancestor(of: find.text('Trending Platters'), matching: find.byType(AnimatedContainer)).first,
+    );
+    final trendingBoxAfter = trendingChipAfter.decoration as BoxDecoration?;
+    expect(trendingBoxAfter?.color, equals(const Color(0xFFFF2A55)));
 
     // 5. Verify Section: HOT NEARBY & Hottest Platters Near You
     expect(find.text('HOT NEARBY'), findsOneWidget);

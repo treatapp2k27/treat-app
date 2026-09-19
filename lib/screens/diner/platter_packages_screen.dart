@@ -468,15 +468,45 @@ class _PlatterPackagesScreenState extends State<PlatterPackagesScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(
-                  icon: Icon(
-                    isFoodieLoggedIn ? Icons.menu : Icons.arrow_back_ios_new_rounded,
-                    color: TreatColors.onSurface,
-                    size: isFoodieLoggedIn ? 24 : 20,
-                  ),
-                  tooltip: isFoodieLoggedIn ? 'Menu' : 'Back to Login',
-                  onPressed: isFoodieLoggedIn ? widget.onOpenDrawer : widget.onBackToLogin,
-                ),
+                isFoodieLoggedIn
+                    ? IconButton(
+                        icon: const Icon(
+                          Icons.menu,
+                          color: TreatColors.onSurface,
+                          size: 24,
+                        ),
+                        tooltip: 'Menu',
+                        onPressed: widget.onOpenDrawer,
+                      )
+                    : InkWell(
+                        onTap: widget.onBackToLogin,
+                        borderRadius: BorderRadius.circular(999),
+                        child: Container(
+                          width: 38,
+                          height: 38,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: const Color(0xFFEDE5F2),
+                              width: 1.2,
+                            ),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color.fromRGBO(124, 82, 170, 0.08),
+                                blurRadius: 8,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.arrow_back_ios_new_rounded,
+                            color: TreatColors.onSurface,
+                            size: 17,
+                          ),
+                        ),
+                      ),
                 Image.asset(
                   AssetConstants.logo,
                   height: 28,
